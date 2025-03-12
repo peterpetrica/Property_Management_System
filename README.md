@@ -87,7 +87,9 @@ cd Property_Management_System
 }
 ```
 
-然后，使用使用 CMake 配置构建，过程中需要梯子
+## 使用 cmake 构建
+
+使用 CMake 配置构建，过程中需要梯子
 
 ```bash
 cmake --preset=default
@@ -100,3 +102,17 @@ cmake --build build
 ```
 
 然后就能在 build 文件夹下看到构建好的文件了
+
+## 也可以直接使用脚本来构建和测试
+
+运行:
+
+```bash
+./run.sh
+```
+
+或者对于 windows 用户，运行：
+
+```powershell
+./run.ps1
+```

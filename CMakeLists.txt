@@ -1,9 +1,19 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.22)
 
 project(Property_Management_System)
 
 find_package(unofficial-sqlite3 CONFIG REQUIRED)
 
-add_executable(HelloWorld helloworld.c)
+set(SOURCES src/main.c src/factorial.c)
+set(HEADERS src/factorial.h)
 
-target_link_libraries(HelloWorld PRIVATE unofficial::sqlite3::sqlite3)
+add_executable(Factorial ${SOURCES} ${HEADERS})
+
+set_property(TARGET Factorial PROPERTY C_STANDARD 11)
+set_property(TARGET Factorial PROPERTY C_STANDARD_REQUIRED ON)
+
+target_link_libraries(Factorial PRIVATE unofficial::sqlite3::sqlite3)
+
+enable_testing() 
+
+add_subdirectory (tst)

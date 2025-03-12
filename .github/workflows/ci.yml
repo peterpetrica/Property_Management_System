@@ -1,0 +1,74 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: 构建
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: 安装依赖
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build
+
+      - name: 设置 vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgDirectory: "${{ github.workspace }}/vcpkg"
+          vcpkgJsonGlob: "**/vcpkg.json"
+
+      - name: 创建 CMakeUserPresets.json
+        run: |
+          echo '{
+            "version": 2,
+            "configurePresets": [
+              {
+                "name": "default",
+                "inherits": "vcpkg",
+                "environment": {
+                  "VCPKG_ROOT": "${{ github.workspace }}/vcpkg"
+                }
+              }
+            ]
+          }' > CMakeUserPresets.json
+
+      - name: 配置项目
+        run: cmake --preset=default
+
+      - name: 构建项目
+        run: cmake --build build
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: build/
+          retention-days: 1
+
+  test:
+    name: 测试
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: 下载构建产物
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+          path: build/
+
+      - name: 添加执行权限
+        run: chmod +x build/tst/Factorial_test
+
+      - name: 运行测试
+        run: ./build/tst/Factorial_test
