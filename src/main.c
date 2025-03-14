@@ -5,7 +5,7 @@
 
 int main()
 {
-    char a[] = "冯小龙没有枪!";
+    char a[] = "e!";
         puts(a);
     return 0;
 }
