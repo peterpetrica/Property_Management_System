@@ -1,4 +1,4 @@
-## 使用 windows开始
+## 使用 windows 开始
 
 最简便的方式是直接下载 Visual Studio 和 Github Desktop
 
