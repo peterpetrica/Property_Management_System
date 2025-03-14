@@ -1,7 +1,16 @@
 {
-  "dependencies": [
-    "sqlite3",
-    "openssl",
-    "libuuid"
-  ]
+    "name": "Property_Management_System",
+    "version": "1.0.0",
+    "dependencies": [
+        "sqlite3",
+        "openssl"
+    ],
+    "features": {
+        "linux": {
+            "description": "仅linux用得到uuid",
+            "dependencies": [
+                "libuuid"
+            ]
+        }
+    }
 }
