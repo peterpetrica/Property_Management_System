@@ -5,7 +5,7 @@
 
 int main()
 {
-    int a = 10;
-    printf("%d", a);
+    char a[] = "·ëĞ¡ÁúÃ»ÓĞÇ¹";
+        puts(a);
     return 0;
 }
