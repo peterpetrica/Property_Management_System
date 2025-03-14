@@ -1,11 +1,88 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "factorial.h"
+#include "db/database.h"
+#include "db/db_init.h"
+#include "auth/auth.h"
+#include "auth/tokens.h"
+#include "ui/ui_login.h"
+#include "ui/ui_main.h"
+#include "utils/file_ops.h"
+
+#define DB_FILENAME "property_management.db"
 
 int main()
 {
-    char a[] = "冯小龙没有枪!";
-        puts(a);
+    // 初始化UI
+    if (!init_ui())
+    {
+        fprintf(stderr, "无法初始化用户界面\n");
+        return 1;
+    }
+
+    // 获取数据目录
+    char data_dir[256];
+    if (!get_data_dir(data_dir, sizeof(data_dir)))
+    {
+        fprintf(stderr, "无法获取数据目录\n");
+        cleanup_ui();
+        return 1;
+    }
+
+    // 确保数据目录存在
+    if (!file_exists(data_dir))
+    {
+        if (!create_directory(data_dir))
+        {
+            fprintf(stderr, "无法创建数据目录: %s\n", data_dir);
+            cleanup_ui();
+            return 1;
+        }
+    }
+
+    // 构建数据库路径
+    char db_path[512];
+    snprintf(db_path, sizeof(db_path), "%s/%s", data_dir, DB_FILENAME);
+
+    // 初始化数据库
+    Database db;
+    if (db_init(&db, db_path) != SQLITE_OK)
+    {
+        fprintf(stderr, "无法初始化数据库\n");
+        cleanup_ui();
+        return 1;
+    }
+
+    // 初始化表结构和默认数据
+    if (db_init_tables(&db) != SQLITE_OK)
+    {
+        fprintf(stderr, "无法初始化数据库表\n");
+        db_close(&db);
+        cleanup_ui();
+        return 1;
+    }
+
+    // 显示登录界面
+    LoginResult login_result = show_login_screen(&db);
+
+    if (login_result.success)
+    {
+        // 登录成功，显示主界面
+        show_main_screen(&db, login_result.token, login_result.user_type);
+
+        // 登出时注销token
+        invalidate_token(&db, login_result.token);
+    }
+    else
+    {
+        printf("登录失败，程序退出\n");
+    }
+
+    // 清理资源
+    db_close(&db);
+    cleanup_ui();
+
     return 0;
 }
