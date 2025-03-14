@@ -3,15 +3,9 @@
 
 #include "factorial.h"
 
-int main(int argc, char *argv[])
+int main()
 {
-    if (argc < 2) {
-        printf("Usage: %s <number>\n", argv[0]);
-        return 1;
-    }
-
-    int n = atoi(argv[1]);
-    unsigned long long factorial = GetFactorial(n);
-    printf("The factorial of %d = %llu\n", n, factorial);
+    int a = 5;
+    printf("%d", a);
     return 0;
 }
