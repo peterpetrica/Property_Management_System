@@ -1,5 +1,5 @@
 {
-    "name": "Property_Management_System",
+    "name": "property-management-system",
     "version": "1.0.0",
     "dependencies": [
         "sqlite3",
