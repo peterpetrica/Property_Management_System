@@ -12,7 +12,7 @@
 
 ### 安装所需的必要软件
 
-- gcc（对于 windows 用户：MSVC）
+- gcc
 - git
 - cmake
 - ninja
