@@ -5,7 +5,7 @@
 
 int main()
 {
-    char a[] = "·ëĞ¡ÁúÃ»ÓĞÇ¹";
+    char a[] = "å†¯å°é¾™æ²¡æœ‰æª!";
         puts(a);
     return 0;
 }
