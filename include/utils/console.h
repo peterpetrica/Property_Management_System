@@ -7,6 +7,8 @@
 void read_password(char *password, size_t size);
 
 // 等待单个字符输入（无需按回车）
+#ifndef _WIN32
 int getch(void);
+#endif
 
 #endif /* CONSOLE_H */

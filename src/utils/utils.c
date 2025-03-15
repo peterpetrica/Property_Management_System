@@ -57,7 +57,7 @@ static char *generate_salt(size_t length)
         return NULL;
 
     // 使用OpenSSL的随机数生成器
-    unsigned char random_bytes[length];
+    unsigned char *random_bytes = (unsigned char *)malloc(length);
     if (RAND_bytes(random_bytes, length) != 1)
     {
         free(salt);
