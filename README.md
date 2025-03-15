@@ -1,16 +1,42 @@
-## 使用 windows 开始
+# 物业管理系统
+
+## 目前在做的事
+
+大家把自己正在写以及写完了的东西写在下面，免得写重了
+
+dch：
+
+ptc：
+
+fxl：
+
+zzm：
+
+## 项目指北
+
+[项目开发指南](./doc/guide.md)
+
+[项目总要求](./doc/require.md)
+
+![项目时序图](./images/项目时序图.png)
+
+![项目类图](./images/项目类图.png)
+
+## 快速开始
+
+### 使用 windows 开始
 
 最简便的方式是直接下载 Visual Studio 和 Github Desktop
 
-先使用 github desktop 克隆(clone)下本仓库，然后使用vs从文件夹打开，打开本项目，VS 应当会配置好所有内容，可以直接开始
+先使用 github desktop 克隆(clone)下本仓库，然后使用 vs 从文件夹打开，打开本项目，VS 应当会配置好所有内容，可以直接开始
 
 请**务必**挂上梯子或者有良好的网络环境（如校园网）
 
-请在VS的扩展商店搜索并安装```force utf-8```插件，来统一项目中文编码（需要推出VS来完成插件安装）
+请在 VS 的扩展商店搜索并安装`force utf-8`插件，来统一项目中文编码（需要推出 VS 来完成插件安装）
 
-## 使用 linux 开始
+### 使用 linux 开始
 
-### 安装所需的必要软件
+#### 安装所需的必要软件
 
 - gcc
 - git
@@ -23,7 +49,7 @@ ubuntu 下仅需：
 sudo apt-get install -y ninja-build git gcc cmake
 ```
 
-### 安装 vcpkg 并进行必要配置
+#### 安装 vcpkg 并进行必要配置
 
 选择一个你喜欢的地方拉下 vcpkg，并执行编译安装脚本
 
@@ -60,7 +86,7 @@ export PATH=$VCPKG_ROOT:$PATH
 }
 ```
 
-### 使用 cmake 构建
+#### 使用 cmake 构建
 
 使用 CMake 配置构建，过程中需要梯子
 
@@ -76,9 +102,15 @@ cmake --build build
 
 然后就能在 build 文件夹下看到构建好的文件了
 
-### 也可以直接使用脚本来构建和测试
+#### 也可以直接使用脚本来构建和测试
 
 运行:
+
+```bash
+./build.sh
+```
+
+然后：
 
 ```bash
 ./run.sh
