@@ -1,4 +1,10 @@
 cmake_minimum_required(VERSION 3.14)
+
+# 为vcpkg设置平台
+if(UNIX AND NOT APPLE)
+  set(VCPKG_MANIFEST_FEATURES "linux")
+endif()
+
 project(Property_Management_System VERSION 1.0.0 LANGUAGES C)
 
 # 设置C语言标准
@@ -15,20 +21,16 @@ endif()
 find_package(unofficial-sqlite3 CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED)
 
-# 处理 libuuid 依赖
-if(UNIX AND NOT APPLE)
-  find_package(PkgConfig REQUIRED)
-  pkg_check_modules(UUID REQUIRED uuid)
-  include_directories(${UUID_INCLUDE_DIRS})
-endif()
-
-# 创建一个变量来存储平台特定的链接库
 set(PLATFORM_LIBS "")
 if(UNIX AND NOT APPLE)
-  set(PLATFORM_LIBS ${UUID_LIBRARIES})
+  # 使用 vcpkg 的 libuuid
+  find_path(LIBUUID_INCLUDE_DIR uuid/uuid.h)
+  find_library(LIBUUID_LIBRARY uuid)
+  include_directories(${LIBUUID_INCLUDE_DIR})
+  set(PLATFORM_LIBS ${LIBUUID_LIBRARY})
 endif()
 
-# 创建一个变量来存储源文件
+# 源文件位置
 set(SOURCE_FILES
     src/main.c
     src/db/database.c
@@ -49,12 +51,12 @@ set(SOURCE_FILES
     src/utils/console.c
 )
 
-# 定义头文件路径
+# 头文件位置
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-# 定义可执行文件
+# 编译出来的程序名称
 add_executable(pms ${SOURCE_FILES})
 
 # 链接库
@@ -65,11 +67,11 @@ target_link_libraries(pms PRIVATE
 )
 
 # 添加测试
-option(BUILD_TESTS "Build the tests" OFF)
+option(BUILD_TESTS "Build the tests" ON)
 if(BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif()
 
-# 安装规则
+# 安装。。。就是放在这
 install(TARGETS pms DESTINATION bin)

@@ -66,7 +66,7 @@ char *get_data_dir(char *buffer, size_t size)
     }
 
 #ifdef _WIN32
-    // Windows平台
+    // Windows
     const char *appdata = getenv("APPDATA");
     if (!appdata)
     {
@@ -75,7 +75,7 @@ char *get_data_dir(char *buffer, size_t size)
 
     snprintf(buffer, size, "%s\\PropertyManagementSystem", appdata);
 #else
-    // Unix/Linux平台
+    // Linux
     const char *home = getenv("HOME");
     if (!home)
     {

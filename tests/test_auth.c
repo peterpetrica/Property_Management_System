@@ -3,7 +3,8 @@
 #include "auth/auth.h"
 #include "utils/utils.h"
 
-int main() {
+int main()
+{
     printf("Authentication tests\n");
     return 0;
 }

@@ -1,5 +1,5 @@
 #include "db/database.h"
-#include "db/db_init.h" // 添加此行
+#include "db/db_init.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -278,54 +278,17 @@ static const char *CREATE_TABLES[] = {
 // 初始化默认管理员账户
 static const char *INSERT_DEFAULT_ADMIN =
     "INSERT OR IGNORE INTO admins (id, name, password_hash, weight) "
-    "VALUES ('admin_001', 'admin', '$2a$12$K3JNi.UlZZN9OYlUNvLBLeEZVtUAQJLvUbYUmIIe2ZHl9xsBWWObi', 1);";
-// 注意: 密码为 'admin123'，实际应用中应当使用更安全的方式
+    "VALUES ('admin_001', 'admin', 'admin123', 1);";
+// **仅作示例**
 
 int db_init_tables(Database *db) // 修改函数名，避免与 database.c 中的 db_init 冲突
 {
-    if (!db || !db->db)
-    {
-        return SQLITE_ERROR;
-    }
-
-    int rc;
-
-    // 启用外键约束
-    rc = sqlite3_exec(db->db, "PRAGMA foreign_keys = ON;", NULL, NULL, NULL);
-    if (rc != SQLITE_OK)
-    {
-        fprintf(stderr, "无法启用外键约束: %s\n", sqlite3_errmsg(db->db));
-        return rc;
-    }
-
-    // 创建所有表
-    for (int i = 0; CREATE_TABLES[i] != NULL; i++)
-    {
-        rc = sqlite3_exec(db->db, CREATE_TABLES[i], NULL, NULL, NULL);
-        if (rc != SQLITE_OK)
-        {
-            fprintf(stderr, "创建表失败: %s\n", sqlite3_errmsg(db->db));
-            return rc;
-        }
-    }
-
-    return db_init_admin(db);
+    // TODO: 实现数据库表初始化功能
+    return SQLITE_OK;
 }
 
 int db_init_admin(Database *db)
 {
-    if (!db || !db->db)
-    {
-        return SQLITE_ERROR;
-    }
-
-    // 插入默认管理员账户
-    int rc = sqlite3_exec(db->db, INSERT_DEFAULT_ADMIN, NULL, NULL, NULL);
-    if (rc != SQLITE_OK)
-    {
-        fprintf(stderr, "插入默认管理员账户失败: %s\n", sqlite3_errmsg(db->db));
-        return rc;
-    }
-
+    // TODO: 实现默认管理员账户初始化功能
     return SQLITE_OK;
 }

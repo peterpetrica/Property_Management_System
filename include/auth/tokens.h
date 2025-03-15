@@ -2,7 +2,7 @@
 #define TOKENS_H
 
 #include "db/database.h"
-#include <stddef.h> // 添加 size_t 类型的定义
+#include <stddef.h>
 #include <stdbool.h>
 
 // 生成令牌

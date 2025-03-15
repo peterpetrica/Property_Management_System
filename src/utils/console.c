@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-// Linux下实现getch函数
+// Linux下所需的getch函数实现
 int getch(void)
 {
     struct termios oldattr, newattr;

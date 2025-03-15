@@ -1,3 +1,1 @@
-#!/bin/bash
-
-./build/pms
+scripts/run.sh

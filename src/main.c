@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "factorial.h"
 #include "db/database.h"
 #include "db/db_init.h"
 #include "auth/auth.h"
@@ -22,7 +21,7 @@ int main()
         return 1;
     }
 
-    // 获取数据目录
+    // 数据库保存的地方
     char data_dir[256];
     if (!get_data_dir(data_dir, sizeof(data_dir)))
     {
@@ -31,7 +30,7 @@ int main()
         return 1;
     }
 
-    // 确保数据目录存在
+    // 如不存在则创建
     if (!file_exists(data_dir))
     {
         if (!create_directory(data_dir))
@@ -42,7 +41,7 @@ int main()
         }
     }
 
-    // 构建数据库路径
+    // 数据库的路径
     char db_path[512];
     snprintf(db_path, sizeof(db_path), "%s/%s", data_dir, DB_FILENAME);
 
@@ -55,7 +54,7 @@ int main()
         return 1;
     }
 
-    // 初始化表结构和默认数据
+    // 初始化数据库的表和缺省数据
     if (db_init_tables(&db) != SQLITE_OK)
     {
         fprintf(stderr, "无法初始化数据库表\n");
@@ -64,12 +63,12 @@ int main()
         return 1;
     }
 
-    // 显示登录界面
+    // 登录界面
     LoginResult login_result = show_login_screen(&db);
 
     if (login_result.success)
     {
-        // 登录成功，显示主界面
+        // 主界面
         show_main_screen(&db, login_result.token, login_result.user_type);
 
         // 登出时注销token
