@@ -18,9 +18,9 @@ zzm：
 
 [项目总要求](./doc/require.md)
 
-[项目时序图](./images/项目时序图.png)
+![项目时序图](./images/项目时序图.png)
 
-[项目类图](./images/项目类图.png)
+![项目类图](./images/项目类图.png)
 
 ## 快速开始
 
