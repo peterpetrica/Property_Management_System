@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.22)
 
+if(UNIX AND NOT APPLE)
+  set(VCPKG_MANIFEST_FEATURES "linux")
+endif()
+
 project(Property_Management_System)
 
 find_package(unofficial-sqlite3 CONFIG REQUIRED)
