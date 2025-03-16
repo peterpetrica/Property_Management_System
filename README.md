@@ -18,13 +18,17 @@ zzm：
 
 [项目总要求](./doc/require.md)
 
+[SQLite 如何使用 C 语言调用？](https://zetcode.com/db/sqlitec)
+
+同时，你可以在名为 practice 的 branch 里进行开发的练习（可以在 Github Desktop 中切换）
+
 ![项目时序图](./images/项目时序图.png)
 
 ![项目类图](./images/项目类图.png)
 
 ## 快速开始
 
-### 使用 windows 开始
+### 使用 Windows 开始
 
 最简便的方式是直接下载 Visual Studio 和 Github Desktop
 
@@ -34,7 +38,7 @@ zzm：
 
 请在 VS 的扩展商店搜索并安装`force utf-8`插件，来统一项目中文编码（需要推出 VS 来完成插件安装）
 
-### 使用 linux 开始
+### 使用 Linux 开始
 
 #### 安装所需的必要软件
 

@@ -40,7 +40,6 @@ Property_Management_System/
 └── $HOME/.property_management/ # 数据库文件存放目录
 ```
 
-
 ## 2. 核心模块
 
 ### 2.1 认证模块 (auth)
@@ -48,15 +47,18 @@ Property_Management_System/
 认证模块负责用户登录、权限验证和令牌管理。
 
 #### 主要文件:
+
 - `auth.h/auth.c` - 定义用户认证和登录验证的函数
 - `tokens.h/tokens.c` - 令牌生成与管理的函数
 
 #### 主要功能:
+
 - 用户登录验证
 - 令牌生成与验证
 - 用户权限检查
 
 #### 示例函数:
+
 ```c
 // 用户登录
 AuthResult login(Database *db, const char *username, const char *password);
@@ -67,21 +69,24 @@ bool validate_token(Database *db, const char *token, int *weight, UserType *user
 
 ### 2.2 数据库模块 (db)
 
-数据库模块提供与SQLite数据库交互的核心功能。
+数据库模块提供与 SQLite 数据库交互的核心功能。
 
 #### 主要文件:
+
 - `database.h/database.c` - 数据库连接和基本操作
 - `db_init.h/db_init.c` - 数据库初始化和表结构创建
 - `db_query.h/db_query.c` - 数据库查询操作
 - `db_utils.h/db_utils.c` - 数据库工具函数
 
 #### 主要功能:
+
 - 数据库连接管理
 - 表结构初始化
 - 事务处理
 - 通用查询接口
 
 #### 示例函数:
+
 ```c
 // 打开数据库连接
 Database *db_open(const char *db_path);
@@ -98,6 +103,7 @@ bool db_transaction(Database *db, const char **sqls, int count);
 数据模型模块定义了系统中的各种实体及其操作。
 
 #### 主要文件:
+
 - `user.h/user.c` - 用户模型（管理员、服务人员、业主）
 - `building.h/building.c` - 楼宇模型
 - `apartment.h/apartment.c` - 房屋模型
@@ -105,11 +111,13 @@ bool db_transaction(Database *db, const char **sqls, int count);
 - `transaction.h/transaction.c` - 财务交易模型
 
 #### 主要功能:
-- CRUD操作（创建、读取、更新、删除）
+
+- CRUD 操作（创建、读取、更新、删除）
 - 关联查询
 - 数据验证
 
 #### 示例函数:
+
 ```c
 // 创建房屋
 bool create_apartment(Database *db, const char *token, Apartment *apartment);
@@ -132,6 +140,7 @@ bool update_owner(Database *db, const char *token, Owner *owner);
 用户界面模块负责与用户交互，显示菜单和处理用户输入。
 
 #### 主要文件:
+
 - `ui_main.h/ui_main.c` - 主界面
 - `ui_login.h/ui_login.c` - 登录界面
 - `ui_admin.h/ui_admin.c` - 管理员界面
@@ -139,11 +148,13 @@ bool update_owner(Database *db, const char *token, Owner *owner);
 - `ui_owner.h/ui_owner.c` - 业主界面
 
 #### 主要功能:
+
 - 菜单显示
 - 用户输入处理
 - 结果展示
 
 #### 示例函数:
+
 ```c
 // 显示主界面
 void show_main_screen(Database *db, const char *token, UserType user_type);
@@ -163,17 +174,20 @@ bool show_confirmation(const char *message);
 工具模块提供各种辅助功能，支持系统其他部分的运行。
 
 #### 主要文件:
+
 - `utils.h/utils.c` - 通用工具函数
 - `file_ops.h/file_ops.c` - 文件操作函数
-- `console.h/console.c` - 控制台UI辅助函数
+- `console.h/console.c` - 控制台 UI 辅助函数
 
 #### 主要功能:
+
 - 字符串处理
 - 文件读写
 - 屏幕绘制和格式化
 - 错误处理
 
 #### 示例函数:
+
 ```c
 // 安全字符串复制
 void safe_strcpy(char *dest, const char *src, size_t size);
@@ -193,12 +207,14 @@ void print_table(const char **headers, const char ***data, int rows, int cols);
 系统支持三种类型的用户，每种用户具有不同的权限和功能：
 
 1. **管理员 (USER_ADMIN)**
+
    - 添加/修改/删除所有用户信息
    - 管理小区、楼宇和房屋信息
    - 分配服务人员到楼宇
    - 查看系统中所有数据
 
 2. **物业服务人员 (USER_STAFF)**
+
    - 查看和更新自己负责的楼宇信息
    - 修改房屋的物业费信息
    - 向业主发送通知
@@ -210,11 +226,12 @@ void print_table(const char **headers, const char ***data, int rows, int cols);
 
 ## 4. 数据库结构
 
-系统使用SQLite数据库存储数据。主要表格包括：
+系统使用 SQLite 数据库存储数据。主要表格包括：
 
 ### 4.1 用户相关表
 
-#### admins表 (管理员信息)
+#### admins 表 (管理员信息)
+
 ```sql
 CREATE TABLE admins (
     id TEXT PRIMARY KEY,
@@ -224,7 +241,8 @@ CREATE TABLE admins (
 );
 ```
 
-#### staff表 (服务人员信息)
+#### staff 表 (服务人员信息)
+
 ```sql
 CREATE TABLE staff (
     id TEXT PRIMARY KEY,
@@ -236,7 +254,8 @@ CREATE TABLE staff (
 );
 ```
 
-#### owners表 (业主信息)
+#### owners 表 (业主信息)
+
 ```sql
 CREATE TABLE owners (
     id TEXT PRIMARY KEY,
@@ -250,7 +269,8 @@ CREATE TABLE owners (
 
 ### 4.2 物业相关表
 
-#### communities表 (小区信息)
+#### communities 表 (小区信息)
+
 ```sql
 CREATE TABLE communities (
     id TEXT PRIMARY KEY,
@@ -258,7 +278,8 @@ CREATE TABLE communities (
 );
 ```
 
-#### buildings表 (楼宇信息)
+#### buildings 表 (楼宇信息)
+
 ```sql
 CREATE TABLE buildings (
     id TEXT PRIMARY KEY,
@@ -270,7 +291,8 @@ CREATE TABLE buildings (
 );
 ```
 
-#### apartments表 (房屋信息)
+#### apartments 表 (房屋信息)
+
 ```sql
 CREATE TABLE apartments (
     id TEXT PRIMARY KEY,
@@ -287,7 +309,8 @@ CREATE TABLE apartments (
 );
 ```
 
-#### parking_spaces表 (停车位信息)
+#### parking_spaces 表 (停车位信息)
+
 ```sql
 CREATE TABLE parking_spaces (
     id TEXT PRIMARY KEY,
@@ -302,7 +325,8 @@ CREATE TABLE parking_spaces (
 
 ### 4.3 费用与服务相关表
 
-#### transactions表 (交易信息)
+#### transactions 表 (交易信息)
+
 ```sql
 CREATE TABLE transactions (
     id TEXT PRIMARY KEY,
@@ -317,7 +341,8 @@ CREATE TABLE transactions (
 );
 ```
 
-#### fee_standards表 (费用标准信息)
+#### fee_standards 表 (费用标准信息)
+
 ```sql
 CREATE TABLE fee_standards (
     id TEXT PRIMARY KEY,
@@ -328,7 +353,8 @@ CREATE TABLE fee_standards (
 );
 ```
 
-#### service_types表 (服务类型信息)
+#### service_types 表 (服务类型信息)
+
 ```sql
 CREATE TABLE service_types (
     id TEXT PRIMARY KEY,
@@ -337,7 +363,8 @@ CREATE TABLE service_types (
 );
 ```
 
-#### service_records表 (服务记录信息)
+#### service_records 表 (服务记录信息)
+
 ```sql
 CREATE TABLE service_records (
     id TEXT PRIMARY KEY,
@@ -356,7 +383,8 @@ CREATE TABLE service_records (
 
 ### 4.4 管理相关表
 
-#### staff_assignments表 (服务人员分配信息)
+#### staff_assignments 表 (服务人员分配信息)
+
 ```sql
 CREATE TABLE staff_assignments (
     id TEXT PRIMARY KEY,
@@ -369,7 +397,8 @@ CREATE TABLE staff_assignments (
 );
 ```
 
-#### tokens表 (用户令牌信息)
+#### tokens 表 (用户令牌信息)
+
 ```sql
 CREATE TABLE tokens (
     token TEXT PRIMARY KEY,
@@ -433,53 +462,57 @@ bool function_name(Database *db, const char *token, /* 其他参数 */)
 ### 5.2 常见操作示例
 
 #### 创建记录
+
 ```c
 bool create_entity(Database *db, const char *token, Entity *entity)
 {
     // 验证及权限检查...
-    
+
     // 构造INSERT SQL
     const char *sql = "INSERT INTO entities (id, name, ...) VALUES (?, ?, ...);";
-    
+
     // 准备语句、绑定参数、执行...
 }
 ```
 
 #### 查询记录
+
 ```c
 bool get_entity_by_id(Database *db, const char *id, Entity *entity)
 {
     // 验证...
-    
+
     // 构造SELECT SQL
     const char *sql = "SELECT * FROM entities WHERE id = ?;";
-    
+
     // 准备语句、绑定参数、执行查询、填充结构体...
 }
 ```
 
 #### 更新记录
+
 ```c
 bool update_entity(Database *db, const char *token, Entity *entity)
 {
     // 验证及权限检查...
-    
+
     // 构造UPDATE SQL
     const char *sql = "UPDATE entities SET name = ?, ... WHERE id = ?;";
-    
+
     // 准备语句、绑定参数、执行...
 }
 ```
 
 #### 删除记录
+
 ```c
 bool delete_entity(Database *db, const char *token, const char *id)
 {
     // 验证及权限检查...
-    
+
     // 构造DELETE SQL
     const char *sql = "DELETE FROM entities WHERE id = ?;";
-    
+
     // 准备语句、绑定参数、执行...
 }
 ```
