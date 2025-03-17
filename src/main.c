@@ -69,15 +69,6 @@ int main()
         return 1;
     }
 
-    // 初始化数据库的表和缺省数据
-    if (db_init_tables(&db) != SQLITE_OK)
-    {
-        fprintf(stderr, "无法初始化数据库表\n");
-        db_close(&db);
-        cleanup_ui();
-        return 1;
-    }
-
     // 登录界面
     LoginResult login_result = show_login_screen(&db);
 
