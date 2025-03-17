@@ -20,7 +20,7 @@
 
 #include "models/user.h"
 #include "utils/utils.h"
-#include "auth/tokens.h"
+#include "auth/auth.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,7 +33,7 @@ bool create_owner(Database *db, Owner *owner, const char *password)
 }
 
 // 更新业主信息
-bool update_owner(Database *db, const char *token, Owner *owner)
+bool update_owner(Database *db, const char *user_id, UserType user_type, Owner *owner)
 {
     // TODO: 实现更新业主信息功能
     return false;
@@ -54,7 +54,7 @@ bool create_staff(Database *db, Staff *staff, const char *password)
 }
 
 // 更新服务人员信息
-bool update_staff(Database *db, const char *token, Staff *staff)
+bool update_staff(Database *db, const char *user_id, UserType user_type, Staff *staff)
 {
     // TODO: 实现更新服务人员信息功能
     return false;
@@ -75,7 +75,7 @@ bool create_admin(Database *db, Admin *admin, const char *password)
 }
 
 // 更新管理员信息
-bool update_admin(Database *db, const char *token, Admin *admin)
+bool update_admin(Database *db, const char *user_id, UserType user_type, Admin *admin)
 {
     // TODO: 实现更新管理员信息功能
     return false;
@@ -89,7 +89,7 @@ bool get_admin_by_id(Database *db, const char *admin_id, Admin *admin)
 }
 
 // 删除用户 (仅管理员可用)
-bool delete_user(Database *db, const char *admin_token, const char *user_id, UserType user_type)
+bool delete_user(Database *db, const char *admin_id, UserType admin_type, const char *user_id, UserType user_type)
 {
     // TODO: 实现删除用户功能
     return false;

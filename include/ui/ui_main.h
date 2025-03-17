@@ -11,7 +11,7 @@ bool init_ui();
 void cleanup_ui();
 
 // 显示主界面
-void show_main_screen(Database *db, const char *token, UserType user_type);
+void show_main_screen(Database *db, const char *user_id, UserType user_type);
 
 // 显示错误信息
 void show_error(const char *message);

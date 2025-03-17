@@ -5,24 +5,24 @@
 #include "auth/auth.h"
 
 // 显示管理员主界面
-void show_admin_main_screen(Database *db, const char *token);
+void show_admin_main_screen(Database *db, const char *user_id, UserType user_type);
 
 // 信息管理界面
-void show_info_management_screen(Database *db, const char *token);
+void show_info_management_screen(Database *db, const char *user_id, UserType user_type);
 
 // 服务分配界面
-void show_service_assignment_screen(Database *db, const char *token);
+void show_service_assignment_screen(Database *db, const char *user_id, UserType user_type);
 
 // 信息查询界面
-void show_info_query_screen(Database *db, const char *token);
+void show_info_query_screen(Database *db, const char *user_id, UserType user_type);
 
 // 信息排序界面
-void show_info_sort_screen(Database *db, const char *token);
+void show_info_sort_screen(Database *db, const char *user_id, UserType user_type);
 
 // 信息统计界面
-void show_info_statistics_screen(Database *db, const char *token);
+void show_info_statistics_screen(Database *db, const char *user_id, UserType user_type);
 
 // 系统维护界面
-void show_system_maintenance_screen(Database *db, const char *token);
+void show_system_maintenance_screen(Database *db, const char *user_id, UserType user_type);
 
 #endif /* UI_ADMIN_H */

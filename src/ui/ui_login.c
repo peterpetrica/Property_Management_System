@@ -7,16 +7,12 @@
  * - 新用户注册
  * - 修改用户密码
  * - 管理员重置密码
- *
- * 提供用户身份认证和账户管理的交互式命令行界面，
- * 是系统的访问入口点。
  */
 
 #include "ui/ui_login.h"
 #include "ui/ui_main.h"
 #include "utils/utils.h"
 #include "models/user.h"
-#include "auth/tokens.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,7 +22,6 @@
 #include <conio.h>
 #else
 #include "utils/console.h"
-
 #include <termios.h>
 #include <unistd.h>
 #endif
@@ -34,7 +29,7 @@
 // 登录界面
 LoginResult show_login_screen(Database *db)
 {
-    LoginResult result = {false, "", 0, 0, ""};
+    LoginResult result = {false, 0, 0, ""};
     char username[64] = {0};
     char password[64] = {0};
     int choice;
@@ -112,15 +107,86 @@ bool show_registration_screen(Database *db)
 }
 
 // 修改密码界面
-bool show_change_password_screen(Database *db, const char *token, UserType user_type)
+bool show_change_password_screen(Database *db, const char *user_id, UserType user_type)
 {
-    // TODO: 实现修改密码界面功能
-    return false;
+    char old_password[64] = {0};
+    char new_password[64] = {0};
+    char confirm_password[64] = {0};
+
+    printf("\n===== 修改密码 =====\n");
+
+    printf("请输入当前密码: ");
+    read_password(old_password, sizeof(old_password));
+
+    printf("请输入新密码: ");
+    read_password(new_password, sizeof(new_password));
+
+    printf("请确认新密码: ");
+    read_password(confirm_password, sizeof(confirm_password));
+
+    if (strcmp(new_password, confirm_password) != 0)
+    {
+        printf("两次输入的新密码不一致！\n");
+        return false;
+    }
+
+    if (change_password(db, user_id, user_type, old_password, new_password))
+    {
+        printf("密码修改成功！\n");
+        return true;
+    }
+    else
+    {
+        printf("密码修改失败，当前密码可能不正确。\n");
+        return false;
+    }
 }
 
 // 重置密码界面 (仅管理员)
-bool show_reset_password_screen(Database *db, const char *token)
+bool show_reset_password_screen(Database *db, const char *admin_id, UserType admin_type)
 {
-    // TODO: 实现重置密码界面功能
-    return false;
+    if (admin_type != USER_ADMIN)
+    {
+        printf("只有管理员可以重置密码！\n");
+        return false;
+    }
+
+    char user_id[32] = {0};
+    int user_type_choice = 0;
+    UserType user_type;
+
+    printf("\n===== 重置用户密码 =====\n");
+
+    printf("请输入要重置密码的用户ID: ");
+    scanf("%31s", user_id);
+
+    printf("请选择用户类型 (1:管理员, 2:服务人员, 3:业主): ");
+    scanf("%d", &user_type_choice);
+
+    switch (user_type_choice)
+    {
+    case 1:
+        user_type = USER_ADMIN;
+        break;
+    case 2:
+        user_type = USER_STAFF;
+        break;
+    case 3:
+        user_type = USER_OWNER;
+        break;
+    default:
+        printf("无效的用户类型！\n");
+        return false;
+    }
+
+    if (reset_password(db, admin_id, admin_type, user_id, user_type))
+    {
+        printf("密码重置成功！\n");
+        return true;
+    }
+    else
+    {
+        printf("密码重置失败！\n");
+        return false;
+    }
 }

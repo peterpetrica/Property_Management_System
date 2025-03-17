@@ -44,27 +44,25 @@ Property_Management_System/
 
 ### 2.1 认证模块 (auth)
 
-认证模块负责用户登录、权限验证和令牌管理。
+认证模块负责用户登录和权限验证。
 
 #### 主要文件:
 
-- `auth.h/auth.c` - 定义用户认证和登录验证的函数
-- `tokens.h/tokens.c` - 令牌生成与管理的函数
+- `auth.h/auth.c` - 定义用户认证和权限验证的函数
 
 #### 主要功能:
 
 - 用户登录验证
-- 令牌生成与验证
 - 用户权限检查
 
 #### 示例函数:
 
 ```c
 // 用户登录
-AuthResult login(Database *db, const char *username, const char *password);
+LoginResult login(Database *db, const char *username, const char *password);
 
-// 验证令牌
-bool validate_token(Database *db, const char *token, int *weight, UserType *user_type);
+// 验证权限
+bool validate_permission(Database *db, const char *user_id, UserType user_type, int min_weight);
 ```
 
 ### 2.2 数据库模块 (db)

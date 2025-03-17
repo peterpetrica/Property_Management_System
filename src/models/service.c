@@ -18,21 +18,21 @@
 #include <time.h>
 
 // 添加服务类型
-bool add_service_type(Database *db, const char *token, ServiceType *type)
+bool add_service_type(Database *db, const char *user_id, UserType user_type, ServiceType *type)
 {
     // TODO: 实现添加服务类型功能
     return false;
 }
 
 // 修改服务类型
-bool update_service_type(Database *db, const char *token, ServiceType *type)
+bool update_service_type(Database *db, const char *user_id, UserType user_type, ServiceType *type)
 {
     // TODO: 实现修改服务类型功能
     return false;
 }
 
 // 删除服务类型
-bool delete_service_type(Database *db, const char *token, const char *type_id)
+bool delete_service_type(Database *db, const char *user_id, UserType user_type, const char *type_id)
 {
     // TODO: 实现删除服务类型功能
     return false;
@@ -46,21 +46,21 @@ bool list_service_types(Database *db, QueryResult *result)
 }
 
 // 记录服务
-bool record_service(Database *db, const char *token, ServiceRecord *record)
+bool record_service(Database *db, const char *user_id, UserType user_type, ServiceRecord *record)
 {
     // TODO: 实现记录服务功能
     return false;
 }
 
 // 获取服务记录
-bool get_service_records_by_staff(Database *db, const char *token, const char *staff_id, QueryResult *result)
+bool get_service_records_by_staff(Database *db, const char *user_id, UserType user_type, const char *staff_id, QueryResult *result)
 {
     // TODO: 实现获取员工服务记录功能
     return false;
 }
 
 // 获取房屋的服务记录
-bool get_service_records_by_apartment(Database *db, const char *token, const char *apartment_id, QueryResult *result)
+bool get_service_records_by_apartment(Database *db, const char *user_id, UserType user_type, const char *apartment_id, QueryResult *result)
 {
     // TODO: 实现获取房屋服务记录功能
     return false;

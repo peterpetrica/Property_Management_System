@@ -3,17 +3,19 @@
 ## 用户相关表
 
 ### 用户表 (users)
+
 - user_id (主键)
 - username (登录名)
 - password_hash (密码哈希)
 - name (姓名)
 - phone_number (电话)
 - email (邮箱)
-- role_id (角色ID，外键)
+- role_id (角色 ID，外键)
 - status (状态)
 - registration_date (注册日期)
 
 ### 角色表 (roles)
+
 - role_id (主键)
 - role_name (角色名：管理员、物业服务人员、业主)
 - permission_level (权限级别)
@@ -21,58 +23,66 @@
 ## 物业资源表
 
 ### 楼宇表 (buildings)
+
 - building_id (主键)
 - building_name (楼宇名称)
 - address (地址)
 - floors_count (楼层数)
 
 ### 房屋表 (rooms)
+
 - room_id (主键)
-- building_id (楼宇ID，外键)
+- building_id (楼宇 ID，外键)
 - room_number (房间号)
 - floor (楼层)
 - area_sqm (面积平方米)
-- owner_id (业主ID，外键)
+- owner_id (业主 ID，外键)
 - status (状态)
 
 ### 停车位表 (parking_spaces)
+
 - parking_id (主键)
 - parking_number (车位号)
-- owner_id (业主ID，外键)
+- owner_id (业主 ID，外键)
 - status (状态)
 
 ## 物业服务表
 
 ### 物业人员表 (staff)
+
 - staff_id (主键)
-- user_id (用户ID，外键)
-- staff_type_id (人员类型ID，外键)
+- user_id (用户 ID，外键)
+- staff_type_id (人员类型 ID，外键)
 - hire_date (入职日期)
 - status (状态)
 
 ### 人员类型表 (staff_types)
+
 - staff_type_id (主键)
 - type_name (类型名称：管家、保安、清洁工等)
 - description (描述)
 
 ### 服务区域表 (service_areas)
+
 - area_id (主键)
-- staff_id (物业人员ID，外键)
-- building_id (楼宇ID，外键)
+- staff_id (物业人员 ID，外键)
+- building_id (楼宇 ID，外键)
 - assignment_date (分配日期)
 
 ### 服务记录表 (service_records)
+
 - record_id (主键)
-- staff_id (物业人员ID，外键)
+- staff_id (物业人员 ID，外键)
 - service_type (服务类型)
 - service_date (服务日期)
 - description (描述)
 - status (状态)
-- target_id (目标ID：楼宇ID或房屋ID)
+- target_id (目标 ID：楼宇 ID 或房屋 ID)
 
 ## 费用相关表
 
 ### 费用标准表 (fee_standards)
+
 - standard_id (主键)
 - fee_type (费用类型：物业费、停车费等)
 - price_per_unit (单价)
@@ -81,10 +91,11 @@
 - end_date (结束日期)
 
 ### 交易表 (transactions)
+
 - transaction_id (主键)
-- user_id (用户ID，外键)
-- room_id (房屋ID，外键，物业费时有值)
-- parking_id (停车位ID，外键，停车费时有值)
+- user_id (用户 ID，外键)
+- room_id (房屋 ID，外键，物业费时有值)
+- parking_id (停车位 ID，外键，停车费时有值)
 - fee_type (费用类型)
 - amount (金额)
 - payment_date (支付日期)
@@ -93,7 +104,6 @@
 - status (状态：已付、未付、逾期)
 - period_start (账单开始日期)
 - period_end (账单结束日期)
-
 
 # 物业管理系统
 
@@ -309,10 +319,9 @@
 
 #### 统一查询接口
 
-姓名 密码，传入数据库，验证，成功返回临时 token 和 角色权重值
-数据库记录该 token 及其对应权重值
+姓名 密码，传入数据库，验证，成功返回用户 ID 和角色权重值
 使用构造查询语句对数据库查询
-包括 token 查询表单 查询内容
+包括 用户 ID 查询表单 查询内容
 数据库返回结果
 解析成对应格式，进行相应操作后展示
 

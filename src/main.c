@@ -20,7 +20,6 @@
 #include "db/database.h"
 #include "db/db_init.h"
 #include "auth/auth.h"
-#include "auth/tokens.h"
 #include "ui/ui_login.h"
 #include "ui/ui_main.h"
 #include "utils/file_ops.h"
@@ -75,10 +74,7 @@ int main()
     if (login_result.success)
     {
         // 主界面
-        show_main_screen(&db, login_result.token, login_result.user_type);
-
-        // 登出时注销token
-        invalidate_token(&db, login_result.token);
+        show_main_screen(&db, login_result.user_id, login_result.user_type);
     }
     else
     {

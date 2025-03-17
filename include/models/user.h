@@ -39,7 +39,7 @@ typedef struct
 bool create_owner(Database *db, Owner *owner, const char *password);
 
 // 更新业主信息
-bool update_owner(Database *db, const char *token, Owner *owner);
+bool update_owner(Database *db, const char *user_id, UserType user_type, Owner *owner);
 
 // 获取业主信息
 bool get_owner_by_id(Database *db, const char *owner_id, Owner *owner);
@@ -48,7 +48,7 @@ bool get_owner_by_id(Database *db, const char *owner_id, Owner *owner);
 bool create_staff(Database *db, Staff *staff, const char *password);
 
 // 更新服务人员信息
-bool update_staff(Database *db, const char *token, Staff *staff);
+bool update_staff(Database *db, const char *user_id, UserType user_type, Staff *staff);
 
 // 获取服务人员信息
 bool get_staff_by_id(Database *db, const char *staff_id, Staff *staff);
@@ -57,12 +57,12 @@ bool get_staff_by_id(Database *db, const char *staff_id, Staff *staff);
 bool create_admin(Database *db, Admin *admin, const char *password);
 
 // 更新管理员信息
-bool update_admin(Database *db, const char *token, Admin *admin);
+bool update_admin(Database *db, const char *user_id, UserType user_type, Admin *admin);
 
 // 获取管理员信息
 bool get_admin_by_id(Database *db, const char *admin_id, Admin *admin);
 
 // 删除用户 (仅管理员可用)
-bool delete_user(Database *db, const char *admin_token, const char *user_id, UserType user_type);
+bool delete_user(Database *db, const char *admin_id, UserType admin_type, const char *user_id, UserType user_type);
 
 #endif /* USER_H */

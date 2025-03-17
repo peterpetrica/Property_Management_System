@@ -16,7 +16,6 @@ typedef enum
 typedef struct
 {
     bool success;
-    char token[64];
     int weight;
     UserType user_type;
     char user_id[32];
@@ -25,16 +24,13 @@ typedef struct
 // 用户认证
 LoginResult authenticate_user(Database *db, const char *username, const char *password);
 
-// 验证token
-bool validate_token(Database *db, const char *token, int *weight, UserType *user_type);
+// 验证用户权限
+bool validate_permission(Database *db, const char *user_id, UserType user_type, int min_weight);
 
 // 更改密码
 bool change_password(Database *db, const char *user_id, UserType user_type, const char *old_password, const char *new_password);
 
 // 重置密码 (仅管理员)
-bool reset_password(Database *db, const char *admin_token, const char *user_id, UserType user_type);
-
-// 注销token
-bool invalidate_token(Database *db, const char *token);
+bool reset_password(Database *db, const char *admin_id, UserType admin_type, const char *user_id, UserType user_type);
 
 #endif /* AUTH_H */

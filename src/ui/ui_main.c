@@ -3,24 +3,6 @@
  * 文件名称：ui_main.c
  * 功能描述：物业管理系统的用户界面主要实现文件
  * ============================================================================
- *
- * 本文件包含物业管理系统UI的核心功能实现，主要负责：
- * - 用户界面的初始化和清理
- * - 主界面的显示与交互
- * - 错误和成功信息的展示
- * - 用户确认对话框的实现
- * - 界面辅助功能（如清屏、显示标题等）
- *
- * 预期实现：
- * - 提供一个简洁、直观的命令行界面
- * - 根据不同的用户类型(管理员、员工、业主)显示不同的界面选项
- * - 确保界面操作流畅、反馈明确
- *
- * 依赖模块：
- * - ui_admin.h: 管理员界面模块
- * - ui_staff.h: 员工界面模块
- * - ui_owner.h: 业主界面模块
- * - utils/console.h: 控制台工具函数
  */
 
 #include "ui/ui_main.h"
@@ -42,48 +24,78 @@
 
 bool init_ui()
 {
-    // TODO: 实现UI初始化
+    // 简单实现，只是清屏
+    system(CLEAR_COMMAND);
     return true;
 }
 
 void cleanup_ui()
 {
-    // TODO: 实现UI清理
-}
-
-// 主界面
-void show_main_screen(Database *db, const char *token, UserType user_type)
-{
-    // TODO: 实现主界面展示
-}
-
-// 显示错误信息
-void show_error(const char *message)
-{
-    // TODO: 实现错误信息展示
-}
-
-// 显示成功信息
-void show_success(const char *message)
-{
-    // TODO: 实现成功信息展示
-}
-
-// 显示确认对话框
-bool show_confirmation(const char *message)
-{
-    // TODO: 实现确认对话框
-    return false;
+    // 简单实现，不需要特别清理
 }
 
 // 清屏
 void clear_screen()
 {
-    // TODO: 实现清屏功能
+    system(CLEAR_COMMAND);
 }
 
 // 显示标题
 void show_title(const char *title)
 {
-    // TODO: 实现标题显示
+    clear_screen();
+    printf("\n===== %s =====\n\n", title);
+}
+
+// 主界面
+void show_main_screen(Database *db, const char *user_id, UserType user_type)
+{
+    if (!db || !user_id)
+    {
+        show_error("系统错误：无效的用户会话");
+        return;
+    }
+
+    // 根据用户类型显示不同的界面
+    switch (user_type)
+    {
+    case USER_ADMIN:
+        show_admin_main_screen(db, user_id, user_type);
+        break;
+    case USER_STAFF:
+        show_staff_main_screen(db, user_id, user_type);
+        break;
+    case USER_OWNER:
+        show_owner_main_screen(db, user_id, user_type);
+        break;
+    default:
+        show_error("未知的用户类型");
+        break;
+    }
+}
+
+// 显示错误信息
+void show_error(const char *message)
+{
+    printf("\n[错误] %s\n", message);
+    printf("按任意键继续...");
+    getch();
+}
+
+// 显示成功信息
+void show_success(const char *message)
+{
+    printf("\n[成功] %s\n", message);
+    printf("按任意键继续...");
+    getch();
+}
+
+// 显示确认对话框
+bool show_confirmation(const char *message)
+{
+    char choice;
+    printf("\n%s [y/n]: ", message);
+    choice = getch();
+    printf("%c\n", choice);
+    return (choice == 'y' || choice == 'Y');
 }

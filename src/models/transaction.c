@@ -22,8 +22,14 @@
 #include <time.h>
 
 // 添加费用标准
-bool add_fee_standard(Database *db, const char *token, FeeStandard *standard)
+bool add_fee_standard(Database *db, const char *user_id, UserType user_type, FeeStandard *standard)
 {
+    // 验证权限
+    if (!validate_permission(db, user_id, user_type, 2))
+    { // 假设权重2以上才能添加费用标准
+        return false;
+    }
+
     // TODO: 实现添加费用标准功能
     return false;
 }
@@ -36,15 +42,33 @@ bool get_current_fee_standard(Database *db, TransactionType type, FeeStandard *s
 }
 
 // 添加交易记录
-bool add_transaction(Database *db, const char *token, Transaction *transaction)
+bool add_transaction(Database *db, const char *user_id, UserType user_type, Transaction *transaction)
 {
+    // 验证权限
+    if (!validate_permission(db, user_id, user_type, 1))
+    { // 假设权重1以上才能添加交易记录
+        return false;
+    }
+
     // TODO: 实现添加交易记录功能
     return false;
 }
 
 // 获取业主交易记录
-bool get_owner_transactions(Database *db, const char *token, const char *owner_id, QueryResult *result)
+bool get_owner_transactions(Database *db, const char *user_id, UserType user_type, const char *owner_id, QueryResult *result)
 {
+    // 验证权限 - 普通用户只能查看自己的交易记录
+    if (user_type == USER_OWNER && strcmp(user_id, owner_id) != 0)
+    {
+        return false;
+    }
+
+    // 管理员和物业服务人员需要验证权限
+    if (user_type != USER_OWNER && !validate_permission(db, user_id, user_type, 1))
+    {
+        return false;
+    }
+
     // TODO: 实现获取业主交易记录功能
     return false;
 }

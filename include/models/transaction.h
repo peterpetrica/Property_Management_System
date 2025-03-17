@@ -3,6 +3,7 @@
 
 #include "db/database.h"
 #include "db/db_query.h"
+#include "auth/auth.h"
 #include <stdbool.h>
 #include <time.h>
 
@@ -40,15 +41,15 @@ typedef struct
 } Transaction;
 
 // 添加费用标准
-bool add_fee_standard(Database *db, const char *token, FeeStandard *standard);
+bool add_fee_standard(Database *db, const char *user_id, UserType user_type, FeeStandard *standard);
 
 // 获取当前费用标准
 bool get_current_fee_standard(Database *db, TransactionType type, FeeStandard *standard);
 
 // 添加交易记录
-bool add_transaction(Database *db, const char *token, Transaction *transaction);
+bool add_transaction(Database *db, const char *user_id, UserType user_type, Transaction *transaction);
 
 // 获取业主交易记录
-bool get_owner_transactions(Database *db, const char *token, const char *owner_id, QueryResult *result);
+bool get_owner_transactions(Database *db, const char *user_id, UserType user_type, const char *owner_id, QueryResult *result);
 
 #endif /* TRANSACTION_H */
