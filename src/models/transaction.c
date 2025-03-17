@@ -35,7 +35,7 @@ bool add_fee_standard(Database *db, const char *user_id, UserType user_type, Fee
 }
 
 // 获取当前费用标准
-bool get_current_fee_standard(Database *db, TransactionType type, FeeStandard *standard)
+bool get_current_fee_standard(Database *db, int fee_type, FeeStandard *standard)
 {
     // TODO: 实现获取当前费用标准功能
     return false;
@@ -70,5 +70,47 @@ bool get_owner_transactions(Database *db, const char *user_id, UserType user_typ
     }
 
     // TODO: 实现获取业主交易记录功能
+    return false;
+}
+
+// 获取房屋交易记录
+bool get_room_transactions(Database *db, const char *user_id, UserType user_type, const char *room_id, QueryResult *result)
+{
+    // 验证权限
+    if (user_type == USER_OWNER)
+    {
+        // TODO: 检查房屋是否属于该业主
+        // 暂时先简单返回false
+        return false;
+    }
+
+    // 管理员和物业服务人员需要验证权限
+    if (!validate_permission(db, user_id, user_type, 1))
+    {
+        return false;
+    }
+
+    // TODO: 实现获取房屋交易记录功能
+    return false;
+}
+
+// 获取停车位交易记录
+bool get_parking_transactions(Database *db, const char *user_id, UserType user_type, const char *parking_id, QueryResult *result)
+{
+    // 验证权限
+    if (user_type == USER_OWNER)
+    {
+        // TODO: 检查停车位是否属于该业主
+        // 暂时先简单返回false
+        return false;
+    }
+
+    // 管理员和物业服务人员需要验证权限
+    if (!validate_permission(db, user_id, user_type, 1))
+    {
+        return false;
+    }
+
+    // TODO: 实现获取停车位交易记录功能
     return false;
 }

@@ -19,42 +19,42 @@
 #include <string.h>
 
 // 添加房屋
-bool add_apartment(Database *db, const char *user_id, UserType user_type, Apartment *apartment)
+bool add_room(Database *db, const char *user_id, UserType user_type, Room *room)
 {
     // TODO: 实现添加房屋功能
     return false;
 }
 
 // 修改房屋信息
-bool update_apartment(Database *db, const char *user_id, UserType user_type, Apartment *apartment)
+bool update_room(Database *db, const char *user_id, UserType user_type, Room *room)
 {
     // TODO: 实现修改房屋信息功能
     return false;
 }
 
 // 删除房屋
-bool delete_apartment(Database *db, const char *user_id, UserType user_type, const char *apartment_id)
+bool delete_room(Database *db, const char *user_id, UserType user_type, const char *room_id)
 {
     // TODO: 实现删除房屋功能
     return false;
 }
 
 // 获取房屋信息
-bool get_apartment(Database *db, const char *apartment_id, Apartment *apartment)
+bool get_room(Database *db, const char *room_id, Room *room)
 {
     // TODO: 实现获取房屋信息功能
     return false;
 }
 
 // 获取某楼宇内所有房屋
-bool list_apartments_by_building(Database *db, const char *user_id, UserType user_type, const char *building_id, QueryResult *result)
+bool list_rooms_by_building(Database *db, const char *user_id, UserType user_type, const char *building_id, QueryResult *result)
 {
     // TODO: 实现按楼宇列出房屋功能
     return false;
 }
 
 // 查询业主的房屋
-bool get_owner_apartments(Database *db, const char *user_id, UserType user_type, const char *owner_id, QueryResult *result)
+bool get_owner_rooms(Database *db, const char *user_id, UserType user_type, const char *owner_id, QueryResult *result)
 {
     // TODO: 实现获取业主房屋功能
     return false;

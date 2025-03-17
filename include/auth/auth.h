@@ -16,16 +16,16 @@ typedef enum
 typedef struct
 {
     bool success;
-    int weight;
+    int permission_level; // 与roles表的permission_level对应
     UserType user_type;
-    char user_id[32];
+    char user_id[32]; // 与users表的user_id对应
 } LoginResult;
 
 // 用户认证
 LoginResult authenticate_user(Database *db, const char *username, const char *password);
 
 // 验证用户权限
-bool validate_permission(Database *db, const char *user_id, UserType user_type, int min_weight);
+bool validate_permission(Database *db, const char *user_id, UserType user_type, int min_permission_level);
 
 // 更改密码
 bool change_password(Database *db, const char *user_id, UserType user_type, const char *old_password, const char *new_password);

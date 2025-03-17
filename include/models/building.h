@@ -3,30 +3,17 @@
 
 #include "db/database.h"
 #include "db/db_query.h"
-#include "auth/auth.h" // 添加这一行以引入 UserType 定义
+#include "auth/auth.h"
 #include <stdbool.h>
-
-// 社区信息
-typedef struct
-{
-    char id[32];
-    char name[64];
-    char address[256];
-    int building_count;
-} Community;
 
 // 楼宇信息
 typedef struct
 {
-    char id[32];
-    char community_id[32];
-    char name[64];
-    int floor_count;
-    int room_count;
+    char building_id[32];
+    char building_name[64];
+    char address[256];
+    int floors_count;
 } Building;
-
-// 添加社区
-bool add_community(Database *db, const char *user_id, UserType user_type, Community *community);
 
 // 添加楼宇
 bool add_building(Database *db, const char *user_id, UserType user_type, Building *building);

@@ -3,6 +3,7 @@
 
 #include "db/database.h"
 #include "db/db_query.h"
+#include "auth/auth.h"
 #include <stdbool.h>
 #include <time.h>
 
@@ -14,16 +15,33 @@ typedef struct
     char description[256];
 } ServiceType;
 
+// 服务人员类型
+typedef struct
+{
+    char staff_type_id[32];
+    char type_name[64];
+    char description[256];
+} StaffType;
+
+// 服务区域
+typedef struct
+{
+    char area_id[32];
+    char staff_id[32];
+    char building_id[32];
+    time_t assignment_date;
+} ServiceArea;
+
 // 服务记录
 typedef struct
 {
-    char id[32];
+    char record_id[32];
     char staff_id[32];
-    char building_id[32];
-    char apartment_id[32];
-    char service_type_id[32];
-    time_t service_time;
+    char service_type[64];
+    time_t service_date;
     char description[256];
+    int status;
+    char target_id[32]; // 目标ID：楼宇ID或房屋ID
 } ServiceRecord;
 
 // 添加服务类型
@@ -38,6 +56,27 @@ bool delete_service_type(Database *db, const char *user_id, UserType user_type, 
 // 获取所有服务类型
 bool list_service_types(Database *db, QueryResult *result);
 
+// 添加服务人员类型
+bool add_staff_type(Database *db, const char *user_id, UserType user_type, StaffType *type);
+
+// 修改服务人员类型
+bool update_staff_type(Database *db, const char *user_id, UserType user_type, StaffType *type);
+
+// 删除服务人员类型
+bool delete_staff_type(Database *db, const char *user_id, UserType user_type, const char *staff_type_id);
+
+// 获取所有服务人员类型
+bool list_staff_types(Database *db, QueryResult *result);
+
+// 分配服务区域
+bool assign_service_area(Database *db, const char *user_id, UserType user_type, ServiceArea *area);
+
+// 取消服务区域分配
+bool unassign_service_area(Database *db, const char *user_id, UserType user_type, const char *area_id);
+
+// 获取服务人员的服务区域
+bool get_staff_service_areas(Database *db, const char *user_id, UserType user_type, const char *staff_id, QueryResult *result);
+
 // 记录服务
 bool record_service(Database *db, const char *user_id, UserType user_type, ServiceRecord *record);
 
@@ -45,6 +84,9 @@ bool record_service(Database *db, const char *user_id, UserType user_type, Servi
 bool get_service_records_by_staff(Database *db, const char *user_id, UserType user_type, const char *staff_id, QueryResult *result);
 
 // 获取房屋的服务记录
-bool get_service_records_by_apartment(Database *db, const char *user_id, UserType user_type, const char *apartment_id, QueryResult *result);
+bool get_service_records_by_room(Database *db, const char *user_id, UserType user_type, const char *room_id, QueryResult *result);
+
+// 获取楼宇的服务记录
+bool get_service_records_by_building(Database *db, const char *user_id, UserType user_type, const char *building_id, QueryResult *result);
 
 #endif /* SERVICE_H */

@@ -4,35 +4,50 @@
 #include "db/database.h"
 #include "auth/auth.h"
 #include <stdbool.h>
+#include <time.h> // 添加对time.h的引用以解决time_t未定义的问题
+
+// 用户信息
+typedef struct
+{
+    char user_id[32];
+    char username[64];
+    char name[64];
+    char phone_number[20];
+    char email[64];
+    char role_id[32];
+    int status;
+    time_t registration_date;
+} User;
 
 // 业主信息
 typedef struct
 {
-    char id[32];
+    char user_id[32]; // 对应users表中的user_id
+    char username[64];
     char name[64];
-    char phone[20];
-    char building_id[32];
-    char apartment_id[32];
+    char phone_number[20];
+    char email[64];
     bool notification_required;
-    int weight;
 } Owner;
 
 // 服务人员信息
 typedef struct
 {
-    char id[32];
+    char staff_id[32]; // 对应staff表中的staff_id
+    char user_id[32];  // 对应users表中的user_id
     char name[64];
-    char phone[20];
-    char service_type[32]; // 管家、保安、清洁工等
-    int weight;
+    char phone_number[20];
+    char staff_type_id[32]; // 对应staff_types表中的staff_type_id
+    time_t hire_date;
+    int status;
 } Staff;
 
 // 管理员信息
 typedef struct
 {
-    char id[32];
+    char user_id[32]; // 对应users表中的user_id
+    char username[64];
     char name[64];
-    int weight;
 } Admin;
 
 // 创建业主账户
@@ -42,7 +57,7 @@ bool create_owner(Database *db, Owner *owner, const char *password);
 bool update_owner(Database *db, const char *user_id, UserType user_type, Owner *owner);
 
 // 获取业主信息
-bool get_owner_by_id(Database *db, const char *owner_id, Owner *owner);
+bool get_owner_by_id(Database *db, const char *user_id, Owner *owner);
 
 // 创建服务人员账户
 bool create_staff(Database *db, Staff *staff, const char *password);

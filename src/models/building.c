@@ -1,8 +1,7 @@
 /*
- * 楼宇和小区管理模块
+ * 楼宇管理模块
  *
- * 该文件实现了物业管理系统中楼宇和小区相关的功能，包括：
- * - 小区管理：添加小区信息
+ * 该文件实现了物业管理系统中楼宇相关的功能，包括：
  * - 楼宇管理：添加、修改、删除、查询楼宇信息
  * - 楼宇列表：获取系统中所有楼宇的列表
  * - 人员分配：管理服务人员与楼宇之间的分配关系
@@ -16,16 +15,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-// 添加小区
-bool add_community(Database *db, const char *user_id, UserType user_type, Community *community)
-{
-    // TODO: 实现添加小区的功能
-    return false;
-}
-
 // 添加楼宇
 bool add_building(Database *db, const char *user_id, UserType user_type, Building *building)
 {
+    // 验证权限
+    if (!validate_permission(db, user_id, user_type, 1))
+    {
+        return false;
+    }
+
     // TODO: 实现添加楼宇的功能
     return false;
 }
@@ -33,6 +31,12 @@ bool add_building(Database *db, const char *user_id, UserType user_type, Buildin
 // 修改楼宇信息
 bool update_building(Database *db, const char *user_id, UserType user_type, Building *building)
 {
+    // 验证权限
+    if (!validate_permission(db, user_id, user_type, 1))
+    {
+        return false;
+    }
+
     // TODO: 实现修改楼宇信息的功能
     return false;
 }
@@ -40,6 +44,12 @@ bool update_building(Database *db, const char *user_id, UserType user_type, Buil
 // 删除楼宇
 bool delete_building(Database *db, const char *user_id, UserType user_type, const char *building_id)
 {
+    // 验证权限
+    if (!validate_permission(db, user_id, user_type, 1))
+    {
+        return false;
+    }
+
     // TODO: 实现删除楼宇的功能
     return false;
 }
@@ -61,6 +71,12 @@ bool list_buildings(Database *db, const char *user_id, UserType user_type, Query
 // 分配服务人员到楼宇
 bool assign_staff_to_building(Database *db, const char *user_id, UserType user_type, const char *staff_id, const char *building_id)
 {
+    // 验证权限
+    if (!validate_permission(db, user_id, user_type, 1))
+    {
+        return false;
+    }
+
     // TODO: 实现分配服务人员到楼宇的功能
     return false;
 }
@@ -68,6 +84,12 @@ bool assign_staff_to_building(Database *db, const char *user_id, UserType user_t
 // 取消服务人员的楼宇分配
 bool unassign_staff_from_building(Database *db, const char *user_id, UserType user_type, const char *staff_id, const char *building_id)
 {
+    // 验证权限
+    if (!validate_permission(db, user_id, user_type, 1))
+    {
+        return false;
+    }
+
     // TODO: 实现取消服务人员的楼宇分配的功能
     return false;
 }
