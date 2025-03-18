@@ -21,26 +21,18 @@
 #include "db/db_init.h"
 #include "auth/auth.h"
 #include "ui/ui_login.h"
-#include "ui/ui_main.h"
 #include "utils/file_ops.h"
 
 #define DB_FILENAME "property_management.db"
 
 int main()
 {
-    // 初始化UI
-    if (!init_ui())
-    {
-        fprintf(stderr, "无法初始化用户界面\n");
-        return 1;
-    }
 
     // 数据库保存的地方
     char data_dir[256];
     if (!get_data_dir(data_dir, sizeof(data_dir)))
     {
         fprintf(stderr, "无法获取数据目录\n");
-        cleanup_ui();
         return 1;
     }
 
@@ -50,7 +42,6 @@ int main()
         if (!create_directory(data_dir))
         {
             fprintf(stderr, "无法创建数据目录: %s\n", data_dir);
-            cleanup_ui();
             return 1;
         }
     }
@@ -64,17 +55,29 @@ int main()
     if (db_init(&db, db_path) != SQLITE_OK)
     {
         fprintf(stderr, "无法初始化数据库\n");
-        cleanup_ui();
         return 1;
     }
 
-    // 登录界面
     LoginResult login_result = show_login_screen(&db);
 
     if (login_result.success)
     {
         // 主界面
-        show_main_screen(&db, login_result.user_id, login_result.user_type);
+        switch (login_result.user_type)
+        {
+        case USER_ADMIN:
+            show_admin_main_screen(db, login_result.user_id, login_result.user_type);
+            break;
+        case USER_STAFF:
+            show_staff_main_screen(db, login_result.user_id, login_result.user_type);
+            break;
+        case USER_OWNER:
+            show_owner_main_screen(db, login_result.user_id, login_result.user_type);
+            break;
+        default:
+            puts("未知的用户类型");
+            break;
+        }
     }
     else
     {
@@ -83,7 +86,6 @@ int main()
 
     // 清理资源
     db_close(&db);
-    cleanup_ui();
 
     return 0;
 }

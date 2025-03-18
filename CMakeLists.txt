@@ -37,7 +37,6 @@ set(SOURCE_FILES
     src/db/db_init.c
     src/db/db_query.c
     src/auth/auth.c
-    src/ui/ui_main.c
     src/ui/ui_login.c
     src/ui/ui_admin.c
     src/ui/ui_staff.c
