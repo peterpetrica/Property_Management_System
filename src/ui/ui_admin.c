@@ -33,11 +33,55 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+void show_info_management_screen(Database *db, const char *user_id, UserType user_type);
+void show_service_assignment_screen(Database *db, const char *user_id, UserType user_type);
+void show_info_query_screen(Database *db, const char *user_id, UserType user_type);
+void show_info_sort_screen(Database *db, const char *user_id, UserType user_type);
+void show_info_statistics_screen(Database *db, const char *user_id, UserType user_type);
+void show_system_maintenance_screen(Database *db, const char *user_id, UserType user_type);
 
 // 显示管理员主界面
 void show_admin_main_screen(Database *db, const char *user_id, UserType user_type)
 {
-    // TODO: 实现管理员主界面功能
+    printf("\n=== 物业服务管理系统主页面 ===\n");
+    printf("1. 信息管理界面\n");
+    printf("2. 服务分配界面\n");
+    printf("3. 信息查询界面\n");
+    printf("4. 信息排序界面\n");
+    printf("5. 信息统计界面\n");
+    printf("6. 系统维护界面\n");
+    printf("7. 退出系统\n");
+    printf("请输入选项: ");
+    int choice;
+    scanf("%d", &choice);
+    getchar(); // 清除输入缓冲区中的换行符
+
+    switch (choice)
+    {
+    case 1:
+        show_info_management_screen(db, user_id, user_type);
+        break;
+    case 2:
+        show_service_assignment_screen(db, user_id, user_type);
+        break;
+    case 3:
+        show_info_query_screen(db, user_id, user_type);
+        break;
+    case 4:
+        show_info_sort_screen(db, user_id, user_type);
+        break;
+    case 5:
+        show_info_statistics_screen(db, user_id, user_type);
+        break;
+    case 6:
+        show_system_maintenance_screen(db, user_id, user_type);
+        break;
+    case 7:
+        printf("退出系统。\n");
+        exit(0);
+    default:
+        printf("无效选项，请重新输入。\n");
+    }
 }
 
 // 信息管理界面
