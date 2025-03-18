@@ -10,7 +10,6 @@
  */
 
 #include "ui/ui_login.h"
-#include "ui/ui_main.h"
 #include "utils/utils.h"
 #include "models/user.h"
 #include <stdio.h>
@@ -102,91 +101,111 @@ LoginResult show_login_screen(Database *db)
 // 显示注册界面
 bool show_registration_screen(Database *db)
 {
-    // TODO: 实现注册界面功能
-    return false;
-}
-
-// 修改密码界面
-bool show_change_password_screen(Database *db, const char *user_id, UserType user_type)
-{
-    char old_password[64] = {0};
-    char new_password[64] = {0};
+    char username[64] = {0};
+    char password[64] = {0};
     char confirm_password[64] = {0};
+    char name[64] = {0};
+    char phone[20] = {0};
+    char email[64] = {0};
+    char user_id[37] = {0}; // UUID字符串长度为36+结束符
+    char query[512] = {0};
+    char error_message[128] = {0};
+    sqlite3_stmt *stmt = NULL;
+    bool success = false;
+    time_t current_time;
 
-    printf("\n===== 修改密码 =====\n");
+    printf("\n===== 用户注册 =====\n");
 
-    printf("请输入当前密码: ");
-    read_password(old_password, sizeof(old_password));
+    // 输入用户名
+    printf("用户名 (必填): ");
+    scanf("%63s", username);
 
-    printf("请输入新密码: ");
-    read_password(new_password, sizeof(new_password));
+    // 检查用户名是否已存在
+    sprintf(query, "SELECT COUNT(*) FROM users WHERE username = ?;");
 
-    printf("请确认新密码: ");
+    if (db_prepare(db, query, &stmt) != SQLITE_OK)
+    {
+        printf("数据库错误: %s\n", sqlite3_errmsg(db->db));
+        return false;
+    }
+
+    sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC);
+
+    if (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        int count = sqlite3_column_int(stmt, 0);
+        if (count > 0)
+        {
+            printf("用户名已存在，请选择其他用户名\n");
+            sqlite3_finalize(stmt);
+            return false;
+        }
+    }
+
+    sqlite3_finalize(stmt);
+    stmt = NULL;
+
+    // 输入密码
+    printf("密码 (必填): ");
+    while (getchar() != '\n')
+        ; // 清空输入缓冲区
+    read_password(password, sizeof(password));
+
+    printf("确认密码: ");
     read_password(confirm_password, sizeof(confirm_password));
 
-    if (strcmp(new_password, confirm_password) != 0)
+    // 检查密码一致性
+    if (strcmp(password, confirm_password) != 0)
     {
-        printf("两次输入的新密码不一致！\n");
+        printf("两次输入的密码不匹配\n");
         return false;
     }
 
-    if (change_password(db, user_id, user_type, old_password, new_password))
+    // 输入个人信息
+    printf("真实姓名 (必填): ");
+    scanf("%63s", name);
+
+    printf("电话号码 (选填): ");
+    scanf("%19s", phone);
+
+    printf("电子邮箱 (选填): ");
+    scanf("%63s", email);
+
+    // 生成唯一用户ID
+    generate_uuid(user_id);
+
+    // 获取当前时间戳
+    time(&current_time);
+
+    // 插入新用户记录 (默认为业主角色)
+    sprintf(query,
+            "INSERT INTO users (user_id, username, password_hash, name, phone_number, email, role_id, registration_date) "
+            "VALUES (?, ?, ?, ?, ?, ?, 'role_owner', ?);");
+
+    if (db_prepare(db, query, &stmt) != SQLITE_OK)
     {
-        printf("密码修改成功！\n");
-        return true;
+        printf("数据库错误: %s\n", sqlite3_errmsg(db->db));
+        return false;
+    }
+
+    sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, username, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, password, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 4, name, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 5, phone, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 6, email, -1, SQLITE_STATIC);
+    sqlite3_bind_int64(stmt, 7, current_time);
+
+    if (sqlite3_step(stmt) == SQLITE_DONE)
+    {
+        success = true;
     }
     else
     {
-        printf("密码修改失败，当前密码可能不正确。\n");
-        return false;
-    }
-}
-
-// 重置密码界面 (仅管理员)
-bool show_reset_password_screen(Database *db, const char *admin_id, UserType admin_type)
-{
-    if (admin_type != USER_ADMIN)
-    {
-        printf("只有管理员可以重置密码！\n");
-        return false;
+        strcpy(error_message, sqlite3_errmsg(db->db));
+        printf("注册失败: %s\n", error_message);
     }
 
-    char user_id[32] = {0};
-    int user_type_choice = 0;
-    UserType user_type;
-
-    printf("\n===== 重置用户密码 =====\n");
-
-    printf("请输入要重置密码的用户ID: ");
-    scanf("%31s", user_id);
-
-    printf("请选择用户类型 (1:管理员, 2:服务人员, 3:业主): ");
-    scanf("%d", &user_type_choice);
-
-    switch (user_type_choice)
-    {
-    case 1:
-        user_type = USER_ADMIN;
-        break;
-    case 2:
-        user_type = USER_STAFF;
-        break;
-    case 3:
-        user_type = USER_OWNER;
-        break;
-    default:
-        printf("无效的用户类型！\n");
-        return false;
-    }
-
-    if (reset_password(db, admin_id, admin_type, user_id, user_type))
-    {
-        printf("密码重置成功！\n");
-        return true;
-    }
-    else
-    {
-        printf("密码重置失败！\n");
-        return false;
-    }
+    sqlite3_finalize(stmt);
+    return success;
 }

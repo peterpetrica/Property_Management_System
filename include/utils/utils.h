@@ -5,7 +5,7 @@
 #include <time.h>
 
 // 生成UUID
-char *generate_uuid();
+void generate_uuid(char *out);
 
 // 加密密码
 char *hash_password(const char *password);

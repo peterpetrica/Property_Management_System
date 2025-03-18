@@ -23,40 +23,46 @@
 #include <uuid/uuid.h>
 #endif
 
-// 生成UUID
-char *generate_uuid()
-{
-    char *uuid_str = (char *)malloc(37); // 36个字符加上空终止符
-    if (!uuid_str)
-        return NULL;
 
-#ifdef __linux__
-    uuid_t uuid;
-    uuid_generate(uuid);
-    uuid_unparse_lower(uuid, uuid_str);
-#else
-    // 在非Linux系统上，使用OpenSSL的随机数生成器模拟UUID
-    unsigned char random_bytes[16];
-    if (RAND_bytes(random_bytes, sizeof(random_bytes)) != 1)
+void generate_uuid(char *out)
+{
+    static const char *chars = "0123456789abcdef";
+    static bool seeded = false;
+
+    if (!seeded)
     {
-        free(uuid_str);
-        return NULL;
+        srand((unsigned int)time(NULL));
+        seeded = true;
     }
 
-    // 设置UUID版本 (版本4 - 随机)
-    random_bytes[6] = (random_bytes[6] & 0x0F) | 0x40;
-    random_bytes[8] = (random_bytes[8] & 0x3F) | 0x80;
+    // 生成UUID的各部分
+    // 格式：8-4-4-4-12
+    for (int i = 0; i < 36; i++)
+    {
+        if (i == 8 || i == 13 || i == 18 || i == 23)
+        {
+            out[i] = '-';
+        }
+        // 版本号 (UUID v4使用4)
+        else if (i == 14)
+        {
+            out[i] = '4';
+        }
+        // 变体位 (UUID v4对应8, 9, A, B的任意一个)
+        else if (i == 19)
+        {
+            out[i] = chars[8 + (rand() % 4)];
+        }
+        else
+        {
+            out[i] = chars[rand() % 16];
+        }
+    }
 
-    sprintf(uuid_str,
-            "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
-            random_bytes[0], random_bytes[1], random_bytes[2], random_bytes[3],
-            random_bytes[4], random_bytes[5], random_bytes[6], random_bytes[7],
-            random_bytes[8], random_bytes[9], random_bytes[10], random_bytes[11],
-            random_bytes[12], random_bytes[13], random_bytes[14], random_bytes[15]);
-#endif
-
-    return uuid_str;
+    // 添加结束符
+    out[36] = '\0';
 }
+
 
 // 生成随机盐值
 static char *generate_salt(size_t length)

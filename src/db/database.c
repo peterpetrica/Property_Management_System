@@ -109,6 +109,29 @@ int db_execute(Database *db, const char *sql)
     return SQLITE_OK;
 }
 
+// 准备SQL语句
+int db_prepare(Database *db, const char *sql, sqlite3_stmt **stmt)
+{
+    int rc;
+
+    // 参数检查
+    if (!db || !db->db || !sql || !stmt)
+    {
+        fprintf(stderr, "准备SQL语句失败：参数无效\n");
+        return SQLITE_ERROR;
+    }
+
+    // 准备SQL语句
+    rc = sqlite3_prepare_v2(db->db, sql, -1, stmt, NULL);
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "准备SQL语句失败: %s\n", sqlite3_errmsg(db->db));
+        return rc;
+    }
+
+    return SQLITE_OK;
+}
+
 // 数据库备份
 int db_backup(Database *db, const char *backup_path)
 {

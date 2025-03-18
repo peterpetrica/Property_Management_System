@@ -10,10 +10,4 @@ LoginResult show_login_screen(Database *db);
 // 注册界面
 bool show_registration_screen(Database *db);
 
-// 修改密码界面
-bool show_change_password_screen(Database *db, const char *user_id, UserType user_type);
-
-// 重置密码界面 (仅管理员)
-bool show_reset_password_screen(Database *db, const char *admin_id, UserType admin_type);
-
 #endif /* UI_LOGIN_H */

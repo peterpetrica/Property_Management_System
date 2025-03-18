@@ -21,6 +21,9 @@ void db_close(Database *db);
 // 执行SQL语句
 int db_execute(Database *db, const char *sql);
 
+// 准备SQL语句
+int db_prepare(Database *db, const char *sql, sqlite3_stmt **stmt);
+
 // 数据库备份
 int db_backup(Database *db, const char *backup_path);
 
