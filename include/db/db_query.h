@@ -19,8 +19,11 @@ typedef struct
     char **column_names; // 列名
 } QueryResult;
 
-// 执行简单的SQL查询并返回结果
-int db_simple_query(Database *db, const char *query, QueryResult *result);
+// 执行SQL查询并返回结果
+bool execute_query(Database *db, const char *sql, QueryResult *result);
+
+// 执行SQL更新操作
+bool execute_update(Database *db, const char *sql);
 
 // 释放查询结果资源
 void free_query_result(QueryResult *result);

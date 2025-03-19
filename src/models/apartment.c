@@ -14,11 +14,34 @@
 #include "models/apartment.h"
 #include "auth/auth.h"
 #include "utils/utils.h"
+#include "db/db_query.h" // 添加缺失的头文件
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define SQL_MAX_LENGTH 4096
+
+// 添加缺失的日志函数
+void log_error(const char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    fprintf(stderr, "[ERROR] ");
+    vfprintf(stderr, format, args);
+    fprintf(stderr, "\n");
+    va_end(args);
+}
+
+void log_info(const char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    fprintf(stdout, "[INFO] ");
+    vfprintf(stdout, format, args);
+    fprintf(stdout, "\n");
+    va_end(args);
+}
 
 // 添加房屋
 bool add_room(Database *db, const char *user_id, UserType user_type, Room *room)
@@ -74,7 +97,7 @@ bool add_room(Database *db, const char *user_id, UserType user_type, Room *room)
              room->room_id, room->building_id, room->room_number,
              room->floor, room->area_sqm,
              room->owner_id[0] ? room->owner_id : "NULL",
-             room->status);
+             room->status); // status应该是char数组
 
     if (!execute_update(db, query))
     {
@@ -118,7 +141,7 @@ bool update_room(Database *db, const char *user_id, UserType user_type, Room *ro
              "area_sqm=%.2f, owner_id='%s', status='%s' "
              "WHERE room_id='%s'",
              room->building_id, room->room_number, room->floor,
-             room->area_sqm, room->owner_id, room->status,
+             room->area_sqm, room->owner_id, room->status, // status应该是char数组
              room->room_id);
 
     if (!execute_update(db, query))
@@ -223,7 +246,7 @@ bool get_room(Database *db, const char *room_id, Room *room)
     room->floor = atoi(row->values[3]);
     room->area_sqm = atof(row->values[4]);
     strncpy(room->owner_id, row->values[5] ? row->values[5] : "", sizeof(room->owner_id) - 1);
-    strncpy(room->status, row->values[6], sizeof(room->status) - 1);
+    strncpy(room->status, row->values[6], sizeof(room->status) - 1); // status应该是char数组
 
     free_query_result(&result);
     return true;
