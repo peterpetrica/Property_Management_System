@@ -39,6 +39,8 @@ void show_info_sort_screen(Database *db, const char *user_id, UserType user_type
 void show_info_statistics_screen(Database *db, const char *user_id, UserType user_type);
 void show_system_maintenance_screen(Database *db, const char *user_id, UserType user_type);
 void show_apartment_test_screen(Database *db, const char *user_id, UserType user_type);
+// 添加楼宇测试界面函数声明
+void show_building_test_screen(Database *db, const char *user_id, UserType user_type);
 
 // 在文件顶部添加这个函数声明
 void clear_screen()
@@ -57,7 +59,8 @@ void show_admin_main_screen(Database *db, const char *user_id, UserType user_typ
     printf("5. 信息统计界面\n");
     printf("6. 系统维护界面\n");
     printf("7. 房屋管理功能测试\n");
-    printf("8. 退出系统\n");
+    printf("8. 楼宇管理功能测试\n"); // 添加新的菜单选项
+    printf("9. 退出系统\n");
     printf("请输入选项: ");
     int choice;
     scanf("%d", &choice);
@@ -87,6 +90,9 @@ void show_admin_main_screen(Database *db, const char *user_id, UserType user_typ
         show_apartment_test_screen(db, user_id, user_type);
         break;
     case 8:
+        show_building_test_screen(db, user_id, user_type); // 添加新的菜单选项处理
+        break;
+    case 9:
         printf("退出系统。\n");
         exit(0);
     default:
@@ -389,6 +395,258 @@ void show_apartment_test_screen(Database *db, const char *user_id, UserType user
             else
             {
                 printf("查询业主房屋失败！\n");
+            }
+        }
+        break;
+
+        default:
+            printf("无效选项，请重新输入。\n");
+        }
+
+        printf("\n按Enter键继续...");
+        getchar();
+    }
+}
+
+// 实现楼宇管理测试界面
+void show_building_test_screen(Database *db, const char *user_id, UserType user_type)
+{
+    while (1)
+    {
+        clear_screen();
+        printf("\n=== 楼宇管理功能测试 ===\n");
+        printf("1. 添加楼宇\n");
+        printf("2. 修改楼宇信息\n");
+        printf("3. 删除楼宇\n");
+        printf("4. 获取楼宇信息\n");
+        printf("5. 获取所有楼宇列表\n");
+        printf("6. 分配服务人员到楼宇\n");
+        printf("7. 取消服务人员的楼宇分配\n");
+        printf("0. 返回主菜单\n");
+        printf("请输入选项: ");
+
+        int choice;
+        scanf("%d", &choice);
+        getchar(); // 清除输入缓冲区中的换行符
+
+        if (choice == 0)
+        {
+            show_admin_main_screen(db, user_id, user_type);
+            return;
+        }
+
+        switch (choice)
+        {
+        case 1: // 添加楼宇
+        {
+            Building building;
+            memset(&building, 0, sizeof(Building));
+
+            printf("请输入楼宇名称: ");
+            fgets(building.building_name, sizeof(building.building_name), stdin);
+            building.building_name[strcspn(building.building_name, "\n")] = 0;
+
+            printf("请输入楼宇地址: ");
+            fgets(building.address, sizeof(building.address), stdin);
+            building.address[strcspn(building.address, "\n")] = 0;
+
+            printf("请输入楼层数: ");
+            scanf("%d", &building.floors_count);
+            getchar();
+
+            if (add_building(db, user_id, user_type, &building))
+            {
+                printf("添加楼宇成功！楼宇ID: %s\n", building.building_id);
+            }
+            else
+            {
+                printf("添加楼宇失败！\n");
+            }
+        }
+        break;
+
+        case 2: // 修改楼宇信息
+        {
+            Building building;
+            memset(&building, 0, sizeof(Building));
+
+            printf("请输入要修改的楼宇ID: ");
+            scanf("%s", building.building_id);
+            getchar();
+
+            // 获取原楼宇信息
+            if (!get_building(db, building.building_id, &building))
+            {
+                printf("未找到此楼宇ID！\n");
+                break;
+            }
+
+            printf("当前楼宇信息：\n");
+            printf("名称: %s\n", building.building_name);
+            printf("地址: %s\n", building.address);
+            printf("楼层数: %d\n", building.floors_count);
+
+            printf("\n请输入新的楼宇信息（直接回车保持不变）：\n");
+
+            char buffer[256];
+            printf("名称 [%s]: ", building.building_name);
+            fgets(buffer, sizeof(buffer), stdin);
+            buffer[strcspn(buffer, "\n")] = 0;
+            if (buffer[0] != '\0')
+                strncpy(building.building_name, buffer, sizeof(building.building_name) - 1);
+
+            printf("地址 [%s]: ", building.address);
+            fgets(buffer, sizeof(buffer), stdin);
+            buffer[strcspn(buffer, "\n")] = 0;
+            if (buffer[0] != '\0')
+                strncpy(building.address, buffer, sizeof(building.address) - 1);
+
+            printf("楼层数 [%d]: ", building.floors_count);
+            fgets(buffer, sizeof(buffer), stdin);
+            buffer[strcspn(buffer, "\n")] = 0;
+            if (buffer[0] != '\0')
+                building.floors_count = atoi(buffer);
+
+            if (update_building(db, user_id, user_type, &building))
+            {
+                printf("更新楼宇信息成功！\n");
+            }
+            else
+            {
+                printf("更新楼宇信息失败！\n");
+            }
+        }
+        break;
+
+        case 3: // 删除楼宇
+        {
+            char building_id[64];
+            printf("请输入要删除的楼宇ID: ");
+            scanf("%s", building_id);
+            getchar();
+
+            printf("警告：删除楼宇将同时删除与该楼宇相关的所有信息！\n");
+            printf("确定要删除吗？(y/n): ");
+            char confirm;
+            scanf("%c", &confirm);
+            getchar();
+
+            if (confirm == 'y' || confirm == 'Y')
+            {
+                if (delete_building(db, user_id, user_type, building_id))
+                {
+                    printf("删除楼宇成功！\n");
+                }
+                else
+                {
+                    printf("删除楼宇失败！\n");
+                }
+            }
+            else
+            {
+                printf("取消删除操作。\n");
+            }
+        }
+        break;
+
+        case 4: // 获取楼宇信息
+        {
+            char building_id[64];
+            printf("请输入楼宇ID: ");
+            scanf("%s", building_id);
+            getchar();
+
+            Building building;
+            if (get_building(db, building_id, &building))
+            {
+                printf("\n楼宇信息：\n");
+                printf("---------------------------------------\n");
+                printf("楼宇ID: %s\n", building.building_id);
+                printf("名称: %s\n", building.building_name);
+                printf("地址: %s\n", building.address);
+                printf("楼层数: %d\n", building.floors_count);
+                printf("---------------------------------------\n");
+            }
+            else
+            {
+                printf("获取楼宇信息失败！\n");
+            }
+        }
+        break;
+
+        case 5: // 获取所有楼宇列表
+        {
+            QueryResult result;
+            if (list_buildings(db, user_id, user_type, &result))
+            {
+                printf("\n系统中的所有楼宇：\n");
+                printf("---------------------------------------\n");
+                printf("%-10s %-20s %-30s %-5s\n",
+                       "楼宇ID", "名称", "地址", "楼层");
+
+                for (int i = 0; i < result.row_count; i++)
+                {
+                    printf("%-10s %-20s %-30s %-5s\n",
+                           result.rows[i].values[0],  // building_id
+                           result.rows[i].values[1],  // building_name
+                           result.rows[i].values[2],  // address
+                           result.rows[i].values[3]); // floors_count
+                }
+                printf("---------------------------------------\n");
+                printf("共 %d 条记录\n", result.row_count);
+                free_query_result(&result);
+            }
+            else
+            {
+                printf("查询楼宇列表失败！\n");
+            }
+        }
+        break;
+
+        case 6: // 分配服务人员到楼宇
+        {
+            char staff_id[64];
+            char building_id[64];
+
+            printf("请输入服务人员ID: ");
+            scanf("%s", staff_id);
+            getchar();
+
+            printf("请输入楼宇ID: ");
+            scanf("%s", building_id);
+            getchar();
+
+            if (assign_staff_to_building(db, user_id, user_type, staff_id, building_id))
+            {
+                printf("分配服务人员到楼宇成功！\n");
+            }
+            else
+            {
+                printf("分配服务人员到楼宇失败！\n");
+            }
+        }
+        break;
+
+        case 7: // 取消服务人员的楼宇分配
+        {
+            char staff_id[64];
+            char building_id[64];
+
+            printf("请输入服务人员ID: ");
+            scanf("%s", staff_id);
+            getchar();
+
+            printf("请输入楼宇ID: ");
+            scanf("%s", building_id);
+            getchar();
+
+            if (unassign_staff_from_building(db, user_id, user_type, staff_id, building_id))
+            {
+                printf("取消服务人员的楼宇分配成功！\n");
+            }
+            else
+            {
+                printf("取消服务人员的楼宇分配失败！\n");
             }
         }
         break;
