@@ -86,11 +86,12 @@ void show_admin_main_screen(Database *db, const char *user_id, UserType user_typ
     case 6:
         show_system_maintenance_screen(db, user_id, user_type);
         break;
+    // 以下两项是测试用选单，暂时不要删
     case 7:
         show_apartment_test_screen(db, user_id, user_type);
         break;
     case 8:
-        show_building_test_screen(db, user_id, user_type); // 添加新的菜单选项处理
+        show_building_test_screen(db, user_id, user_type);
         break;
     case 9:
         printf("退出系统。\n");
@@ -136,7 +137,14 @@ void show_system_maintenance_screen(Database *db, const char *user_id, UserType 
     // TODO: 实现系统维护界面功能
 }
 
-// 房屋管理功能测试界面
+////////////////////////////////////////////////
+// 以下是各种功能测试的界面及其示例调用，请不要改动   //
+//                                            //
+//                                            //
+//                                            //
+//                                            //
+////////////////////////////////////////////////
+
 void show_apartment_test_screen(Database *db, const char *user_id, UserType user_type)
 {
     while (1)
@@ -154,7 +162,7 @@ void show_apartment_test_screen(Database *db, const char *user_id, UserType user
 
         int choice;
         scanf("%d", &choice);
-        getchar(); // 清除输入缓冲区中的换行符
+        getchar();
 
         if (choice == 0)
         {
@@ -187,7 +195,6 @@ void show_apartment_test_screen(Database *db, const char *user_id, UserType user
 
             printf("请输入业主ID(如果没有业主请直接回车): ");
             fgets(room.owner_id, sizeof(room.owner_id), stdin);
-            // 移除换行符
             room.owner_id[strcspn(room.owner_id, "\n")] = 0;
 
             printf("请输入状态(如 '已售', '在售', '空置'): ");
@@ -262,12 +269,11 @@ void show_apartment_test_screen(Database *db, const char *user_id, UserType user
             if (buffer[0] != '\0')
                 strncpy(room.owner_id, buffer, sizeof(room.owner_id) - 1);
 
-            printf("状态 [%s]: ", room.status); // 应该是字符数组，不需要修改
+            printf("状态 [%s]: ", room.status);
             fgets(buffer, sizeof(buffer), stdin);
             buffer[strcspn(buffer, "\n")] = 0;
             if (buffer[0] != '\0')
-                strncpy(room.status, buffer, sizeof(room.status) - 1); // 应该是字符数组，不需要修改
-
+                strncpy(room.status, buffer, sizeof(room.status) - 1);
             if (update_room(db, user_id, user_type, &room))
             {
                 printf("更新房屋信息成功！\n");
@@ -315,7 +321,7 @@ void show_apartment_test_screen(Database *db, const char *user_id, UserType user
                 printf("楼层: %d\n", room.floor);
                 printf("面积: %.2f平方米\n", room.area_sqm);
                 printf("业主ID: %s\n", room.owner_id[0] ? room.owner_id : "无");
-                printf("状态: %s\n", room.status); // 应该是字符数组，不需要修改
+                printf("状态: %s\n", room.status);
                 printf("---------------------------------------\n");
             }
             else
@@ -427,7 +433,7 @@ void show_building_test_screen(Database *db, const char *user_id, UserType user_
 
         int choice;
         scanf("%d", &choice);
-        getchar(); // 清除输入缓冲区中的换行符
+        getchar();
 
         if (choice == 0)
         {
