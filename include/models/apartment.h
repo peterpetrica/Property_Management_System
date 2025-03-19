@@ -9,12 +9,12 @@
 // 房屋信息
 typedef struct
 {
-    char room_id[32];
-    char building_id[32];
+    char room_id[40];
+    char building_id[40];
     char room_number[16];
     int floor;
     float area_sqm;
-    char owner_id[32];
+    char owner_id[40];
     int status;
 } Room;
 

@@ -21,7 +21,7 @@ typedef enum
 // 费用标准
 typedef struct
 {
-    char standard_id[32];
+    char standard_id[40];
     int fee_type;
     float price_per_unit;
     char unit[16];
@@ -32,10 +32,10 @@ typedef struct
 // 交易记录
 typedef struct
 {
-    char transaction_id[32];
-    char user_id[32];
-    char room_id[32];
-    char parking_id[32];
+    char transaction_id[40];
+    char user_id[40];
+    char room_id[40];
+    char parking_id[40];
     int fee_type;
     float amount;
     time_t payment_date;

@@ -9,7 +9,7 @@
 // 楼宇信息
 typedef struct
 {
-    char building_id[32];
+    char building_id[40];
     char building_name[64];
     char address[256];
     int floors_count;

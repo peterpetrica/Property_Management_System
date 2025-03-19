@@ -10,7 +10,7 @@
 // 服务类型
 typedef struct
 {
-    char id[32];
+    char id[40];
     char name[64];
     char description[256];
 } ServiceType;
@@ -18,7 +18,7 @@ typedef struct
 // 服务人员类型
 typedef struct
 {
-    char staff_type_id[32];
+    char staff_type_id[40];
     char type_name[64];
     char description[256];
 } StaffType;
@@ -26,22 +26,22 @@ typedef struct
 // 服务区域
 typedef struct
 {
-    char area_id[32];
-    char staff_id[32];
-    char building_id[32];
+    char area_id[40];
+    char staff_id[40];
+    char building_id[40];
     time_t assignment_date;
 } ServiceArea;
 
 // 服务记录
 typedef struct
 {
-    char record_id[32];
-    char staff_id[32];
+    char record_id[40];
+    char staff_id[40];
     char service_type[64];
     time_t service_date;
     char description[256];
     int status;
-    char target_id[32]; // 目标ID：楼宇ID或房屋ID
+    char target_id[40]; // 目标ID：楼宇ID或房屋ID
 } ServiceRecord;
 
 // 添加服务类型

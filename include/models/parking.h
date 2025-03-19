@@ -9,9 +9,9 @@
 // 停车位信息
 typedef struct
 {
-    char parking_id[32];
+    char parking_id[40];
     char parking_number[16];
-    char owner_id[32];
+    char owner_id[40];
     int status;
 } ParkingSpace;
 

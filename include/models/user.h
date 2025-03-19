@@ -9,12 +9,12 @@
 // 用户信息
 typedef struct
 {
-    char user_id[32];
+    char user_id[40];
     char username[64];
     char name[64];
     char phone_number[20];
     char email[64];
-    char role_id[32];
+    char role_id[40];
     int status;
     time_t registration_date;
 } User;
@@ -22,7 +22,7 @@ typedef struct
 // 业主信息
 typedef struct
 {
-    char user_id[32]; // 对应users表中的user_id
+    char user_id[40]; // 对应users表中的user_id
     char username[64];
     char name[64];
     char phone_number[20];
@@ -33,11 +33,11 @@ typedef struct
 // 服务人员信息
 typedef struct
 {
-    char staff_id[32]; // 对应staff表中的staff_id
-    char user_id[32];  // 对应users表中的user_id
+    char staff_id[40]; // 对应staff表中的staff_id
+    char user_id[40];  // 对应users表中的user_id
     char name[64];
     char phone_number[20];
-    char staff_type_id[32]; // 对应staff_types表中的staff_type_id
+    char staff_type_id[40]; // 对应staff_types表中的staff_type_id
     time_t hire_date;
     int status;
 } Staff;
@@ -45,7 +45,7 @@ typedef struct
 // 管理员信息
 typedef struct
 {
-    char user_id[32]; // 对应users表中的user_id
+    char user_id[40]; // 对应users表中的user_id
     char username[64];
     char name[64];
 } Admin;
