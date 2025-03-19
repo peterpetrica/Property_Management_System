@@ -98,7 +98,13 @@ bool delete_user(Database *db, const char *admin_id, UserType admin_type, const 
 // 根据用户ID查询用户名
 bool query_username(Database *db, const char *user_id, char *username)
 {
-    // 准备SQL查询语句
+    if (db == NULL || db->db == NULL || user_id == NULL || username == NULL)
+    {
+        fprintf(stderr, "查询用户名参数无效\n");
+        return false;
+    }
+
+    // 准备SQL查询语句 - 从users表查询username字段
     const char *query = "SELECT username FROM users WHERE user_id = ?";
     sqlite3_stmt *stmt;
 
@@ -120,20 +126,25 @@ bool query_username(Database *db, const char *user_id, char *username)
     }
 
     // 执行查询
-    if (sqlite3_step(stmt) == SQLITE_ROW)
+    rc = sqlite3_step(stmt);
+    if (rc == SQLITE_ROW)
     {
         // 获取结果
-        const char *result = (const char *)sqlite3_column_text(stmt, 0);
+        const unsigned char *result = sqlite3_column_text(stmt, 0);
         if (result)
         {
-            strncpy(username, result, 99);
+            strncpy(username, (const char *)result, 99);
             username[99] = '\0'; // 确保字符串结束
             sqlite3_finalize(stmt);
             return true;
         }
     }
+    else if (rc != SQLITE_DONE)
+    {
+        fprintf(stderr, "查询执行失败: %s\n", sqlite3_errmsg(db->db));
+    }
 
-    // 如果没有找到用户名，设置一个默认值
+    // 没有找到
     strncpy(username, "未知用户", 99);
     sqlite3_finalize(stmt);
     return false;

@@ -16,9 +16,9 @@ typedef enum
 typedef struct
 {
     bool success;
-    int permission_level; // 与roles表的permission_level对应
+    int permission_level;
     UserType user_type;
-    char user_id[32]; // 与users表的user_id对应
+    char user_id[40];
 } LoginResult;
 
 // 用户认证
