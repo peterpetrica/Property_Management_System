@@ -94,3 +94,47 @@ bool delete_user(Database *db, const char *admin_id, UserType admin_type, const 
     // TODO: 实现删除用户功能
     return false;
 }
+
+// 根据用户ID查询用户名
+bool query_username(Database *db, const char *user_id, char *username)
+{
+    // 准备SQL查询语句
+    const char *query = "SELECT username FROM users WHERE user_id = ?";
+    sqlite3_stmt *stmt;
+
+    // 准备语句
+    int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "无法准备查询语句: %s\n", sqlite3_errmsg(db->db));
+        return false;
+    }
+
+    // 绑定参数
+    rc = sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "无法绑定用户ID: %s\n", sqlite3_errmsg(db->db));
+        sqlite3_finalize(stmt);
+        return false;
+    }
+
+    // 执行查询
+    if (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        // 获取结果
+        const char *result = (const char *)sqlite3_column_text(stmt, 0);
+        if (result)
+        {
+            strncpy(username, result, 99);
+            username[99] = '\0'; // 确保字符串结束
+            sqlite3_finalize(stmt);
+            return true;
+        }
+    }
+
+    // 如果没有找到用户名，设置一个默认值
+    strncpy(username, "未知用户", 99);
+    sqlite3_finalize(stmt);
+    return false;
+}

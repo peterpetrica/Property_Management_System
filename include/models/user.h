@@ -80,4 +80,7 @@ bool get_admin_by_id(Database *db, const char *admin_id, Admin *admin);
 // 删除用户 (仅管理员可用)
 bool delete_user(Database *db, const char *admin_id, UserType admin_type, const char *user_id, UserType user_type);
 
+// 根据用户ID查询用户名
+bool query_username(Database *db, const char *user_id, char *username);
+
 #endif /* USER_H */

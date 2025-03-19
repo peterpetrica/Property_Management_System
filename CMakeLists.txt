@@ -30,12 +30,12 @@ if(UNIX AND NOT APPLE)
   set(PLATFORM_LIBS ${LIBUUID_LIBRARY})
 endif()
 
-# 源文件位置
 set(SOURCE_FILES
     src/main.c
     src/db/database.c
     src/db/db_init.c
     src/db/db_query.c
+    src/db/db_utils.c
     src/auth/auth.c
     src/ui/ui_login.c
     src/ui/ui_admin.c
@@ -44,6 +44,8 @@ set(SOURCE_FILES
     src/models/building.c
     src/models/apartment.c
     src/models/user.c
+    src/models/service.c
+    src/models/transaction.c
     src/utils/utils.c
     src/utils/file_ops.c
     src/utils/console.c

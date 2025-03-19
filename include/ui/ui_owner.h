@@ -7,6 +7,9 @@
 // 显示业主主界面
 void show_owner_main_screen(Database *db, const char *user_id, UserType user_type);
 
+// 主界面函数（添加此函数声明）
+void main_screen_owner(Database *db, const char *user_id, UserType user_type);
+
 // 个人信息管理界面
 void show_personal_info_screen(Database *db, const char *user_id, UserType user_type);
 
