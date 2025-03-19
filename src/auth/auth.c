@@ -21,28 +21,83 @@
 static bool check_user_credentials(Database *db, const char *username, const char *password,
                                    UserType *user_type, char *user_id, int *permission_level)
 {
-    // TODO: 实现检查用户凭证的功能
-    // 1. 根据username在各用户表中查找用户
-    // 2. 验证密码
-    // 3. 设置user_type, user_id和permission_level
-    // 4. 返回验证结果
-
-    // 临时代码，使用硬编码的管理员账户
-    if (strcmp(username, "admin") == 0 && strcmp(password, "admin123") == 0)
+    if (!db || !username || !password || !user_type || !user_id || !permission_level)
     {
-        *user_type = USER_ADMIN;
-        strcpy(user_id, "1");
-        *permission_level = 1;
-        return true;
+        return false;
     }
-    return false;
+
+    // 准备SQL查询语句，从users表中查询用户信息
+    const char *query = "SELECT user_id, password_hash, role_id FROM users WHERE username = ? AND status = 1;";
+    sqlite3_stmt *stmt = NULL;
+
+    if (db_prepare(db, query, &stmt) != SQLITE_OK)
+    {
+        fprintf(stderr, "SQL准备失败: %s\n", sqlite3_errmsg(db->db));
+        return false;
+    }
+
+    // 绑定用户名参数
+    if (sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC) != SQLITE_OK)
+    {
+        fprintf(stderr, "参数绑定失败: %s\n", sqlite3_errmsg(db->db));
+        sqlite3_finalize(stmt);
+        return false;
+    }
+
+    bool found = false;
+    // 执行查询
+    if (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        // 获取用户ID
+        const char *db_user_id = (const char *)sqlite3_column_text(stmt, 0);
+        // 获取密码哈希（实际上是明文密码）
+        const char *db_password = (const char *)sqlite3_column_text(stmt, 1);
+        // 获取角色ID
+        const char *role_id = (const char *)sqlite3_column_text(stmt, 2);
+
+        // 直接比较明文密码
+        if (db_password && strcmp(password, db_password) == 0)
+        {
+            // 复制用户ID
+            strcpy(user_id, db_user_id);
+
+            // 根据角色ID设置用户类型和权限级别
+            if (strcmp(role_id, "role_admin") == 0)
+            {
+                *user_type = USER_ADMIN;
+                *permission_level = 1;
+            }
+            else if (strcmp(role_id, "role_staff") == 0)
+            {
+                *user_type = USER_STAFF;
+                *permission_level = 2;
+            }
+            else if (strcmp(role_id, "role_owner") == 0)
+            {
+                *user_type = USER_OWNER;
+                *permission_level = 3;
+            }
+            else
+            {
+                // 未知角色，设置为最低权限
+                *user_type = USER_OWNER;
+                *permission_level = 3;
+            }
+            found = true;
+        }
+    }
+
+    // 清理语句
+    sqlite3_finalize(stmt);
+
+    return found;
 }
 
 // 用户认证
 LoginResult authenticate_user(Database *db, const char *username, const char *password)
 {
     LoginResult result = {false, 0, 0, {0}};
-    char user_id[32] = {0};
+    char user_id[80] = {0};
     int permission_level = 0;
     UserType user_type = 0;
 
