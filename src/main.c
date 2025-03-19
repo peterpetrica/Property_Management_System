@@ -16,11 +16,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "db/database.h"
 #include "db/db_init.h"
 #include "auth/auth.h"
 #include "ui/ui_login.h"
+#include "ui/ui_admin.h"
+#include "ui/ui_staff.h"
+#include "ui/ui_owner.h"
 #include "utils/file_ops.h"
 
 #define DB_FILENAME "property_management.db"
@@ -58,6 +62,8 @@ int main()
         return 1;
     }
 
+    system("clear||cls");
+
     LoginResult login_result = show_login_screen(&db);
 
     if (login_result.success)
@@ -66,22 +72,21 @@ int main()
         switch (login_result.user_type)
         {
         case USER_ADMIN:
-            show_admin_main_screen(db, login_result.user_id, login_result.user_type);
+            system("clear||cls");
+            show_admin_main_screen(&db, login_result.user_id, login_result.user_type);
             break;
         case USER_STAFF:
-            show_staff_main_screen(db, login_result.user_id, login_result.user_type);
+            system("clear||cls");
+            show_staff_main_screen(&db, login_result.user_id, login_result.user_type);
             break;
         case USER_OWNER:
-            show_owner_main_screen(db, login_result.user_id, login_result.user_type);
+            system("clear||cls");
+            show_owner_main_screen(&db, login_result.user_id, login_result.user_type);
             break;
         default:
             puts("未知的用户类型");
             break;
         }
-    }
-    else
-    {
-        printf("登录失败，程序退出\n");
     }
 
     // 清理资源

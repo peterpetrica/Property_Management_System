@@ -33,6 +33,8 @@ LoginResult show_login_screen(Database *db)
     char password[64] = {0};
     int choice;
 
+    system("clear||cls");
+
     while (true)
     {
         printf("\n===== 物业管理系统登录 =====\n");
@@ -43,10 +45,12 @@ LoginResult show_login_screen(Database *db)
 
         if (scanf("%d", &choice) != 1)
         {
-            // 处理非数字输入
             scanf("%*[^\n]");
             scanf("%*c");
+
             printf("无效的输入，请重新选择\n");
+
+            system("clear||cls");
             continue;
         }
 
@@ -57,6 +61,8 @@ LoginResult show_login_screen(Database *db)
             return result;
 
         case 1:
+            system("clear||cls");
+
             printf("\n===== 用户登录 =====\n");
             printf("用户名: ");
             scanf("%63s", username);
@@ -67,7 +73,7 @@ LoginResult show_login_screen(Database *db)
                 ;
             read_password(password, sizeof(password));
 
-            // 调用身份验证函数
+            // 验证账号密码
             result = authenticate_user(db, username, password);
 
             if (result.success)
@@ -77,6 +83,7 @@ LoginResult show_login_screen(Database *db)
             }
             else
             {
+                system("clear||cls");
                 printf("\n登录失败：用户名或密码错误\n");
             }
             break;
@@ -114,6 +121,8 @@ bool show_registration_screen(Database *db)
     bool success = false;
     time_t current_time;
 
+    system("clear||cls");
+
     printf("\n===== 用户注册 =====\n");
 
     // 输入用户名
@@ -125,6 +134,7 @@ bool show_registration_screen(Database *db)
 
     if (db_prepare(db, query, &stmt) != SQLITE_OK)
     {
+        system("clear||cls");
         printf("数据库错误: %s\n", sqlite3_errmsg(db->db));
         return false;
     }
@@ -136,6 +146,7 @@ bool show_registration_screen(Database *db)
         int count = sqlite3_column_int(stmt, 0);
         if (count > 0)
         {
+            system("clear||cls");
             printf("用户名已存在，请选择其他用户名\n");
             sqlite3_finalize(stmt);
             return false;
@@ -157,6 +168,7 @@ bool show_registration_screen(Database *db)
     // 检查密码一致性
     if (strcmp(password, confirm_password) != 0)
     {
+        system("clear||cls");
         printf("两次输入的密码不匹配\n");
         return false;
     }
@@ -177,13 +189,14 @@ bool show_registration_screen(Database *db)
     // 获取当前时间戳
     time(&current_time);
 
-    // 插入新用户记录 (默认为业主角色)
+    // 插入新用户记录 (默认为业主)
     sprintf(query,
             "INSERT INTO users (user_id, username, password_hash, name, phone_number, email, role_id, registration_date) "
             "VALUES (?, ?, ?, ?, ?, ?, 'role_owner', ?);");
 
     if (db_prepare(db, query, &stmt) != SQLITE_OK)
     {
+        system("clear||cls");
         printf("数据库错误: %s\n", sqlite3_errmsg(db->db));
         return false;
     }
@@ -202,10 +215,12 @@ bool show_registration_screen(Database *db)
     }
     else
     {
+        system("clear||cls");
         strcpy(error_message, sqlite3_errmsg(db->db));
         printf("注册失败: %s\n", error_message);
     }
 
     sqlite3_finalize(stmt);
+    system("clear||cls");
     return success;
 }

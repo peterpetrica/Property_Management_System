@@ -17,7 +17,7 @@
 #include <string.h>
 #include <time.h>
 
-// 检查用户是否存在并验证密码
+// 验证帐号密码
 static bool check_user_credentials(Database *db, const char *username, const char *password,
                                    UserType *user_type, char *user_id, int *permission_level)
 {
@@ -50,12 +50,12 @@ static bool check_user_credentials(Database *db, const char *username, const cha
     {
         // 获取用户ID
         const char *db_user_id = (const char *)sqlite3_column_text(stmt, 0);
-        // 获取密码哈希（实际上是明文密码）
+        // 获取密码
         const char *db_password = (const char *)sqlite3_column_text(stmt, 1);
         // 获取角色ID
         const char *role_id = (const char *)sqlite3_column_text(stmt, 2);
 
-        // 直接比较明文密码
+        // 验证密码
         if (db_password && strcmp(password, db_password) == 0)
         {
             // 复制用户ID
@@ -79,7 +79,7 @@ static bool check_user_credentials(Database *db, const char *username, const cha
             }
             else
             {
-                // 未知角色，设置为最低权限
+                // 未知
                 *user_type = USER_OWNER;
                 *permission_level = 3;
             }
@@ -87,13 +87,13 @@ static bool check_user_credentials(Database *db, const char *username, const cha
         }
     }
 
-    // 清理语句
+    // 清理
     sqlite3_finalize(stmt);
 
     return found;
 }
 
-// 用户认证
+// 用户认证主调用
 LoginResult authenticate_user(Database *db, const char *username, const char *password)
 {
     LoginResult result = {false, 0, 0, {0}};
@@ -120,8 +120,6 @@ bool validate_permission(Database *db, const char *user_id, UserType user_type, 
         return false;
     }
 
-    // 此处简单实现，直接根据用户类型判断权限
-    // 在实际应用中，应该从数据库中获取用户的实际权重
     int permission_level;
     switch (user_type)
     {
