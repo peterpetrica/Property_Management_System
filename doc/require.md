@@ -4,7 +4,7 @@
 
 ### 用户表 (users)
 
-- user_id (主键)
+- user_id (主键)(这是字符串，不是数字)
 - username (登录名)
 - password_hash (密码哈希)
 - name (姓名)
