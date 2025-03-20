@@ -33,4 +33,6 @@ int db_parameterized_query(Database *db, const char *query, void *params,
                            void (*bind_params)(sqlite3_stmt *, void *),
                            QueryResult *result);
 
+bool get_building_id_by_name(Database *db, const char *building_name, char *building_id);
+
 #endif /* DB_QUERY_H */

@@ -177,8 +177,16 @@ void show_apartment_test_screen(Database *db, const char *user_id, UserType user
             Room room;
             memset(&room, 0, sizeof(Room));
 
-            printf("请输入楼宇ID: ");
-            scanf("%s", room.building_id);
+            char building_name[64];
+            printf("请输入楼宇名: ");
+            scanf("%s", building_name);
+            // 根据楼宇名查询楼宇ID
+            if (!get_building_id_by_name(db, building_name, room.building_id))
+            {
+                printf("未找到此楼宇名！\n");
+                getchar();
+                break;
+            }
             getchar();
 
             printf("请输入房间号: ");
@@ -333,9 +341,16 @@ void show_apartment_test_screen(Database *db, const char *user_id, UserType user
 
         case 5: // 获取特定楼宇的所有房屋
         {
-            char building_id[64];
-            printf("请输入楼宇ID: ");
-            scanf("%s", building_id);
+            char building_name[64];
+            printf("请输入楼宇名: ");
+            scanf("%s", building_name);
+            // 根据楼宇名查询楼宇ID
+            char building_id[40];
+            if (!get_building_id_by_name(db, building_name, building_id))
+            {
+                printf("未找到此楼宇名！\n");
+                break;
+            }
             getchar();
 
             QueryResult result;
@@ -476,8 +491,14 @@ void show_building_test_screen(Database *db, const char *user_id, UserType user_
             Building building;
             memset(&building, 0, sizeof(Building));
 
-            printf("请输入要修改的楼宇ID: ");
-            scanf("%s", building.building_id);
+            char building_name[64];
+            printf("请输入要修改的楼宇名: ");
+            scanf("%s", building_name);
+            if (!get_building_id_by_name(db, building_name, building.building_id))
+            {
+                printf("未找到此楼宇名！\n");
+                break;
+            }
             getchar();
 
             // 获取原楼宇信息
@@ -526,9 +547,16 @@ void show_building_test_screen(Database *db, const char *user_id, UserType user_
 
         case 3: // 删除楼宇
         {
-            char building_id[64];
-            printf("请输入要删除的楼宇ID: ");
-            scanf("%s", building_id);
+            char building_name[64];
+            printf("请输入楼宇名: ");
+            scanf("%s", building_name);
+            // 根据楼宇名查询楼宇ID
+            char building_id[40];
+            if (!get_building_id_by_name(db, building_name, building_id))
+            {
+                printf("未找到此楼宇名！\n");
+                break;
+            }
             getchar();
 
             printf("警告：删除楼宇将同时删除与该楼宇相关的所有信息！\n");
@@ -557,9 +585,16 @@ void show_building_test_screen(Database *db, const char *user_id, UserType user_
 
         case 4: // 获取楼宇信息
         {
-            char building_id[64];
-            printf("请输入楼宇ID: ");
-            scanf("%s", building_id);
+            char building_name[64];
+            printf("请输入楼宇名: ");
+            scanf("%s", building_name);
+            // 根据楼宇名查询楼宇ID
+            char building_id[40];
+            if (!get_building_id_by_name(db, building_name, building_id))
+            {
+                printf("未找到此楼宇名！\n");
+                break;
+            }
             getchar();
 
             Building building;
@@ -613,13 +648,20 @@ void show_building_test_screen(Database *db, const char *user_id, UserType user_
         {
             char staff_id[64];
             char building_id[64];
+            char building_name[64];
 
             printf("请输入服务人员ID: ");
             scanf("%s", staff_id);
             getchar();
 
-            printf("请输入楼宇ID: ");
-            scanf("%s", building_id);
+            printf("请输入楼宇名: ");
+            scanf("%s", building_name);
+            // 根据楼宇名查询楼宇ID
+            if (!get_building_id_by_name(db, building_name, building_id))
+            {
+                printf("未找到此楼宇名！\n");
+                break;
+            }
             getchar();
 
             if (assign_staff_to_building(db, user_id, user_type, staff_id, building_id))
@@ -637,13 +679,19 @@ void show_building_test_screen(Database *db, const char *user_id, UserType user_
         {
             char staff_id[64];
             char building_id[64];
+            char building_name[64];
 
             printf("请输入服务人员ID: ");
             scanf("%s", staff_id);
             getchar();
 
-            printf("请输入楼宇ID: ");
-            scanf("%s", building_id);
+            printf("请输入楼宇名: ");
+            scanf("%s", building_name);
+            if (!get_building_id_by_name(db, building_name, building_id))
+            {
+                printf("未找到此楼宇名！\n");
+                break;
+            }
             getchar();
 
             if (unassign_staff_from_building(db, user_id, user_type, staff_id, building_id))

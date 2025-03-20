@@ -177,6 +177,25 @@ void free_query_result(QueryResult *result)
     result->column_count = 0;
 }
 
+bool get_building_id_by_name(Database *db, const char *building_name, char *building_id)
+{
+    // 构建SQL语句
+    char sql[256];
+    snprintf(sql, sizeof(sql),
+             "SELECT building_id FROM buildings WHERE building_name = '%s'",
+             building_name);
+
+    QueryResult result;
+    if (!execute_query(db, sql, &result) || result.row_count == 0)
+    {
+        free_query_result(&result);
+        return false;
+    }
+
+    strncpy(building_id, result.rows[0].values[0], 40);
+    free_query_result(&result);
+    return true;
+}
 // 执行复合查询
 int db_compound_query(Database *db, const char *query, QueryResult *result)
 {
