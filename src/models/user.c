@@ -150,17 +150,17 @@ bool query_username_by_user_id(Database *db, const char *user_id, char *username
     return false;
 }
 
-// 通过用户名查询用户ID
-bool query_user_id_by_username(Database *db, const char *username, char *user_id)
+// 通过用户姓名查询用户ID
+bool query_user_id_by_name(Database *db, const char *name, char *user_id)
 {
-    if (db == NULL || db->db == NULL || username == NULL || user_id == NULL)
+    if (db == NULL || db->db == NULL || name == NULL || user_id == NULL)
     {
         fprintf(stderr, "查询用户ID参数无效\n");
         return false;
     }
 
     // 准备SQL查询语句 - 首先计算匹配的用户数量
-    const char *count_query = "SELECT COUNT(*) FROM users WHERE username = ?";
+    const char *count_query = "SELECT COUNT(*) FROM users WHERE name = ?";
     sqlite3_stmt *count_stmt;
     int total_users = 0;
 
@@ -173,10 +173,10 @@ bool query_user_id_by_username(Database *db, const char *username, char *user_id
     }
 
     // 绑定参数
-    rc = sqlite3_bind_text(count_stmt, 1, username, -1, SQLITE_STATIC);
+    rc = sqlite3_bind_text(count_stmt, 1, name, -1, SQLITE_STATIC);
     if (rc != SQLITE_OK)
     {
-        fprintf(stderr, "无法绑定用户名: %s\n", sqlite3_errmsg(db->db));
+        fprintf(stderr, "无法绑定用户姓名: %s\n", sqlite3_errmsg(db->db));
         sqlite3_finalize(count_stmt);
         return false;
     }
@@ -190,13 +190,13 @@ bool query_user_id_by_username(Database *db, const char *username, char *user_id
 
     if (total_users == 0)
     {
-        fprintf(stderr, "未找到用户名为 \"%s\" 的用户\n", username);
+        fprintf(stderr, "未找到姓名为 \"%s\" 的用户\n", name);
         return false;
     }
     else if (total_users == 1)
     {
         // 只有一个匹配，直接查询并返回
-        const char *query = "SELECT user_id FROM users WHERE username = ?";
+        const char *query = "SELECT user_id FROM users WHERE name = ?";
         sqlite3_stmt *stmt;
 
         rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
@@ -206,10 +206,10 @@ bool query_user_id_by_username(Database *db, const char *username, char *user_id
             return false;
         }
 
-        rc = sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC);
+        rc = sqlite3_bind_text(stmt, 1, name, -1, SQLITE_STATIC);
         if (rc != SQLITE_OK)
         {
-            fprintf(stderr, "无法绑定用户名: %s\n", sqlite3_errmsg(db->db));
+            fprintf(stderr, "无法绑定用户姓名: %s\n", sqlite3_errmsg(db->db));
             sqlite3_finalize(stmt);
             return false;
         }
@@ -272,7 +272,7 @@ bool query_user_id_by_username(Database *db, const char *username, char *user_id
         }
 
         // 准备SQL查询语句 - 获取匹配的用户及其手机号
-        const char *query = "SELECT user_id, phone_number FROM users WHERE username = ?";
+        const char *query = "SELECT user_id, phone_number FROM users WHERE name = ?";
         sqlite3_stmt *stmt;
 
         rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
@@ -282,10 +282,10 @@ bool query_user_id_by_username(Database *db, const char *username, char *user_id
             goto cleanup;
         }
 
-        rc = sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC);
+        rc = sqlite3_bind_text(stmt, 1, name, -1, SQLITE_STATIC);
         if (rc != SQLITE_OK)
         {
-            fprintf(stderr, "无法绑定用户名: %s\n", sqlite3_errmsg(db->db));
+            fprintf(stderr, "无法绑定用户姓名: %s\n", sqlite3_errmsg(db->db));
             sqlite3_finalize(stmt);
             goto cleanup;
         }
@@ -320,7 +320,7 @@ bool query_user_id_by_username(Database *db, const char *username, char *user_id
         sqlite3_finalize(stmt);
 
         // 有多个匹配，需要用户选择
-        printf("找到多个用户名为 \"%s\" 的用户，请选择：\n", username);
+        printf("找到多个姓名为 \"%s\" 的用户，请选择：\n", name);
         for (int i = 0; i < count; i++)
         {
             char phone_suffix[15] = "未知";
