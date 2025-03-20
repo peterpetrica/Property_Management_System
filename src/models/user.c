@@ -96,7 +96,7 @@ bool delete_user(Database *db, const char *admin_id, UserType admin_type, const 
 }
 
 // 根据用户ID查询用户名
-bool query_username(Database *db, const char *user_id, char *username)
+bool query_username_by_user_id(Database *db, const char *user_id, char *username)
 {
     if (db == NULL || db->db == NULL || user_id == NULL || username == NULL)
     {
@@ -148,4 +148,221 @@ bool query_username(Database *db, const char *user_id, char *username)
     strncpy(username, "未知用户", 99);
     sqlite3_finalize(stmt);
     return false;
+}
+
+// 通过用户名查询用户ID
+bool query_user_id_by_username(Database *db, const char *username, char *user_id)
+{
+    if (db == NULL || db->db == NULL || username == NULL || user_id == NULL)
+    {
+        fprintf(stderr, "查询用户ID参数无效\n");
+        return false;
+    }
+
+    // 准备SQL查询语句 - 首先计算匹配的用户数量
+    const char *count_query = "SELECT COUNT(*) FROM users WHERE username = ?";
+    sqlite3_stmt *count_stmt;
+    int total_users = 0;
+
+    // 准备计数语句
+    int rc = sqlite3_prepare_v2(db->db, count_query, -1, &count_stmt, NULL);
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "无法准备计数查询语句: %s\n", sqlite3_errmsg(db->db));
+        return false;
+    }
+
+    // 绑定参数
+    rc = sqlite3_bind_text(count_stmt, 1, username, -1, SQLITE_STATIC);
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "无法绑定用户名: %s\n", sqlite3_errmsg(db->db));
+        sqlite3_finalize(count_stmt);
+        return false;
+    }
+
+    // 执行计数查询
+    if (sqlite3_step(count_stmt) == SQLITE_ROW)
+    {
+        total_users = sqlite3_column_int(count_stmt, 0);
+    }
+    sqlite3_finalize(count_stmt);
+
+    if (total_users == 0)
+    {
+        fprintf(stderr, "未找到用户名为 \"%s\" 的用户\n", username);
+        return false;
+    }
+    else if (total_users == 1)
+    {
+        // 只有一个匹配，直接查询并返回
+        const char *query = "SELECT user_id FROM users WHERE username = ?";
+        sqlite3_stmt *stmt;
+
+        rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
+        if (rc != SQLITE_OK)
+        {
+            fprintf(stderr, "无法准备查询语句: %s\n", sqlite3_errmsg(db->db));
+            return false;
+        }
+
+        rc = sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC);
+        if (rc != SQLITE_OK)
+        {
+            fprintf(stderr, "无法绑定用户名: %s\n", sqlite3_errmsg(db->db));
+            sqlite3_finalize(stmt);
+            return false;
+        }
+
+        if (sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            const unsigned char *result = sqlite3_column_text(stmt, 0);
+            if (result)
+            {
+                strncpy(user_id, (const char *)result, 36);
+                user_id[36] = '\0';
+                sqlite3_finalize(stmt);
+                return true;
+            }
+        }
+
+        sqlite3_finalize(stmt);
+        return false;
+    }
+    else
+    {
+        // 有多个匹配，需要动态分配内存存储所有匹配的结果
+        char **user_ids = (char **)malloc(total_users * sizeof(char *));
+        char **phone_numbers = (char **)malloc(total_users * sizeof(char *));
+
+        if (user_ids == NULL || phone_numbers == NULL)
+        {
+            fprintf(stderr, "内存分配失败\n");
+            if (user_ids)
+                free(user_ids);
+            if (phone_numbers)
+                free(phone_numbers);
+            return false;
+        }
+
+        // 为每个用户ID和手机号分配内存
+        for (int i = 0; i < total_users; i++)
+        {
+            user_ids[i] = (char *)malloc(37 * sizeof(char));      // UUID长度最大36字符+结束符
+            phone_numbers[i] = (char *)malloc(20 * sizeof(char)); // 手机号最大19字符+结束符
+
+            if (user_ids[i] == NULL || phone_numbers[i] == NULL)
+            {
+                fprintf(stderr, "内存分配失败\n");
+                // 释放已分配的内存
+                for (int j = 0; j < i; j++)
+                {
+                    free(user_ids[j]);
+                    free(phone_numbers[j]);
+                }
+                if (i < total_users && user_ids[i])
+                    free(user_ids[i]);
+                if (i < total_users && phone_numbers[i])
+                    free(phone_numbers[i]);
+
+                free(user_ids);
+                free(phone_numbers);
+                return false;
+            }
+        }
+
+        // 准备SQL查询语句 - 获取匹配的用户及其手机号
+        const char *query = "SELECT user_id, phone_number FROM users WHERE username = ?";
+        sqlite3_stmt *stmt;
+
+        rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
+        if (rc != SQLITE_OK)
+        {
+            fprintf(stderr, "无法准备查询语句: %s\n", sqlite3_errmsg(db->db));
+            goto cleanup;
+        }
+
+        rc = sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC);
+        if (rc != SQLITE_OK)
+        {
+            fprintf(stderr, "无法绑定用户名: %s\n", sqlite3_errmsg(db->db));
+            sqlite3_finalize(stmt);
+            goto cleanup;
+        }
+
+        // 获取所有匹配的记录
+        int count = 0;
+        while ((rc = sqlite3_step(stmt)) == SQLITE_ROW && count < total_users)
+        {
+            const unsigned char *id_result = sqlite3_column_text(stmt, 0);
+            const unsigned char *phone_result = sqlite3_column_text(stmt, 1);
+
+            if (id_result)
+            {
+                strncpy(user_ids[count], (const char *)id_result, 36);
+                user_ids[count][36] = '\0';
+
+                // 复制手机号或设置为空字符串
+                if (phone_result)
+                {
+                    strncpy(phone_numbers[count], (const char *)phone_result, 19);
+                    phone_numbers[count][19] = '\0';
+                }
+                else
+                {
+                    strcpy(phone_numbers[count], "未知手机号");
+                }
+
+                count++;
+            }
+        }
+
+        sqlite3_finalize(stmt);
+
+        // 有多个匹配，需要用户选择
+        printf("找到多个用户名为 \"%s\" 的用户，请选择：\n", username);
+        for (int i = 0; i < count; i++)
+        {
+            char phone_suffix[15] = "未知";
+            int phone_len = strlen(phone_numbers[i]);
+
+            // 获取手机号后四位
+            if (phone_len >= 4 && strcmp(phone_numbers[i], "未知手机号") != 0)
+            {
+                strncpy(phone_suffix, phone_numbers[i] + (phone_len - 4), 4);
+                phone_suffix[4] = '\0';
+            }
+
+            printf("%d. 用户(手机尾号: %s)\n", i + 1, phone_suffix);
+        }
+
+        int choice;
+        printf("请输入数字选择 (1-%d): ", count);
+        scanf("%d", &choice);
+
+        // 验证选择的有效性
+        bool success = false;
+        if (choice >= 1 && choice <= count)
+        {
+            // 返回选择的用户ID
+            strcpy(user_id, user_ids[choice - 1]);
+            success = true;
+        }
+        else
+        {
+            fprintf(stderr, "无效的选择\n");
+        }
+
+    cleanup:
+        // 释放分配的内存
+        for (int i = 0; i < total_users; i++)
+        {
+            free(user_ids[i]);
+            free(phone_numbers[i]);
+        }
+        free(user_ids);
+        free(phone_numbers);
+
+        return success;
+    }
 }

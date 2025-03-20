@@ -129,33 +129,6 @@ bool show_registration_screen(Database *db)
     printf("用户名 (必填): ");
     scanf("%63s", username);
 
-    // 检查用户名是否已存在
-    sprintf(query, "SELECT COUNT(*) FROM users WHERE username = ?;");
-
-    if (db_prepare(db, query, &stmt) != SQLITE_OK)
-    {
-        system("clear||cls");
-        printf("数据库错误: %s\n", sqlite3_errmsg(db->db));
-        return false;
-    }
-
-    sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC);
-
-    if (sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        int count = sqlite3_column_int(stmt, 0);
-        if (count > 0)
-        {
-            system("clear||cls");
-            printf("用户名已存在，请选择其他用户名\n");
-            sqlite3_finalize(stmt);
-            return false;
-        }
-    }
-
-    sqlite3_finalize(stmt);
-    stmt = NULL;
-
     // 输入密码
     printf("密码 (必填): ");
     while (getchar() != '\n')
@@ -177,8 +150,35 @@ bool show_registration_screen(Database *db)
     printf("真实姓名 (必填): ");
     scanf("%63s", name);
 
-    printf("电话号码 (选填): ");
+    printf("电话号码 (必填): ");
     scanf("%19s", phone);
+
+    // 检查手机号是否已被注册
+    sprintf(query, "SELECT COUNT(*) FROM users WHERE phone_number = ?;");
+
+    if (db_prepare(db, query, &stmt) != SQLITE_OK)
+    {
+        system("clear||cls");
+        printf("数据库错误: %s\n", sqlite3_errmsg(db->db));
+        return false;
+    }
+
+    sqlite3_bind_text(stmt, 1, phone, -1, SQLITE_STATIC);
+
+    if (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        int count = sqlite3_column_int(stmt, 0);
+        if (count > 0)
+        {
+            system("clear||cls");
+            printf("该手机号已被注册，请使用其他手机号\n");
+            sqlite3_finalize(stmt);
+            return false;
+        }
+    }
+
+    sqlite3_finalize(stmt);
+    stmt = NULL;
 
     printf("电子邮箱 (选填): ");
     scanf("%63s", email);

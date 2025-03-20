@@ -81,6 +81,6 @@ bool get_admin_by_id(Database *db, const char *admin_id, Admin *admin);
 bool delete_user(Database *db, const char *admin_id, UserType admin_type, const char *user_id, UserType user_type);
 
 // 根据用户ID查询用户名
-bool query_username(Database *db, const char *user_id, char *username);
+bool query_username_by_user_id(Database *db, const char *user_id, char *username);
 
 #endif /* USER_H */

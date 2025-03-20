@@ -31,7 +31,7 @@
 #include <time.h>
 
 // 函数声明
-bool query_username(Database *db, const char *user_id, char *username);
+bool query_username_by_user_id(Database *db, const char *user_id, char *username);
 
 // 清除输入缓冲区
 void clear_input_buffer()
@@ -122,7 +122,7 @@ void handle_change_password(Database *db, const char *user_id, UserType user_typ
 void main_screen_owner(Database *db, const char *user_id, UserType user_type)
 {
     char username[100];
-    query_username(db, user_id, username);
+    query_username_by_user_id(db, user_id, username);
     printf("您好，%s\n", username);
 
     int number;
@@ -164,7 +164,7 @@ void main_screen_owner(Database *db, const char *user_id, UserType user_type)
 void show_personal_info_screen(Database *db, const char *user_id, UserType user_type)
 {
     char username[100];
-    query_username(db, user_id, username);
+    query_username_by_user_id(db, user_id, username);
 
     printf("更改您的用户名---1    更改您的密码---2    退出---0\n");
     int num;
