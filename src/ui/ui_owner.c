@@ -29,7 +29,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
 // 函数声明
 bool query_username_by_user_id(Database *db, const char *user_id, char *username);
 
@@ -93,9 +92,34 @@ void query_service_staff_info(Database *db, const char *user_id)
 // 修改用户名
 bool change_username(Database *db, const char *user_id, char *username)
 {
-    printf("修改用户名功能待实现\n");
-    // TODO: 实现修改用户名的功能
+    if (db == NULL || user_id == NULL || username == NULL)
+    {
+        fprintf(stderr, "无效的数据库或输入参数\n");
+        return false;
+    }
+const char* sql = "UPDATE users SET username = ? WHERE id = ?;";
+sqlite3_stmt* stmt;
+int rc;
+// 预处理 SQL 语句
+rc = sqlite3_prepare_v2(db->conn, sql, -1, &stmt, 0);
+if (rc != SQLITE_OK) {
+    fprintf(stderr, "SQL 预处理失败: %s\n", sqlite3_errmsg(db->conn));
     return false;
+}
+// 绑定参数
+sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC);
+sqlite3_bind_text(stmt, 2, user_id, -1, SQLITE_STATIC);
+// 执行 SQL 语句
+rc = sqlite3_step(stmt);
+if (rc != SQLITE_DONE) {
+    fprintf(stderr, "用户名更新失败: %s\n", sqlite3_errmsg(db->conn));
+    sqlite3_finalize(stmt);
+    return false;
+}
+// 释放资源
+sqlite3_finalize(stmt);
+printf("用户名修改成功\n");
+return true;
 }
 
 // 修改密码
@@ -306,8 +330,100 @@ void show_owner_query_screen(Database *db, const char *user_id, UserType user_ty
 }
 
 // 业主信息排序界面
+// //需要的函数
+// 按 ID 升序排序的比较函数
+int compare_id_asc(const void* a, const void* b)
+{
+    Owner* ownerA = *(Owner**)a;
+    Owner* ownerB = *(Owner**)b;
+    return ownerA->id - ownerB->id;
+}
+
+// 按 ID 降序排序的比较函数
+int compare_id_desc(const void* a, const void* b)
+{
+    Owner* ownerA = *(Owner**)a;
+    Owner* ownerB = *(Owner**)b;
+    return ownerB->id - ownerA->id;
+}
+
+// 按姓名升序排序的比较函数
+int compare_name_asc(const void* a, const void* b)
+{
+    Owner* ownerA = *(Owner**)a;
+    Owner* ownerB = *(Owner**)b;
+    return strcmp(ownerA->name, ownerB->name);
+}
+
+// 按姓名降序排序的比较函数
+int compare_name_desc(const void* a, const void* b)
+{
+    Owner* ownerA = *(Owner**)a;
+    Owner* ownerB = *(Owner**)b;
+    return strcmp(ownerB->name, ownerA->name);
+}
 void show_owner_sort_screen(Database *db, const char *user_id, UserType user_type)
 {
+    int choice;
+    while (1)
+    {
+        printf("\n===== 业主信息排序 =====\n");
+        printf("1--按 ID 升序\n");
+        printf("2--按 ID 降序\n");
+        printf("3--按姓名升序\n");
+        printf("4--按姓名降序\n");
+        printf("0--返回上一级\n");
+        printf("请输入您的选择: ");
+
+        if (scanf("%d", &choice) != 1)
+        {
+            clear_input_buffer();
+            printf("输入无效，请重新输入。\n");
+            continue;
+        }
+        // 根据用户的选择进行处理
+        switch (choice)
+        {
+        case 1:
+            // 按 ID 升序排序
+        {
+            sort_owners(db, compare_id_asc);
+            display_owners(db);
+            break;
+        }
+
+        case 2:
+            // 按 ID 降序排序
+        {
+            sort_owners(db, compare_id_desc);
+            display_owners(db);
+            break;
+        }
+
+        case 3:
+            // 按姓名升序排序
+        {
+            sort_owners(db, compare_name_asc);
+            display_owners(db);
+            break;
+        }
+
+        case 4:
+            // 按姓名降序排序
+        {
+            sort_owners(db, compare_name_desc);
+            display_owners(db);
+            break;
+        }
+
+        case 0:
+            // 返回上一级菜单
+        {
+            printf("返回上一级菜单。\n");
+            return;
+        }
+
+    }
     // TODO: 实现业主信息排序界面显示和操作逻辑
 }
 
