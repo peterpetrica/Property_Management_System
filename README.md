@@ -13,6 +13,8 @@ ptc：
 - [x] apartment.c 已完成，实现增删查改房屋功能
 - [x] building.c 已完成，实现楼宇的增删查改
 - [x] transaction.c 已初步完成，实现交易记录的添加
+- [x] parking.c
+- [x] service.c 
 以上函数由我负责维护，有需求请联系我
 fxl：
 
@@ -125,3 +127,13 @@ cmake --build build
 ```bash
 ./run.sh
 ```
+## 初始化工作环境 $^{*}$
+
+1. 根据您的操作系统及CPU指令架构，在仓库根目录下的 `.filter-tools` 目录中选择对应的文件，记录其文件名 $^{**}$
+2. 在克隆的仓库中启动终端，使用以下命令在仓库中使用如下命令添加Filter
+
+        # 仅替换 `<platform>` `<arch>` 为您的平台，不要更改相对路径
+        ## 除非你知道你在做什么
+
+        git config --local filter.garbage2null.smudge "./.filter-tools/garbage2null-<platform>-<arch>"
+        git config --local filter.garbage2null.clean "./.filter-tools/garbage2null-<platform>-<arch>"
