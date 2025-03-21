@@ -21,6 +21,14 @@
 #include <string.h>
 #include <time.h>
 
+// 生成交易ID
+char *generate_transaction_id()
+{
+    static char transaction_id[40];
+    generate_uuid(transaction_id);
+    return transaction_id;
+}
+
 // 添加费用标准
 bool add_fee_standard(Database *db, const char *user_id, UserType user_type, FeeStandard *standard)
 {

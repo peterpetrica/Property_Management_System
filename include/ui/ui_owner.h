@@ -7,11 +7,11 @@
 // 显示业主主界面
 void show_owner_main_screen(Database *db, const char *user_id, UserType user_type);
 
-// 主界面函数（添加此函数声明）
+// 主界面函数
 void main_screen_owner(Database *db, const char *user_id, UserType user_type);
 
-// 个人信息管理界面
-void show_personal_info_screen(Database *db, const char *user_id, UserType user_type);
+// 业主个人信息管理界面
+void show_owner_personal_info_screen(Database *db, const char *user_id, UserType user_type);
 
 // 缴费管理界面
 void show_payment_management_screen(Database *db, const char *user_id, UserType user_type);
@@ -27,5 +27,11 @@ void show_owner_statistics_screen(Database *db, const char *user_id, UserType us
 
 // 业主系统维护界面
 void show_owner_maintenance_screen(Database *db, const char *user_id, UserType user_type);
+
+// 重命名后的比较函数声明
+int compare_owner_id_asc(const void *a, const void *b);
+int compare_owner_id_desc(const void *a, const void *b);
+int compare_owner_name_asc(const void *a, const void *b);
+int compare_owner_name_desc(const void *a, const void *b);
 
 #endif /* UI_OWNER_H */

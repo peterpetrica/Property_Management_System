@@ -45,22 +45,22 @@ void show_payment_history(Database *db, const char *user_id)
 {
     system("cls");
     printf("=====缴费记录=====\n");
-    const char*query="SELECT * FROM transactions WHERE user_id=?;";
-    sqlite3_stmt*stmt;
-    int rc=sqlite3_prepare_v2(db->db,query,-1,&stmt,NULL);
-    if(rc!=SQLITE_OK)
+    const char *query = "SELECT * FROM transactions WHERE user_id=?;";
+    sqlite3_stmt *stmt;
+    int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
     {
-        printf("SQLite错误: %s\n",sqlite3_errmsg(db->db));
+        printf("SQLite错误: %s\n", sqlite3_errmsg(db->db));
         return;
     }
-    sqlite3_bind_text(stmt,1,user_id,-1,SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
     printf("交易ID\t\t金额\t\t日期\n");
-    while((rc=sqlite3_step(stmt))==SQLITE_ROW)
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
     {
-        const char*transaction_id=sqlite3_column_text(stmt,0);
-        double amount=sqlite3_column_double(stmt,1);
-        const char*date=sqlite3_column_text(stmt,2);
-        printf("%s\t%.2f\t%s\n",transaction_id,amount,date);
+        const char *transaction_id = sqlite3_column_text(stmt, 0);
+        double amount = sqlite3_column_double(stmt, 1);
+        const char *date = sqlite3_column_text(stmt, 2);
+        printf("%s\t%.2f\t%s\n", transaction_id, amount, date);
     }
     sqlite3_finalize(stmt);
     printf("按任意键返回...\n");
@@ -74,35 +74,33 @@ void process_payment_screen(Database *db, const char *user_id)
     printf("=====缴费流程=====\n");
     double amount;
     printf("请输入缴费金额: ");
-    if(scanf("%lf",&amount)!=1)
+    if (scanf("%lf", &amount) != 1)
     {
         printf("输入错误，请重试\n");
         clear_input_buffer();
         return;
     }
-    const char*query="INSERT INTO transactions(transaction_id,amount,date) VALUES(?,?,?);";
-    sqlite3_stmt*stmt;
-    int rc=sqlite3_prepare_v2(db->db,query,-1,&stmt,NULL);
-    if(rc!=SQLITE_OK)
+    const char *query = "INSERT INTO transactions(transaction_id,amount,date) VALUES(?,?,?);";
+    sqlite3_stmt *stmt;
+    int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
     {
-        fprintf(stderr,"无法准备插入语句: %s\n",sqlite3_errmsg(db->db));
+        fprintf(stderr, "无法准备插入语句: %s\n", sqlite3_errmsg(db->db));
         return;
     }
-    sqlite3_bind_text(stmt,1,generate_transaction_id(),-1,SQLITE_STATIC);
-    sqlite3_bind_double(stmt,2,amount);
-   if(sqlite3_step(stmt)!=SQLITE_DONE)
+    sqlite3_bind_text(stmt, 1, generate_transaction_id(), -1, SQLITE_STATIC);
+    sqlite3_bind_double(stmt, 2, amount);
+    if (sqlite3_step(stmt) != SQLITE_DONE)
     {
-        fprintf(stderr,"缴费失败: %s\n",sqlite3_errmsg(db->db));
+        fprintf(stderr, "缴费失败: %s\n", sqlite3_errmsg(db->db));
     }
     else
     {
-        printf("缴费成功！金额: %.2f\n",amount);
+        printf("缴费成功！金额: %.2f\n", amount);
     }
     sqlite3_finalize(stmt);
     printf("按任意键返回...\n");
     clear_input_buffer();
-    
-
 }
 
 // 查询应缴费用
@@ -110,19 +108,19 @@ void query_due_amount(Database *db, const char *user_id)
 {
     system("cls");
     printf("=====查询应缴费用=====\n");
-    const char*query="SELECT SUM(amount) FROM transactions WHERE user_id=?;";
-    sqlite3_stmt*stmt;
-    int rc=sqlite3_prepare_v2(db->db,query,-1,&stmt,NULL);
-    if(rc!=SQLITE_OK)
+    const char *query = "SELECT SUM(amount) FROM transactions WHERE user_id=?;";
+    sqlite3_stmt *stmt;
+    int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
     {
-        fprintf(stderr,"无法准备查询语句: %s\n",sqlite3_errmsg(db->db));
+        fprintf(stderr, "无法准备查询语句: %s\n", sqlite3_errmsg(db->db));
         return;
     }
-    sqlite3_bind_text(stmt,1,user_id,-1,SQLITE_STATIC);
-    if(sqlite3_step(stmt)==SQLITE_ROW)
+    sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
+    if (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        double total_amount=sqlite3_column_double(stmt,0);
-        printf("应缴费用: %.2f\n",total_amount);
+        double total_amount = sqlite3_column_double(stmt, 0);
+        printf("应缴费用: %.2f\n", total_amount);
     }
     else
     {
@@ -138,19 +136,19 @@ void query_remaining_balance(Database *db, const char *user_id)
 {
     system("cls");
     printf("=====查询剩余费用=====\n");
-    const char*query="SELECT SUM(amount) FROM transactions WHERE user_id=?;";
-    sqlite3_stmt*stmt;
-    int rc=sqlite3_prepare_v2(db->db,query,-1,&stmt,NULL);
-    if(rc!=SQLITE_OK)
+    const char *query = "SELECT SUM(amount) FROM transactions WHERE user_id=?;";
+    sqlite3_stmt *stmt;
+    int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
     {
-        fprintf(stderr,"无法准备查询语句: %s\n",sqlite3_errmsg(db->db));
+        fprintf(stderr, "无法准备查询语句: %s\n", sqlite3_errmsg(db->db));
         return;
     }
-    sqlite3_bind_text(stmt,1,user_id,-1,SQLITE_STATIC);
-    if(sqlite3_step(stmt)==SQLITE_ROW)
+    sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
+    if (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        double total_amount=sqlite3_column_double(stmt,0);
-        printf("剩余费用: %.2f\n",total_amount);
+        double total_amount = sqlite3_column_double(stmt, 0);
+        printf("剩余费用: %.2f\n", total_amount);
     }
     else
     {
@@ -166,22 +164,22 @@ void query_community_info(Database *db)
 {
     system("cls");
     printf("=====查询小区基本信息=====\n");
-    const char*query="SELECT * FROM community_info;";
-    sqlite3_stmt*stmt;
-    int rc=sqlite3_prepare_v2(db->db,query,-1,&stmt,NULL);
-    if(rc!=SQLITE_OK)
+    const char *query = "SELECT * FROM community_info;";
+    sqlite3_stmt *stmt;
+    int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
     {
-        fprintf(stderr,"无法准备查询语句: %s\n",sqlite3_errmsg(db->db));
+        fprintf(stderr, "无法准备查询语句: %s\n", sqlite3_errmsg(db->db));
         return;
     }
-    while((rc=sqlite3_step(stmt))==SQLITE_ROW)
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
     {
-        const char*name=sqlite3_column_text(stmt,0);
-        const char*address=sqlite3_column_text(stmt,1);
-        const char*phone_number=sqlite3_column_text(stmt,2);
-        printf("小区名称: %s\n",name);
-        printf("地址: %s\n",address);
-        printf("联系电话: %s\n",phone_number);
+        const char *name = sqlite3_column_text(stmt, 0);
+        const char *address = sqlite3_column_text(stmt, 1);
+        const char *phone_number = sqlite3_column_text(stmt, 2);
+        printf("小区名称: %s\n", name);
+        printf("地址: %s\n", address);
+        printf("联系电话: %s\n", phone_number);
     }
     sqlite3_finalize(stmt);
     printf("按任意键返回...\n");
@@ -193,27 +191,26 @@ void query_fee_info(Database *db, const char *user_id)
 {
     system("cls");
     printf("=====查询收费信息=====\n");
-    const char*query="SELECT * FROM fee_info;";
-    sqlite3_stmt*stmt;
-    int rc=sqlite3_prepare_v2(db->db,query,-1,&stmt,NULL);
-    if(rc!=SQLITE_OK)
+    const char *query = "SELECT * FROM fee_info;";
+    sqlite3_stmt *stmt;
+    int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
     {
-        fprintf(stderr,"无法准备查询语句: %s\n",sqlite3_errmsg(db->db));
+        fprintf(stderr, "无法准备查询语句: %s\n", sqlite3_errmsg(db->db));
         return;
     }
-    sqlite3_bind_text(stmt,1,user_id,-1,SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
     printf("费用ID\t\t费用名称\t\t费用金额\n");
-    while((rc=sqlite3_step(stmt))==SQLITE_ROW)
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
     {
-        const char*fee_id=sqlite3_column_text(stmt,0);
-        const char*fee_name=sqlite3_column_text(stmt,1);
-        double fee_amount=sqlite3_column_double(stmt,2);
-        printf("%s\t%s\t%.2f\n",fee_id,fee_name,fee_amount);
+        const char *fee_id = sqlite3_column_text(stmt, 0);
+        const char *fee_name = sqlite3_column_text(stmt, 1);
+        double fee_amount = sqlite3_column_double(stmt, 2);
+        printf("%s\t%s\t%.2f\n", fee_id, fee_name, fee_amount);
     }
     sqlite3_finalize(stmt);
     printf("按任意键返回...\n");
     clear_input_buffer();
-    
 }
 
 // 查询服务人员信息
@@ -221,22 +218,22 @@ void query_service_staff_info(Database *db, const char *user_id)
 {
     system("cls");
     printf("=====查询服务人员信息=====\n");
-    const char*query="SELECT * FROM service_staff_info;";
-    sqlite3_stmt*stmt;
-    int rc=sqlite3_prepare_v2(db->db,query,-1,&stmt,NULL);
-    if(rc!=SQLITE_OK)
+    const char *query = "SELECT * FROM service_staff_info;";
+    sqlite3_stmt *stmt;
+    int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
     {
-        fprintf(stderr,"无法准备查询语句: %s\n",sqlite3_errmsg(db->db));
+        fprintf(stderr, "无法准备查询语句: %s\n", sqlite3_errmsg(db->db));
         return;
     }
-    sqlite3_bind_text(stmt,1,user_id,-1,SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
     printf("服务人员ID\t\t姓名\t\t联系电话\n");
-    while((rc=sqlite3_step(stmt))==SQLITE_ROW)
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
     {
-        const char*staff_id=sqlite3_column_text(stmt,0);
-        const char*name=sqlite3_column_text(stmt,1);
-        const char*phone_number=sqlite3_column_text(stmt,2);
-        printf("%s\t%s\t%s\n",staff_id,name,phone_number); 
+        const char *staff_id = sqlite3_column_text(stmt, 0);
+        const char *name = sqlite3_column_text(stmt, 1);
+        const char *phone_number = sqlite3_column_text(stmt, 2);
+        printf("%s\t%s\t%s\n", staff_id, name, phone_number);
     }
     sqlite3_finalize(stmt);
     printf("按任意键返回...\n");
@@ -251,29 +248,31 @@ bool change_username(Database *db, const char *user_id, char *username)
         fprintf(stderr, "无效的数据库或输入参数\n");
         return false;
     }
-const char* sql = "UPDATE users SET username = ? WHERE id = ?;";
-sqlite3_stmt* stmt;
-int rc;
-// 预处理 SQL 语句
-rc = sqlite3_prepare_v2(db->db, sql, -1, &stmt, 0);
-if (rc != SQLITE_OK) {
-    fprintf(stderr, "SQL 预处理失败: %s\n", sqlite3_errmsg(db->db));
-    return false;
-}
-// 绑定参数
-sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC);
-sqlite3_bind_text(stmt, 2, user_id, -1, SQLITE_STATIC);
-// 执行 SQL 语句
-rc = sqlite3_step(stmt);
-if (rc != SQLITE_DONE) {
-    fprintf(stderr, "用户名更新失败: %s\n", sqlite3_errmsg(db->db));
+    const char *sql = "UPDATE users SET username = ? WHERE id = ?;";
+    sqlite3_stmt *stmt;
+    int rc;
+    // 预处理 SQL 语句
+    rc = sqlite3_prepare_v2(db->db, sql, -1, &stmt, 0);
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "SQL 预处理失败: %s\n", sqlite3_errmsg(db->db));
+        return false;
+    }
+    // 绑定参数
+    sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, user_id, -1, SQLITE_STATIC);
+    // 执行 SQL 语句
+    rc = sqlite3_step(stmt);
+    if (rc != SQLITE_DONE)
+    {
+        fprintf(stderr, "用户名更新失败: %s\n", sqlite3_errmsg(db->db));
+        sqlite3_finalize(stmt);
+        return false;
+    }
+    // 释放资源
     sqlite3_finalize(stmt);
-    return false;
-}
-// 释放资源
-sqlite3_finalize(stmt);
-printf("用户名修改成功\n");
-return true;
+    printf("用户名修改成功\n");
+    return true;
 }
 
 // 修改密码
@@ -317,7 +316,7 @@ void main_screen_owner(Database *db, const char *user_id, UserType user_type)
 
         if (number == 1)
         {
-            show_personal_info_screen(db, user_id, user_type);
+            show_owner_personal_info_screen(db, user_id, user_type); // 修正函数名称和语法错误
         }
         else if (number == 2)
         {
@@ -339,7 +338,7 @@ void main_screen_owner(Database *db, const char *user_id, UserType user_type)
 }
 
 // 个人信息管理界面
-void show_personal_info_screen(Database *db, const char *user_id, UserType user_type)
+void show_owner_personal_info_screen(Database *db, const char *user_id, UserType user_type)
 {
     char username[100];
     query_username_by_user_id(db, user_id, username);
@@ -485,38 +484,38 @@ void show_owner_query_screen(Database *db, const char *user_id, UserType user_ty
 
 // 业主信息排序界面
 // //需要的函数
-// 按 ID 升序排序的比较函数
-int compare_id_asc(const void* a, const void* b)
+// 按 ID 升序排序的比较函数 - 重命名以避免与user.c冲突
+int compare_owner_id_asc(const void *a, const void *b)
 {
-    Owner* ownerA = *(Owner**)a;
-    Owner* ownerB = *(Owner**)b;
+    Owner *ownerA = *(Owner **)a;
+    Owner *ownerB = *(Owner **)b;
     return ownerA->user_id - ownerB->user_id;
 }
 
-// 按 ID 降序排序的比较函数
-int compare_id_desc(const void* a, const void* b)
+// 按 ID 降序排序的比较函数 - 重命名
+int compare_owner_id_desc(const void *a, const void *b)
 {
-    Owner* ownerA = *(Owner**)a;
-    Owner* ownerB = *(Owner**)b;
+    Owner *ownerA = *(Owner **)a;
+    Owner *ownerB = *(Owner **)b;
     return ownerB->user_id - ownerA->user_id;
 }
 
-// 按姓名升序排序的比较函数
-int compare_name_asc(const void* a, const void* b)
+// 按姓名升序排序的比较函数 - 重命名
+int compare_owner_name_asc(const void *a, const void *b)
 {
-    Owner* ownerA = *(Owner**)a;
-    Owner* ownerB = *(Owner**)b;
+    Owner *ownerA = *(Owner **)a;
+    Owner *ownerB = *(Owner **)b;
     return strcmp(ownerA->name, ownerB->name);
 }
 
-// 按姓名降序排序的比较函数
-int compare_name_desc(const void* a, const void* b)
+// 按姓名降序排序的比较函数 - 重命名
+int compare_owner_name_desc(const void *a, const void *b)
 {
-    Owner* ownerA = *(Owner**)a;
-    Owner* ownerB = *(Owner**)b;
+    Owner *ownerA = *(Owner **)a;
+    Owner *ownerB = *(Owner **)b;
     return strcmp(ownerB->name, ownerA->name);
 }
-void show_owner_sort_screen(Database* db, const char* user_id, UserType user_type)
+void show_owner_sort_screen(Database *db, const char *user_id, UserType user_type)
 {
     int choice;
     while (1)
@@ -539,62 +538,61 @@ void show_owner_sort_screen(Database* db, const char* user_id, UserType user_typ
         switch (choice)
         {
         case 1:
-            // 按 ID 升序排序
-        {
-            sort_owners(db, compare_id_asc);
-            display_owners(db);
-            break;
-        }
+            // 按 ID 升序排序 - 更新函数名称
+            {
+                sort_owners(db, compare_owner_id_asc);
+                display_owners(db);
+                break;
+            }
 
         case 2:
-            // 按 ID 降序排序
-        {
-            sort_owners(db, compare_id_desc);
-            display_owners(db);
-            break;
-        }
+            // 按 ID 降序排序 - 更新函数名称
+            {
+                sort_owners(db, compare_owner_id_desc);
+                display_owners(db);
+                break;
+            }
 
         case 3:
-            // 按姓名升序排序
-        {
-            sort_owners(db, compare_name_asc);
-            display_owners(db);
-            break;
-        }
+            // 按姓名升序排序 - 更新函数名称
+            {
+                sort_owners(db, compare_owner_name_asc);
+                display_owners(db);
+                break;
+            }
 
         case 4:
-            // 按姓名降序排序
-        {
-            sort_owners(db, compare_name_desc);
-            display_owners(db);
-            break;
-        }
+            // 按姓名降序排序 - 更新函数名称
+            {
+                sort_owners(db, compare_owner_name_desc);
+                display_owners(db);
+                break;
+            }
 
         case 0:
             // 返回上一级菜单
-        {
-            printf("返回上一级菜单。\n");
-            return;
-        }
-
+            {
+                printf("返回上一级菜单。\n");
+                return;
+            }
         }
     }
 }
-    // TODO: 实现业主信息排序界面显示和操作逻辑
+// TODO: 实现业主信息排序界面显示和操作逻辑
 // 业主信息统计界面
-    void show_owner_statistics_screen(Database * db, const char* user_id, UserType user_type)
+void show_owner_statistics_screen(Database *db, const char *user_id, UserType user_type)
 {
     // TODO: 实现业主信息统计界面显示和操作逻辑
 }
 
 // 业主系统维护界面
-void show_owner_maintenance_screen(Database * db, const char* user_id, UserType user_type)
+void show_owner_maintenance_screen(Database *db, const char *user_id, UserType user_type)
 {
     // TODO: 实现业主系统维护界面显示和操作逻辑
 }
 
 // 兼容旧接口
-void show_owner_main_screen(Database * db, const char* user_id, UserType user_type)
+void show_owner_main_screen(Database *db, const char *user_id, UserType user_type)
 {
     main_screen_owner(db, user_id, user_type);
 }

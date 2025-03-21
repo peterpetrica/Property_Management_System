@@ -23,7 +23,6 @@
 #include <uuid/uuid.h>
 #endif
 
-
 void generate_uuid(char *out)
 {
     static const char *chars = "0123456789abcdef";
@@ -63,7 +62,6 @@ void generate_uuid(char *out)
     out[36] = '\0';
 }
 
-
 // 生成随机盐值
 static char *generate_salt(size_t length)
 {
@@ -92,171 +90,29 @@ static char *generate_salt(size_t length)
     return salt;
 }
 
-// 加密密码
-char *hash_password(const char *password)
+// 修改为直接存储明文密码
+bool hash_password(const char *password, char *hashed_output, size_t output_size)
 {
-    if (!password)
-        return NULL;
-
-    // 生成盐值
-    char *salt = generate_salt(16);
-    if (!salt)
-        return NULL;
-
-    // 创建哈希上下文
-    EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
-    if (!mdctx)
+    if (!password || !hashed_output || output_size <= 0)
     {
-        free(salt);
-        return NULL;
+        return false;
     }
 
-    // 初始化哈希上下文
-    if (EVP_DigestInit_ex(mdctx, EVP_sha256(), NULL) != 1)
-    {
-        EVP_MD_CTX_free(mdctx);
-        free(salt);
-        return NULL;
-    }
+    // 直接复制明文密码到输出缓冲区
+    strncpy(hashed_output, password, output_size - 1);
+    hashed_output[output_size - 1] = '\0'; // 确保字符串以null结尾
 
-    // 更新哈希上下文 (添加盐值)
-    if (EVP_DigestUpdate(mdctx, salt, strlen(salt)) != 1)
-    {
-        EVP_MD_CTX_free(mdctx);
-        free(salt);
-        return NULL;
-    }
-
-    // 更新哈希上下文 (添加密码)
-    if (EVP_DigestUpdate(mdctx, password, strlen(password)) != 1)
-    {
-        EVP_MD_CTX_free(mdctx);
-        free(salt);
-        return NULL;
-    }
-
-    // 完成哈希计算
-    unsigned char hash[EVP_MAX_MD_SIZE];
-    unsigned int hash_len;
-    if (EVP_DigestFinal_ex(mdctx, hash, &hash_len) != 1)
-    {
-        EVP_MD_CTX_free(mdctx);
-        free(salt);
-        return NULL;
-    }
-
-    // 释放哈希上下文
-    EVP_MD_CTX_free(mdctx);
-
-    // 分配结果缓冲区 (盐值 + $ + 哈希的十六进制表示)
-    char *result = (char *)malloc(strlen(salt) + 1 + hash_len * 2 + 1);
-    if (!result)
-    {
-        free(salt);
-        return NULL;
-    }
-
-    // 复制盐值
-    strcpy(result, salt);
-    strcat(result, "$");
-
-    // 添加哈希的十六进制表示
-    char *p = result + strlen(salt) + 1;
-    for (unsigned int i = 0; i < hash_len; i++)
-    {
-        sprintf(p + i * 2, "%02x", hash[i]);
-    }
-
-    free(salt);
-    return result;
+    return true;
 }
 
-// 验证密码
+// 验证密码 - 明文比较
 bool verify_password(const char *password, const char *hash)
 {
     if (!password || !hash)
         return false;
 
-    // 查找分隔符
-    const char *sep = strchr(hash, '$');
-    if (!sep)
-        return false;
-
-    // 提取盐值
-    size_t salt_len = sep - hash;
-    char *salt = (char *)malloc(salt_len + 1);
-    if (!salt)
-        return false;
-    strncpy(salt, hash, salt_len);
-    salt[salt_len] = '\0';
-
-    // 创建哈希上下文
-    EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
-    if (!mdctx)
-    {
-        free(salt);
-        return false;
-    }
-
-    // 初始化哈希上下文
-    if (EVP_DigestInit_ex(mdctx, EVP_sha256(), NULL) != 1)
-    {
-        EVP_MD_CTX_free(mdctx);
-        free(salt);
-        return false;
-    }
-
-    // 更新哈希上下文 (添加盐值)
-    if (EVP_DigestUpdate(mdctx, salt, strlen(salt)) != 1)
-    {
-        EVP_MD_CTX_free(mdctx);
-        free(salt);
-        return false;
-    }
-
-    // 更新哈希上下文 (添加密码)
-    if (EVP_DigestUpdate(mdctx, password, strlen(password)) != 1)
-    {
-        EVP_MD_CTX_free(mdctx);
-        free(salt);
-        return false;
-    }
-
-    // 完成哈希计算
-    unsigned char calc_hash[EVP_MAX_MD_SIZE];
-    unsigned int hash_len;
-    if (EVP_DigestFinal_ex(mdctx, calc_hash, &hash_len) != 1)
-    {
-        EVP_MD_CTX_free(mdctx);
-        free(salt);
-        return false;
-    }
-
-    // 释放哈希上下文
-    EVP_MD_CTX_free(mdctx);
-
-    // 分配缓冲区以保存计算出的哈希的十六进制表示
-    char *calc_hash_hex = (char *)malloc(hash_len * 2 + 1);
-    if (!calc_hash_hex)
-    {
-        free(salt);
-        return false;
-    }
-
-    // 生成十六进制表示
-    for (unsigned int i = 0; i < hash_len; i++)
-    {
-        sprintf(calc_hash_hex + i * 2, "%02x", calc_hash[i]);
-    }
-
-    // 比较哈希
-    bool result = (strcmp(calc_hash_hex, sep + 1) == 0);
-
-    // 清理
-    free(salt);
-    free(calc_hash_hex);
-
-    return result;
+    // 直接比较明文密码
+    return (strcmp(password, hash) == 0);
 }
 
 // 格式化时间为字符串

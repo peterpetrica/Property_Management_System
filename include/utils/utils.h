@@ -7,8 +7,8 @@
 // 生成UUID
 void generate_uuid(char *out);
 
-// 加密密码
-char *hash_password(const char *password);
+// 修改 hash_password 函数声明
+bool hash_password(const char *password, char *hashed_output, size_t output_size);
 
 // 验证密码
 bool verify_password(const char *password, const char *hash);

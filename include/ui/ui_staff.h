@@ -3,6 +3,7 @@
 
 #include "db/database.h"
 #include "auth/auth.h"
+#include "models/user.h" // 添加这行以引入Staff类型定义
 
 // 显示服务人员主界面
 void show_staff_main_screen(Database *db, const char *user_id, UserType user_type);
@@ -21,5 +22,15 @@ void show_staff_statistics_screen(Database *db, const char *user_id, UserType us
 
 // 服务人员系统维护界面
 void show_staff_maintenance_screen(Database *db, const char *user_id, UserType user_type);
+
+// 添加这些函数声明
+void show_staff_personal_info_screen(Database *db, const char *user_id, UserType user_type);
+void modify_personal_info_screen(Database *db, const char *user_id, UserType user_type);
+
+// 用于查询和统计的辅助函数
+int query_all_staff(Database *db, Staff *staff_list, int max_count);
+int count_all_staff(Database *db);
+bool backup_database(Database *db);
+bool restore_database(Database *db);
 
 #endif /* UI_STAFF_H */

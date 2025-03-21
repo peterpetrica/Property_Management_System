@@ -64,4 +64,7 @@ bool get_room_transactions(Database *db, const char *user_id, UserType user_type
 // 获取停车位交易记录
 bool get_parking_transactions(Database *db, const char *user_id, UserType user_type, const char *parking_id, QueryResult *result);
 
+// 生成交易ID
+char *generate_transaction_id();
+
 #endif /* TRANSACTION_H */

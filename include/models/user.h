@@ -59,6 +59,12 @@ bool update_owner(Database *db, const char *user_id, UserType user_type, Owner *
 // 获取业主信息
 bool get_owner_by_id(Database *db, const char *user_id, Owner *owner);
 
+// 排序业主
+void sort_owners(Database *db, int (*compare_func)(const void *, const void *));
+
+// 显示业主列表
+void display_owners(Database *db);
+
 // 创建服务人员账户
 bool create_staff(Database *db, Staff *staff, const char *password);
 
