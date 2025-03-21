@@ -43,50 +43,204 @@ void clear_input_buffer()
 // 显示缴费记录
 void show_payment_history(Database *db, const char *user_id)
 {
-    printf("显示缴费记录功能待实现\n");
-    // TODO: 实现显示缴费记录的功能
+    system("cls");
+    printf("=====缴费记录=====\n");
+    const char*query="SELECT * FROM transactions WHERE user_id=?;";
+    sqlite3_stmt*stmt;
+    int rc=sqlite3_prepare_v2(db->db,query,-1,&stmt,NULL);
+    if(rc!=SQLITE_OK)
+    {
+        printf("SQLite错误: %s\n",sqlite3_errmsg(db->db));
+        return;
+    }
+    sqlite3_bind_text(stmt,1,user_id,-1,SQLITE_STATIC);
+    printf("交易ID\t\t金额\t\t日期\n");
+    while((rc=sqlite3_step(stmt))==SQLITE_ROW)
+    {
+        const char*transaction_id=sqlite3_column_text(stmt,0);
+        double amount=sqlite3_column_double(stmt,1);
+        const char*date=sqlite3_column_text(stmt,2);
+        printf("%s\t%.2f\t%s\n",transaction_id,amount,date);
+    }
+    sqlite3_finalize(stmt);
+    printf("按任意键返回...\n");
+    clear_input_buffer();
 }
 
 // 处理缴费流程
 void process_payment_screen(Database *db, const char *user_id)
 {
-    printf("缴费流程功能待实现\n");
-    // TODO: 实现缴费流程的功能
+    system("cls");
+    printf("=====缴费流程=====\n");
+    double amount;
+    printf("请输入缴费金额: ");
+    if(scanf("%lf",&amount)!=1)
+    {
+        printf("输入错误，请重试\n");
+        clear_input_buffer();
+        return;
+    }
+    const char*query="INSERT INTO transactions(transaction_id,amount,date) VALUES(?,?,?);";
+    sqlite3_stmt*stmt;
+    int rc=sqlite3_prepare_v2(db->db,query,-1,&stmt,NULL);
+    if(rc!=SQLITE_OK)
+    {
+        fprintf(stderr,"无法准备插入语句: %s\n",sqlite3_errmsg(db->db));
+        return;
+    }
+    sqlite3_bind_text(stmt,1,generate_transaction_id(),-1,SQLITE_STATIC);
+    sqlite3_bind_double(stmt,2,amount);
+   if(sqlite3_step(stmt)!=SQLITE_DONE)
+    {
+        fprintf(stderr,"缴费失败: %s\n",sqlite3_errmsg(db->db));
+    }
+    else
+    {
+        printf("缴费成功！金额: %.2f\n",amount);
+    }
+    sqlite3_finalize(stmt);
+    printf("按任意键返回...\n");
+    clear_input_buffer();
+    
+
 }
 
 // 查询应缴费用
 void query_due_amount(Database *db, const char *user_id)
 {
-    printf("查询应缴费用功能待实现\n");
-    // TODO: 实现查询应缴费用的功能
+    system("cls");
+    printf("=====查询应缴费用=====\n");
+    const char*query="SELECT SUM(amount) FROM transactions WHERE user_id=?;";
+    sqlite3_stmt*stmt;
+    int rc=sqlite3_prepare_v2(db->db,query,-1,&stmt,NULL);
+    if(rc!=SQLITE_OK)
+    {
+        fprintf(stderr,"无法准备查询语句: %s\n",sqlite3_errmsg(db->db));
+        return;
+    }
+    sqlite3_bind_text(stmt,1,user_id,-1,SQLITE_STATIC);
+    if(sqlite3_step(stmt)==SQLITE_ROW)
+    {
+        double total_amount=sqlite3_column_double(stmt,0);
+        printf("应缴费用: %.2f\n",total_amount);
+    }
+    else
+    {
+        printf("未找到任何记录\n");
+    }
+    sqlite3_finalize(stmt);
+    printf("按任意键返回...\n");
+    clear_input_buffer();
 }
 
 // 查询剩余费用
 void query_remaining_balance(Database *db, const char *user_id)
 {
-    printf("查询剩余费用功能待实现\n");
-    // TODO: 实现查询剩余费用的功能
+    system("cls");
+    printf("=====查询剩余费用=====\n");
+    const char*query="SELECT SUM(amount) FROM transactions WHERE user_id=?;";
+    sqlite3_stmt*stmt;
+    int rc=sqlite3_prepare_v2(db->db,query,-1,&stmt,NULL);
+    if(rc!=SQLITE_OK)
+    {
+        fprintf(stderr,"无法准备查询语句: %s\n",sqlite3_errmsg(db->db));
+        return;
+    }
+    sqlite3_bind_text(stmt,1,user_id,-1,SQLITE_STATIC);
+    if(sqlite3_step(stmt)==SQLITE_ROW)
+    {
+        double total_amount=sqlite3_column_double(stmt,0);
+        printf("剩余费用: %.2f\n",total_amount);
+    }
+    else
+    {
+        printf("查询失败或无剩余费用\n");
+    }
+    sqlite3_finalize(stmt);
+    printf("按任意键返回...\n");
+    clear_input_buffer();
 }
 
 // 查询小区基本信息
 void query_community_info(Database *db)
 {
-    printf("查询小区基本信息功能待实现\n");
-    // TODO: 实现查询小区基本信息的功能
+    system("cls");
+    printf("=====查询小区基本信息=====\n");
+    const char*query="SELECT * FROM community_info;";
+    sqlite3_stmt*stmt;
+    int rc=sqlite3_prepare_v2(db->db,query,-1,&stmt,NULL);
+    if(rc!=SQLITE_OK)
+    {
+        fprintf(stderr,"无法准备查询语句: %s\n",sqlite3_errmsg(db->db));
+        return;
+    }
+    while((rc=sqlite3_step(stmt))==SQLITE_ROW)
+    {
+        const char*name=sqlite3_column_text(stmt,0);
+        const char*address=sqlite3_column_text(stmt,1);
+        const char*phone_number=sqlite3_column_text(stmt,2);
+        printf("小区名称: %s\n",name);
+        printf("地址: %s\n",address);
+        printf("联系电话: %s\n",phone_number);
+    }
+    sqlite3_finalize(stmt);
+    printf("按任意键返回...\n");
+    clear_input_buffer();
 }
 
 // 查询收费信息
 void query_fee_info(Database *db, const char *user_id)
 {
-    printf("查询收费信息功能待实现\n");
-    // TODO: 实现查询收费信息的功能
+    system("cls");
+    printf("=====查询收费信息=====\n");
+    const char*query="SELECT * FROM fee_info;";
+    sqlite3_stmt*stmt;
+    int rc=sqlite3_prepare_v2(db->db,query,-1,&stmt,NULL);
+    if(rc!=SQLITE_OK)
+    {
+        fprintf(stderr,"无法准备查询语句: %s\n",sqlite3_errmsg(db->db));
+        return;
+    }
+    sqlite3_bind_text(stmt,1,user_id,-1,SQLITE_STATIC);
+    printf("费用ID\t\t费用名称\t\t费用金额\n");
+    while((rc=sqlite3_step(stmt))==SQLITE_ROW)
+    {
+        const char*fee_id=sqlite3_column_text(stmt,0);
+        const char*fee_name=sqlite3_column_text(stmt,1);
+        double fee_amount=sqlite3_column_double(stmt,2);
+        printf("%s\t%s\t%.2f\n",fee_id,fee_name,fee_amount);
+    }
+    sqlite3_finalize(stmt);
+    printf("按任意键返回...\n");
+    clear_input_buffer();
+    
 }
 
 // 查询服务人员信息
 void query_service_staff_info(Database *db, const char *user_id)
 {
-    printf("查询服务人员信息功能待实现\n");
-    // TODO: 实现查询服务人员信息的功能
+    system("cls");
+    printf("=====查询服务人员信息=====\n");
+    const char*query="SELECT * FROM service_staff_info;";
+    sqlite3_stmt*stmt;
+    int rc=sqlite3_prepare_v2(db->db,query,-1,&stmt,NULL);
+    if(rc!=SQLITE_OK)
+    {
+        fprintf(stderr,"无法准备查询语句: %s\n",sqlite3_errmsg(db->db));
+        return;
+    }
+    sqlite3_bind_text(stmt,1,user_id,-1,SQLITE_STATIC);
+    printf("服务人员ID\t\t姓名\t\t联系电话\n");
+    while((rc=sqlite3_step(stmt))==SQLITE_ROW)
+    {
+        const char*staff_id=sqlite3_column_text(stmt,0);
+        const char*name=sqlite3_column_text(stmt,1);
+        const char*phone_number=sqlite3_column_text(stmt,2);
+        printf("%s\t%s\t%s\n",staff_id,name,phone_number); 
+    }
+    sqlite3_finalize(stmt);
+    printf("按任意键返回...\n");
+    clear_input_buffer();
 }
 
 // 修改用户名

@@ -28,6 +28,14 @@
  #include <string.h>
  #include <time.h>
  
+ // 等待用户按键返回
+void wait_for_user()
+{
+    printf("按任意键返回主菜单...\n");
+    getchar();
+    getchar(); // 等待用户输入
+}
+
  // 显示服务人员主界面
  void show_staff_main_screen(Database *db, const char *token,UserType user_type)
  {
@@ -47,8 +55,13 @@
          printf("4.服务人员信息排序\n");
          printf("5.服务人员数据统计\n");
          printf("0.退出\n");
-         printf("请选择\n");
-         scanf("%d", &choice);
+         printf("请选择: \n");
+         if(scanf("%d", &choice)!=1);
+         {
+            printf("输入错误，请重试\n");
+            while(getchar()!= '\n');//清空缓冲区
+            continue;
+         }
          switch (choice)
          {
          case 1:
@@ -66,6 +79,8 @@
          case 5:
              show_staff_statistics_screen(db, token);
              break;
+         case 6:
+             show_staff_maintenance_screen(db, token);
          case 0:
              printf("退出服务人员主界面\n");
              break;
@@ -83,14 +98,14 @@
      if(!get_staff_by_id(db, token, &staff))
      {
          printf("获取个人信息失败\n");
+         wait_for_user();
          return;
      }
      printf("姓名: %s\n", staff.name);
-     printf("联系方式: %s\n", staff.phone);
-     printf("服务类型: %s\n", staff.service_type);
+     printf("联系方式: %s\n", staff.phone_number);
+     printf("服务类型: %s\n", staff.staff_type_id);
      printf("按任意键返回主菜单...\n");
-     getchar();
-     getchar(); // 等待用户输入
+    wait_for_user();
  }
  // 修改个人信息界面
  void modify_personal_info_screen(Database *db, const char *token)
@@ -102,17 +117,18 @@
      if (!get_staff_by_id(db, token, &staff))
      {
          printf("获取个人信息失败\n");
+         wait_for_user();
          return;
      }
      printf("当前姓名: %s\n", staff.name);
      printf("请输入新的姓名: ");
      scanf("%s", staff.name);
  
-     printf("当前联系方式: %s\n", staff.phone);
+     printf("当前联系方式: %s\n", staff.phone_number);
      printf("请输入新的联系方式: ");
-     scanf("%s", staff.phone);
+     scanf("%s", staff.phone_number);
  
-     if (update_staff(db, token, &staff))
+     if (update_staff(db, token, &staff, USER_STAFF))
      {
          printf("个人信息更新成功\n");
      }
@@ -122,8 +138,7 @@
      }
  
      printf("按任意键返回主菜单...\n");
-     getchar();
-     getchar(); // 等待用户输入
+     wait_for_user();
  }
  // 服务人员信息查询界面
  void show_staff_query_screen(Database *db, const char *token)
@@ -143,22 +158,29 @@
          for (int i = 0; i < count; i++)
          {
              printf("%d. 姓名: %s, 联系方式: %s, 服务类型: %s\n",
-                    i + 1, staff_list[i].name, staff_list[i].phone, staff_list[i].service_type);
+                    i + 1, staff_list[i].name, staff_list[i].phone_number, staff_list[i].staff_type_id);
          }
      }
  
      printf("按任意键返回主菜单...\n");
-     getchar();
-     getchar(); // 等待用户输入
+     wait_for_user();
  }
  
- // 服务人员信息排序界面
- void show_staff_sort_screen(Database *db, const char *token)
+// 比较函数：按姓名比较服务人员
+int compare_staff_by_name(const void *a, const void *b)
+{
+    const Staff *staff1 = (const Staff *)a;
+    const Staff *staff2 = (const Staff *)b;
+    return strcmp(staff1->name, staff2->name);
+}
+
+// 服务人员信息排序界面
+void show_staff_sort_screen(Database *db, const char *token)
  {
      system("cls");
      printf("服务人员信息排序界面\n");
  
-     Staff staff_list[100];
+     Staff staff_list[100]; // 定义 staff_list 数组
      int count = query_all_staff(db, staff_list, 100);
      if (count <= 0)
      {
@@ -171,7 +193,7 @@
          for (int i = 0; i < count; i++)
          {
              printf("%d. 姓名: %s, 联系方式: %s, 服务类型: %s\n",
-                    i + 1, staff_list[i].name, staff_list[i].phone, staff_list[i].service_type);
+                    i + 1, staff_list[i].name, staff_list[i].phone_number, staff_list[i].staff_type_id);
          }
      }
  
@@ -188,10 +210,23 @@
  
      int total_staff = count_all_staff(db);
      printf("服务人员总数: %d\n", total_staff);
- 
-     printf("按任意键返回主菜单...\n");
-     getchar();
-     getchar(); // 等待用户输入
+     const char*query="SELECT staff_type_id, COUNT(*) FROM staff GROUP BY staff_type_id";
+     sqlite3_stmt*stmt;
+     int rc=sqlite3_prepare_v2(db->db,query,-1,&stmt,NULL);
+     if(rc!=SQLITE_OK)
+     {
+         printf("SQLite错误: %s\n",sqlite3_errmsg(db->db));
+         return;
+     }
+        printf("服务人员类型统计:\n");
+        while((rc=sqlite3_step(stmt))==SQLITE_ROW)
+        {
+            const char*staff_type=sqlite3_column_text(stmt,0);
+            int count=sqlite3_column_int(stmt,1);
+            printf("服务人员类型: %s, 人数: %d\n",staff_type,count);
+        }
+        sqlite3_finalize(stmt);
+        wait_for_user();
  }
  
  // 服务人员系统维护界面
@@ -204,7 +239,12 @@
      printf("2. 数据恢复\n");
      printf("0. 返回主菜单\n");
      int choice;
-     scanf("%d", &choice);
+     if(scanf("%d", &choice)!=1);
+     {
+         printf("输入错误，请重试\n");
+         while(getchar()!= '\n');//清空缓冲区
+         return;
+     }
  
      switch (choice)
      {
@@ -234,8 +274,6 @@
          printf("无效选择，请重试\n");
      }
  
-     printf("按任意键返回主菜单...\n");
-     getchar();
-     getchar(); // 等待用户输入
+     wait_for_user();
  }
  
