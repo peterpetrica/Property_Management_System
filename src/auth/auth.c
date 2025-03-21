@@ -213,5 +213,38 @@ bool reset_password(Database *db, const char *admin_id, UserType admin_type, con
     // 1. 验证操作者是否为管理员
     // 2. 生成默认密码的哈希
     // 3. 更新数据库中的密码
-    return false;
+    if(!db||!admin_id||!user_id){
+        fprintf(stderr,"无效的参数\n");
+        return false;
+    }
+    //生成默认密码的哈希
+    const char* default_password = "default_password";
+    char default_password_hash[256];
+    if(!hash_password(default_password,default_password_hash,sizeof(default_password_hash))){
+        fprintf(stderr,"密码加密失败\n");
+        return false;
+    }
+    //验证操作者是否为管理员
+    if(admin_type!=USER_ADMIN){
+        fprintf(stderr,"只有管理员可以重置密码\n");
+        return false; 
+    }
+    //更新数据库中的密码
+    const char*query = "UPDATE users SET password_hash = ? WHERE user_id = ? AND role_id = ?;";
+    sqlite3_stmt*stmt;
+    if(sqlite3_prepare_v2(db->db,query,-1,&stmt,NULL)!=SQLITE_OK){
+        fprintf(stderr,"SQL更新失败:%s\n",sqlite3_errmsg(db->db));
+        return false;
+    }
+    sqlite3_bind_text(stmt,1,default_password_hash,-1,SQLITE_STATIC);
+    sqlite3_bind_text(stmt,2,user_id,-1,SQLITE_STATIC);
+    sqlite3_bind_text(stmt,3,user_type==USER_ADMIN?"role_admin":"role_staff",-1,SQLITE_STATIC);
+    if(sqlite3_step(stmt)!=SQLITE_DONE){
+        fprintf(stderr,"密码重置失败:%s\n",sqlite3_errmsg(db->db));
+        sqlite3_finalize(stmt);
+        return false; 
+    }
+    sqlite3_finalize(stmt);
+    printf("密码重置成功\n");
+    return true;
 }
