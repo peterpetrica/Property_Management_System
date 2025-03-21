@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <openssl/sha.h>
 
 // 验证帐号密码
 static bool check_user_credentials(Database *db, const char *username, const char *password,
@@ -146,9 +147,65 @@ bool change_password(Database *db, const char *user_id, UserType user_type, cons
     // 1. 验证旧密码是否正确
     // 2. 生成新密码的哈希
     // 3. 更新数据库中的密码
-    return false;
-}
+    if (db == NULL || db->db == NULL || user_id == NULL || old_password == NULL || new_password == NULL) {
+        fprintf(stderr, "无效的参数\n");
+        return false;
+        sqlite3_stmt* stmt;
+        char stored_password[256] = { 0 };  // 假设数据库中的密码最大长度为 255
 
+        // **2. 查询数据库中存储的旧密码**
+        const char* sql_query = "SELECT password FROM users WHERE id = ? AND user_type = ?;";
+        if (sqlite3_prepare_v2(db->db, sql_query, -1, &stmt, 0) != SQLITE_OK) {
+            fprintf(stderr, "SQL 查询失败: %s\n", sqlite3_errmsg(db->db));
+            return false;
+        }
+
+        // 绑定参数
+        sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
+        sqlite3_bind_int(stmt, 2, user_type);
+
+        // 执行查询
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            strcpy(stored_password, (const char*)sqlite3_column_text(stmt, 0));
+        }
+        else {
+            fprintf(stderr, "用户不存在或角色不匹配\n");
+            sqlite3_finalize(stmt);
+            return false;
+        }
+        sqlite3_finalize(stmt);  // 释放查询语句
+
+        // **3. 验证旧密码是否正确**
+        if (strcmp(stored_password, old_password) != 0) {
+            fprintf(stderr, "旧密码错误\n");
+            return false;
+        }
+
+        // **4. 更新密码**
+        const char* sql_update = "UPDATE users SET password = ? WHERE id = ?;";
+        if (sqlite3_prepare_v2(db->db, sql_update, -1, &stmt, 0) != SQLITE_OK) {
+            fprintf(stderr, "SQL 预处理失败: %s\n", sqlite3_errmsg(db->db));
+            return false;
+        }
+
+        // 绑定新密码和用户ID
+        sqlite3_bind_text(stmt, 1, new_password, -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 2, user_id, -1, SQLITE_STATIC);
+
+        // 执行更新
+        if (sqlite3_step(stmt) != SQLITE_DONE) {
+            fprintf(stderr, "密码更新失败: %s\n", sqlite3_errmsg(db->db));
+            sqlite3_finalize(stmt);
+            return false;
+        }
+
+        sqlite3_finalize(stmt);  // 释放语句
+        printf("密码修改成功\n");
+        return true;
+    }
+    }
+
+    
 // 重置密码 (仅管理员)
 bool reset_password(Database *db, const char *admin_id, UserType admin_type, const char *user_id, UserType user_type)
 {

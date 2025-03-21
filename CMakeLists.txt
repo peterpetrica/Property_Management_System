@@ -43,6 +43,7 @@ set(SOURCE_FILES
     src/ui/ui_owner.c
     src/models/building.c
     src/models/apartment.c
+    src/models/parking.c
     src/models/user.c
     src/models/service.c
     src/models/transaction.c
