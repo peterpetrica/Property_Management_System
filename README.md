@@ -13,6 +13,8 @@ ptc：
 - [x] apartment.c 已完成，实现增删查改房屋功能
 - [x] building.c 已完成，实现楼宇的增删查改
 - [x] transaction.c 已初步完成，实现交易记录的添加
+- [x] parking.c
+- [x] service.c 
 以上函数由我负责维护，有需求请联系我
 fxl：
 
