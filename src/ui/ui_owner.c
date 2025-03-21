@@ -101,9 +101,9 @@ const char* sql = "UPDATE users SET username = ? WHERE id = ?;";
 sqlite3_stmt* stmt;
 int rc;
 // 预处理 SQL 语句
-rc = sqlite3_prepare_v2(db->conn, sql, -1, &stmt, 0);
+rc = sqlite3_prepare_v2(db->db, sql, -1, &stmt, 0);
 if (rc != SQLITE_OK) {
-    fprintf(stderr, "SQL 预处理失败: %s\n", sqlite3_errmsg(db->conn));
+    fprintf(stderr, "SQL 预处理失败: %s\n", sqlite3_errmsg(db->db));
     return false;
 }
 // 绑定参数
@@ -112,7 +112,7 @@ sqlite3_bind_text(stmt, 2, user_id, -1, SQLITE_STATIC);
 // 执行 SQL 语句
 rc = sqlite3_step(stmt);
 if (rc != SQLITE_DONE) {
-    fprintf(stderr, "用户名更新失败: %s\n", sqlite3_errmsg(db->conn));
+    fprintf(stderr, "用户名更新失败: %s\n", sqlite3_errmsg(db->db));
     sqlite3_finalize(stmt);
     return false;
 }
@@ -336,7 +336,7 @@ int compare_id_asc(const void* a, const void* b)
 {
     Owner* ownerA = *(Owner**)a;
     Owner* ownerB = *(Owner**)b;
-    return ownerA->id - ownerB->id;
+    return ownerA->user_id - ownerB->user_id;
 }
 
 // 按 ID 降序排序的比较函数
@@ -344,7 +344,7 @@ int compare_id_desc(const void* a, const void* b)
 {
     Owner* ownerA = *(Owner**)a;
     Owner* ownerB = *(Owner**)b;
-    return ownerB->id - ownerA->id;
+    return ownerB->user_id - ownerA->user_id;
 }
 
 // 按姓名升序排序的比较函数
@@ -362,7 +362,7 @@ int compare_name_desc(const void* a, const void* b)
     Owner* ownerB = *(Owner**)b;
     return strcmp(ownerB->name, ownerA->name);
 }
-void show_owner_sort_screen(Database *db, const char *user_id, UserType user_type)
+void show_owner_sort_screen(Database* db, const char* user_id, UserType user_type)
 {
     int choice;
     while (1)
@@ -423,24 +423,24 @@ void show_owner_sort_screen(Database *db, const char *user_id, UserType user_typ
             return;
         }
 
+        }
     }
-    // TODO: 实现业主信息排序界面显示和操作逻辑
 }
-
+    // TODO: 实现业主信息排序界面显示和操作逻辑
 // 业主信息统计界面
-void show_owner_statistics_screen(Database *db, const char *user_id, UserType user_type)
+    void show_owner_statistics_screen(Database * db, const char* user_id, UserType user_type)
 {
     // TODO: 实现业主信息统计界面显示和操作逻辑
 }
 
 // 业主系统维护界面
-void show_owner_maintenance_screen(Database *db, const char *user_id, UserType user_type)
+void show_owner_maintenance_screen(Database * db, const char* user_id, UserType user_type)
 {
     // TODO: 实现业主系统维护界面显示和操作逻辑
 }
 
 // 兼容旧接口
-void show_owner_main_screen(Database *db, const char *user_id, UserType user_type)
+void show_owner_main_screen(Database * db, const char* user_id, UserType user_type)
 {
     main_screen_owner(db, user_id, user_type);
 }
