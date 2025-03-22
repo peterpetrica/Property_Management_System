@@ -25,7 +25,12 @@
 #include <unistd.h>
 #endif
 
-// 登录界面
+/**
+ * @brief 显示系统登录界面并处理用户登录
+ *
+ * @param db 数据库连接指针
+ * @return LoginResult 包含登录结果信息的结构体
+ */
 LoginResult show_login_screen(Database *db)
 {
     LoginResult result = {false, 0, 0, ""};
@@ -105,7 +110,12 @@ LoginResult show_login_screen(Database *db)
     }
 }
 
-// 显示注册界面
+/**
+ * @brief 显示用户注册界面并处理注册流程
+ *
+ * @param db 数据库连接指针
+ * @return bool 注册是否成功
+ */
 bool show_registration_screen(Database *db)
 {
     char username[64] = {0};
@@ -125,7 +135,6 @@ bool show_registration_screen(Database *db)
 
     printf("\n===== 用户注册 =====\n");
 
-    // 输入用户名
     printf("用户名 (必填): ");
     scanf("%63s", username);
 
@@ -156,7 +165,6 @@ bool show_registration_screen(Database *db)
     sqlite3_finalize(stmt);
     stmt = NULL;
 
-    // 输入密码
     printf("密码 (必填): ");
     while (getchar() != '\n')
         ; // 清空输入缓冲区
@@ -173,7 +181,6 @@ bool show_registration_screen(Database *db)
         return false;
     }
 
-    // 输入个人信息
     printf("真实姓名 (必填): ");
     scanf("%63s", name);
 

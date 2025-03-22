@@ -16,23 +16,30 @@
 #include <string.h>
 #include <time.h>
 
-// 添加楼宇
+/**
+ * 添加楼宇
+ *
+ * 向系统中添加新的楼宇信息，需要管理员权限
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ * @param building 楼宇信息结构体，包含楼宇的基本信息
+ * @return 添加成功返回true，失败返回false
+ */
 bool add_building(Database *db, const char *user_id, UserType user_type, Building *building)
 {
-    // 验证权限
     if (!validate_permission(db, user_id, user_type, 1))
     {
         printf("权限不足，无法添加楼宇。\n");
         return false;
     }
 
-    // 生成唯一的楼宇ID
     char uuid[37];
     generate_uuid(uuid);
     strncpy(building->building_id, uuid, sizeof(building->building_id) - 1);
     building->building_id[sizeof(building->building_id) - 1] = '\0';
 
-    // 构建SQL语句
     char sql[1024];
     snprintf(sql, sizeof(sql),
              "INSERT INTO buildings (building_id, building_name, address, floors_count) "
@@ -40,7 +47,6 @@ bool add_building(Database *db, const char *user_id, UserType user_type, Buildin
              building->building_id, building->building_name, building->address,
              building->floors_count);
 
-    // 执行SQL语句 - 从db_execute改为execute_update
     if (execute_update(db, sql))
     {
         printf("楼宇添加成功。\n");
@@ -53,24 +59,31 @@ bool add_building(Database *db, const char *user_id, UserType user_type, Buildin
     }
 }
 
-// 修改楼宇信息
+/**
+ * 修改楼宇信息
+ *
+ * 更新系统中已存在楼宇的信息，需要管理员权限
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ * @param building 包含更新信息的楼宇结构体
+ * @return 修改成功返回true，失败返回false
+ */
 bool update_building(Database *db, const char *user_id, UserType user_type, Building *building)
 {
-    // 验证权限
     if (!validate_permission(db, user_id, user_type, 1))
     {
         printf("权限不足，无法修改楼宇信息。\n");
         return false;
     }
 
-    // 检查楼宇是否存在
     char check_sql[256];
     snprintf(check_sql, sizeof(check_sql),
              "SELECT building_id FROM buildings WHERE building_id = '%s'",
              building->building_id);
 
     QueryResult check_result;
-    // 从db_query改为execute_query
     if (!execute_query(db, check_sql, &check_result) || check_result.row_count == 0)
     {
         if (check_result.row_count > 0)
@@ -80,7 +93,6 @@ bool update_building(Database *db, const char *user_id, UserType user_type, Buil
     }
     free_query_result(&check_result);
 
-    // 构建SQL语句
     char sql[1024];
     snprintf(sql, sizeof(sql),
              "UPDATE buildings SET "
@@ -89,7 +101,6 @@ bool update_building(Database *db, const char *user_id, UserType user_type, Buil
              building->building_name, building->address,
              building->floors_count, building->building_id);
 
-    // 执行SQL语句 - 从db_execute改为execute_update
     if (execute_update(db, sql))
     {
         printf("楼宇信息更新成功。\n");
@@ -102,24 +113,33 @@ bool update_building(Database *db, const char *user_id, UserType user_type, Buil
     }
 }
 
-// 删除楼宇
+/**
+ * 删除楼宇
+ *
+ * 从系统中删除指定楼宇，需要管理员权限
+ * 如果楼宇存在关联的房屋，则无法删除
+ * 如果存在关联的服务区域，会先删除关联关系
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ * @param building_id 要删除的楼宇ID
+ * @return 删除成功返回true，失败返回false
+ */
 bool delete_building(Database *db, const char *user_id, UserType user_type, const char *building_id)
 {
-    // 验证权限
     if (!validate_permission(db, user_id, user_type, 1))
     {
         printf("权限不足，无法删除楼宇。\n");
         return false;
     }
 
-    // 检查是否有关联的房屋
     char check_rooms_sql[256];
     snprintf(check_rooms_sql, sizeof(check_rooms_sql),
              "SELECT room_id FROM rooms WHERE building_id = '%s' LIMIT 1",
              building_id);
 
     QueryResult check_rooms_result;
-    // 从db_query改为execute_query
     if (execute_query(db, check_rooms_sql, &check_rooms_result) && check_rooms_result.row_count > 0)
     {
         free_query_result(&check_rooms_result);
@@ -129,23 +149,19 @@ bool delete_building(Database *db, const char *user_id, UserType user_type, cons
     if (check_rooms_result.row_count > 0)
         free_query_result(&check_rooms_result);
 
-    // 检查是否有关联的服务区域
     char check_areas_sql[256];
     snprintf(check_areas_sql, sizeof(check_areas_sql),
              "SELECT area_id FROM service_areas WHERE building_id = '%s' LIMIT 1",
              building_id);
 
     QueryResult check_areas_result;
-    // 从db_query改为execute_query
     if (execute_query(db, check_areas_sql, &check_areas_result) && check_areas_result.row_count > 0)
     {
         free_query_result(&check_areas_result);
-        // 删除服务区域关联
         char delete_areas_sql[256];
         snprintf(delete_areas_sql, sizeof(delete_areas_sql),
                  "DELETE FROM service_areas WHERE building_id = '%s'", building_id);
 
-        // 从db_execute改为execute_update
         if (!execute_update(db, delete_areas_sql))
         {
             printf("删除楼宇关联的服务区域失败。\n");
@@ -155,13 +171,11 @@ bool delete_building(Database *db, const char *user_id, UserType user_type, cons
     if (check_areas_result.row_count > 0)
         free_query_result(&check_areas_result);
 
-    // 构建SQL语句
     char sql[256];
     snprintf(sql, sizeof(sql),
              "DELETE FROM buildings WHERE building_id = '%s'",
              building_id);
 
-    // 执行SQL语句 - 从db_execute改为execute_update
     if (execute_update(db, sql))
     {
         printf("楼宇删除成功。\n");
@@ -174,17 +188,24 @@ bool delete_building(Database *db, const char *user_id, UserType user_type, cons
     }
 }
 
-// 获取楼宇信息
+/**
+ * 获取楼宇信息
+ *
+ * 根据楼宇ID获取楼宇的详细信息
+ *
+ * @param db 数据库连接
+ * @param building_id 要查询的楼宇ID
+ * @param building 用于存储查询结果的楼宇结构体
+ * @return 查询成功返回true，失败返回false
+ */
 bool get_building(Database *db, const char *building_id, Building *building)
 {
-    // 构建SQL语句
     char sql[256];
     snprintf(sql, sizeof(sql),
              "SELECT building_id, building_name, address, floors_count "
              "FROM buildings WHERE building_id = '%s'",
              building_id);
 
-    // 执行查询 - 从db_query改为execute_query
     QueryResult result;
     if (!execute_query(db, sql, &result) || result.row_count == 0)
     {
@@ -194,7 +215,6 @@ bool get_building(Database *db, const char *building_id, Building *building)
         return false;
     }
 
-    // 解析结果
     strncpy(building->building_id, result.rows[0].values[0], sizeof(building->building_id) - 1);
     building->building_id[sizeof(building->building_id) - 1] = '\0';
 
@@ -210,16 +230,24 @@ bool get_building(Database *db, const char *building_id, Building *building)
     return true;
 }
 
-// 获取所有楼宇列表
+/**
+ * 获取所有楼宇列表
+ *
+ * 查询系统中所有楼宇的基本信息
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ * @param result 查询结果结构体
+ * @return 查询成功返回true，失败返回false
+ */
 bool list_buildings(Database *db, const char *user_id, UserType user_type, QueryResult *result)
 {
-    // 构建SQL语句
     char sql[256];
     snprintf(sql, sizeof(sql),
              "SELECT building_id, building_name, address, floors_count "
              "FROM buildings ORDER BY building_name");
 
-    // 执行查询 - 从db_query改为execute_query
     if (execute_query(db, sql, result))
     {
         return true;
@@ -231,24 +259,32 @@ bool list_buildings(Database *db, const char *user_id, UserType user_type, Query
     }
 }
 
-// 分配服务人员到楼宇
+/**
+ * 分配服务人员到楼宇
+ *
+ * 创建服务人员与楼宇之间的关联关系，需要管理员权限
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ * @param staff_id 服务人员ID
+ * @param building_id 楼宇ID
+ * @return 分配成功返回true，失败返回false
+ */
 bool assign_staff_to_building(Database *db, const char *user_id, UserType user_type, const char *staff_id, const char *building_id)
 {
-    // 验证权限
     if (!validate_permission(db, user_id, user_type, 1))
     {
         printf("权限不足，无法分配服务人员。\n");
         return false;
     }
 
-    // 检查服务人员是否存在
     char check_staff_sql[256];
     snprintf(check_staff_sql, sizeof(check_staff_sql),
              "SELECT staff_id FROM staff WHERE staff_id = '%s'",
              staff_id);
 
     QueryResult check_staff_result;
-    // 从db_query改为execute_query
     if (!execute_query(db, check_staff_sql, &check_staff_result) || check_staff_result.row_count == 0)
     {
         if (check_staff_result.row_count > 0)
@@ -258,14 +294,12 @@ bool assign_staff_to_building(Database *db, const char *user_id, UserType user_t
     }
     free_query_result(&check_staff_result);
 
-    // 检查楼宇是否存在
     char check_building_sql[256];
     snprintf(check_building_sql, sizeof(check_building_sql),
              "SELECT building_id FROM buildings WHERE building_id = '%s'",
              building_id);
 
     QueryResult check_building_result;
-    // 从db_query改为execute_query
     if (!execute_query(db, check_building_sql, &check_building_result) || check_building_result.row_count == 0)
     {
         if (check_building_result.row_count > 0)
@@ -275,14 +309,12 @@ bool assign_staff_to_building(Database *db, const char *user_id, UserType user_t
     }
     free_query_result(&check_building_result);
 
-    // 检查是否已存在分配关系
     char check_assign_sql[256];
     snprintf(check_assign_sql, sizeof(check_assign_sql),
              "SELECT area_id FROM service_areas WHERE staff_id = '%s' AND building_id = '%s'",
              staff_id, building_id);
 
     QueryResult check_assign_result;
-    // 从db_query改为execute_query
     if (execute_query(db, check_assign_sql, &check_assign_result) && check_assign_result.row_count > 0)
     {
         free_query_result(&check_assign_result);
@@ -292,24 +324,20 @@ bool assign_staff_to_building(Database *db, const char *user_id, UserType user_t
     if (check_assign_result.row_count > 0)
         free_query_result(&check_assign_result);
 
-    // 生成唯一的区域ID
     char area_id[37];
     generate_uuid(area_id);
 
-    // 获取当前日期
     time_t now = time(NULL);
     struct tm *timeinfo = localtime(&now);
     char date_str[11];
     strftime(date_str, sizeof(date_str), "%Y-%m-%d", timeinfo);
 
-    // 构建SQL语句
     char sql[512];
     snprintf(sql, sizeof(sql),
              "INSERT INTO service_areas (area_id, staff_id, building_id, assignment_date) "
              "VALUES ('%s', '%s', '%s', '%s')",
              area_id, staff_id, building_id, date_str);
 
-    // 执行SQL语句 - 从db_execute改为execute_update
     if (execute_update(db, sql))
     {
         printf("服务人员成功分配到楼宇。\n");
@@ -322,24 +350,32 @@ bool assign_staff_to_building(Database *db, const char *user_id, UserType user_t
     }
 }
 
-// 取消服务人员的楼宇分配
+/**
+ * 取消服务人员的楼宇分配
+ *
+ * 删除服务人员与楼宇之间的关联关系，需要管理员权限
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ * @param staff_id 服务人员ID
+ * @param building_id 楼宇ID
+ * @return 取消分配成功返回true，失败返回false
+ */
 bool unassign_staff_from_building(Database *db, const char *user_id, UserType user_type, const char *staff_id, const char *building_id)
 {
-    // 验证权限
     if (!validate_permission(db, user_id, user_type, 1))
     {
         printf("权限不足，无法取消服务人员分配。\n");
         return false;
     }
 
-    // 检查是否存在分配关系
     char check_sql[256];
     snprintf(check_sql, sizeof(check_sql),
              "SELECT area_id FROM service_areas WHERE staff_id = '%s' AND building_id = '%s'",
              staff_id, building_id);
 
     QueryResult check_result;
-    // 从db_query改为execute_query
     if (!execute_query(db, check_sql, &check_result) || check_result.row_count == 0)
     {
         if (check_result.row_count > 0)
@@ -349,13 +385,11 @@ bool unassign_staff_from_building(Database *db, const char *user_id, UserType us
     }
     free_query_result(&check_result);
 
-    // 构建SQL语句
     char sql[256];
     snprintf(sql, sizeof(sql),
              "DELETE FROM service_areas WHERE staff_id = '%s' AND building_id = '%s'",
              staff_id, building_id);
 
-    // 执行SQL语句 - 从db_execute改为execute_update
     if (execute_update(db, sql))
     {
         printf("服务人员与楼宇的分配关系已取消。\n");

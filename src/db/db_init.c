@@ -161,11 +161,18 @@ static const char *INSERT_DEFAULT_ADMIN =
     "INSERT OR IGNORE INTO users (user_id, username, password_hash, name, role_id, status, registration_date) "
     "VALUES ('1', 'admin', 'admin123', '系统管理员', 'role_admin', 1, strftime('%s','now'));";
 
+/**
+ * db_init_tables
+ *
+ * 创建物业管理系统所需的所有数据库表并初始化角色数据
+ *
+ * @param db 数据库连接指针
+ * @return SQLITE_OK 表示成功，其他值表示失败
+ */
 int db_init_tables(Database *db)
 {
     int result;
 
-    // 在函数内定义表创建语句的数组
     const char *create_tables[] = {
         CREATE_ROLES_TABLE,
         CREATE_USERS_TABLE,
@@ -178,10 +185,8 @@ int db_init_tables(Database *db)
         CREATE_SERVICE_RECORDS_TABLE,
         CREATE_FEE_STANDARDS_TABLE,
         CREATE_TRANSACTIONS_TABLE,
-        NULL // 结束标记
-    };
+        NULL};
 
-    // 创建表
     int i = 0;
     while (create_tables[i] != NULL)
     {
@@ -194,7 +199,6 @@ int db_init_tables(Database *db)
         i++;
     }
 
-    // 初始化角色数据
     i = 0;
     while (INSERT_ROLES[i] != NULL)
     {
@@ -211,6 +215,14 @@ int db_init_tables(Database *db)
     return SQLITE_OK;
 }
 
+/**
+ * db_init_admin
+ *
+ * 初始化系统默认管理员账户
+ *
+ * @param db 数据库连接指针
+ * @return SQLITE_OK 表示成功，其他值表示失败
+ */
 int db_init_admin(Database *db)
 {
     int result = db_execute(db, INSERT_DEFAULT_ADMIN);

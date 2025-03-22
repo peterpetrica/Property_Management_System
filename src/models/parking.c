@@ -5,20 +5,25 @@
 #include <stdlib.h>
 #include <time.h>
 
-// 添加停车位
+/**
+ * @brief 添加新的停车位
+ *
+ * @param db 数据库连接
+ * @param user_id 操作用户ID
+ * @param user_type 操作用户类型
+ * @param space 停车位信息结构体
+ * @return bool 添加成功返回true，失败返回false
+ */
 bool add_parking_space(Database *db, const char *user_id, UserType user_type, ParkingSpace *space)
 {
-    // 验证权限（只有管理员和物业服务人员可以添加停车位）
     if (!validate_permission(db, user_id, user_type, 1))
     {
         printf("权限不足，无法添加停车位\n");
         return false;
     }
 
-    // 生成停车位ID
     generate_uuid(space->parking_id);
 
-    // 查询停车位号是否已经存在
     char query[512];
     QueryResult check_result;
     snprintf(query, sizeof(query),
@@ -40,7 +45,6 @@ bool add_parking_space(Database *db, const char *user_id, UserType user_type, Pa
 
     free_query_result(&check_result);
 
-    // 插入停车位数据
     snprintf(query, sizeof(query),
              "INSERT INTO parking_spaces (parking_id, parking_number, owner_id, status) "
              "VALUES ('%s', '%s', '%s', %d)",
@@ -55,17 +59,23 @@ bool add_parking_space(Database *db, const char *user_id, UserType user_type, Pa
     return true;
 }
 
-// 修改停车位信息
+/**
+ * @brief 修改停车位信息
+ *
+ * @param db 数据库连接
+ * @param user_id 操作用户ID
+ * @param user_type 操作用户类型
+ * @param space 更新后的停车位信息
+ * @return bool 修改成功返回true，失败返回false
+ */
 bool update_parking_space(Database *db, const char *user_id, UserType user_type, ParkingSpace *space)
 {
-    // 验证权限（只有管理员和物业服务人员可以修改停车位）
     if (!validate_permission(db, user_id, user_type, 1))
     {
         printf("权限不足，无法修改停车位信息\n");
         return false;
     }
 
-    // 检查停车位是否存在
     ParkingSpace existing_space;
     if (!get_parking_space(db, space->parking_id, &existing_space))
     {
@@ -73,7 +83,6 @@ bool update_parking_space(Database *db, const char *user_id, UserType user_type,
         return false;
     }
 
-    // 更新停车位信息
     char query[512];
     snprintf(query, sizeof(query),
              "UPDATE parking_spaces SET parking_number = '%s', owner_id = '%s', status = %d "
@@ -89,17 +98,23 @@ bool update_parking_space(Database *db, const char *user_id, UserType user_type,
     return true;
 }
 
-// 删除停车位
+/**
+ * @brief 删除停车位
+ *
+ * @param db 数据库连接
+ * @param user_id 操作用户ID
+ * @param user_type 操作用户类型
+ * @param parking_id 要删除的停车位ID
+ * @return bool 删除成功返回true，失败返回false
+ */
 bool delete_parking_space(Database *db, const char *user_id, UserType user_type, const char *parking_id)
 {
-    // 验证权限（只有管理员和物业服务人员可以删除停车位）
     if (!validate_permission(db, user_id, user_type, 1))
     {
         printf("权限不足，无法删除停车位\n");
         return false;
     }
 
-    // 检查停车位是否存在
     ParkingSpace space;
     if (!get_parking_space(db, parking_id, &space))
     {
@@ -107,7 +122,6 @@ bool delete_parking_space(Database *db, const char *user_id, UserType user_type,
         return false;
     }
 
-    // 检查是否有关联的交易记录
     char query[512];
     QueryResult check_result;
     snprintf(query, sizeof(query),
@@ -129,7 +143,6 @@ bool delete_parking_space(Database *db, const char *user_id, UserType user_type,
 
     free_query_result(&check_result);
 
-    // 删除停车位
     snprintf(query, sizeof(query),
              "DELETE FROM parking_spaces WHERE parking_id = '%s'",
              parking_id);
@@ -143,7 +156,14 @@ bool delete_parking_space(Database *db, const char *user_id, UserType user_type,
     return true;
 }
 
-// 获取停车位信息
+/**
+ * @brief 获取停车位信息
+ *
+ * @param db 数据库连接
+ * @param parking_id 停车位ID
+ * @param space 用于存储停车位信息的结构体指针
+ * @return bool 获取成功返回true，失败返回false
+ */
 bool get_parking_space(Database *db, const char *parking_id, ParkingSpace *space)
 {
     char query[512];
@@ -167,7 +187,6 @@ bool get_parking_space(Database *db, const char *parking_id, ParkingSpace *space
         return false;
     }
 
-    // 获取停车位信息
     strcpy(space->parking_id, result.rows[0].values[0]);
     strcpy(space->parking_number, result.rows[0].values[1]);
     strcpy(space->owner_id, result.rows[0].values[2] ? result.rows[0].values[2] : "");
@@ -177,10 +196,17 @@ bool get_parking_space(Database *db, const char *parking_id, ParkingSpace *space
     return true;
 }
 
-// 获取所有停车位
+/**
+ * @brief 获取所有停车位列表
+ *
+ * @param db 数据库连接
+ * @param user_id 操作用户ID
+ * @param user_type 操作用户类型
+ * @param result 用于存储查询结果的结构体指针
+ * @return bool 查询成功返回true，失败返回false
+ */
 bool list_parking_spaces(Database *db, const char *user_id, UserType user_type, QueryResult *result)
 {
-    // 验证权限（管理员和物业服务人员可以查看所有停车位）
     if (!validate_permission(db, user_id, user_type, 1))
     {
         printf("权限不足，无法查看所有停车位\n");
@@ -204,10 +230,18 @@ bool list_parking_spaces(Database *db, const char *user_id, UserType user_type, 
     return true;
 }
 
-// 获取业主的停车位
+/**
+ * @brief 获取特定业主的停车位列表
+ *
+ * @param db 数据库连接
+ * @param user_id 操作用户ID
+ * @param user_type 操作用户类型
+ * @param owner_id 业主ID
+ * @param result 用于存储查询结果的结构体指针
+ * @return bool 查询成功返回true，失败返回false
+ */
 bool get_owner_parking_spaces(Database *db, const char *user_id, UserType user_type, const char *owner_id, QueryResult *result)
 {
-    // 验证权限
     if (user_type == USER_OWNER && strcmp(user_id, owner_id) != 0)
     {
         printf("业主只能查看自己的停车位\n");

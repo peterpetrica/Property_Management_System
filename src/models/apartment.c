@@ -22,7 +22,12 @@
 
 #define SQL_MAX_LENGTH 4096
 
-// 添加缺失的日志函数
+/**
+ * 记录错误日志
+ *
+ * @param format 格式化字符串
+ * @param ... 可变参数列表
+ */
 void log_error(const char *format, ...)
 {
     va_list args;
@@ -33,6 +38,12 @@ void log_error(const char *format, ...)
     va_end(args);
 }
 
+/**
+ * 记录信息日志
+ *
+ * @param format 格式化字符串
+ * @param ... 可变参数列表
+ */
 void log_info(const char *format, ...)
 {
     va_list args;
@@ -43,17 +54,25 @@ void log_info(const char *format, ...)
     va_end(args);
 }
 
-// 添加房屋
+/**
+ * 添加新房屋
+ *
+ * 在系统中创建新的房屋记录，需要管理员或物业服务人员权限
+ *
+ * @param db 数据库连接
+ * @param user_id 执行操作的用户ID
+ * @param user_type 执行操作的用户类型
+ * @param room 房屋信息结构体
+ * @return 操作成功返回true，失败返回false
+ */
 bool add_room(Database *db, const char *user_id, UserType user_type, Room *room)
 {
-    // 权限检查：只有管理员和物业服务人员可以添加房屋
     if (user_type != USER_ADMIN && user_type != USER_STAFF)
     {
         log_error("用户 %s 无权添加房屋", user_id);
         return false;
     }
 
-    // 检查楼宇是否存在
     char query[SQL_MAX_LENGTH];
     snprintf(query, sizeof(query),
              "SELECT building_id FROM buildings WHERE building_id='%s'",
@@ -68,7 +87,6 @@ bool add_room(Database *db, const char *user_id, UserType user_type, Room *room)
     }
     free_query_result(&result);
 
-    // 检查房间号是否已存在
     snprintf(query, sizeof(query),
              "SELECT room_id FROM rooms WHERE building_id='%s' AND room_number='%s'",
              room->building_id, room->room_number);
@@ -87,17 +105,15 @@ bool add_room(Database *db, const char *user_id, UserType user_type, Room *room)
     }
     free_query_result(&result);
 
-    // 生成唯一的房间ID
     generate_uuid(room->room_id);
 
-    // 添加房屋记录
     snprintf(query, sizeof(query),
              "INSERT INTO rooms (room_id, building_id, room_number, floor, area_sqm, owner_id, status) "
              "VALUES ('%s', '%s', '%s', %d, %.2f, '%s', '%s')",
              room->room_id, room->building_id, room->room_number,
              room->floor, room->area_sqm,
              room->owner_id[0] ? room->owner_id : "NULL",
-             room->status); // status应该是char数组
+             room->status);
 
     if (!execute_update(db, query))
     {
@@ -109,17 +125,25 @@ bool add_room(Database *db, const char *user_id, UserType user_type, Room *room)
     return true;
 }
 
-// 修改房屋信息
+/**
+ * 修改房屋信息
+ *
+ * 更新已有房屋的信息，需要管理员或物业服务人员权限
+ *
+ * @param db 数据库连接
+ * @param user_id 执行操作的用户ID
+ * @param user_type 执行操作的用户类型
+ * @param room 更新后的房屋信息结构体
+ * @return 操作成功返回true，失败返回false
+ */
 bool update_room(Database *db, const char *user_id, UserType user_type, Room *room)
 {
-    // 权限检查：只有管理员和物业服务人员可以修改房屋
     if (user_type != USER_ADMIN && user_type != USER_STAFF)
     {
         log_error("用户 %s 无权修改房屋信息", user_id);
         return false;
     }
 
-    // 检查房间是否存在
     char query[SQL_MAX_LENGTH];
     snprintf(query, sizeof(query),
              "SELECT * FROM rooms WHERE room_id='%s'",
@@ -134,14 +158,13 @@ bool update_room(Database *db, const char *user_id, UserType user_type, Room *ro
     }
     free_query_result(&result);
 
-    // 更新房屋信息
     snprintf(query, sizeof(query),
              "UPDATE rooms SET "
              "building_id='%s', room_number='%s', floor=%d, "
              "area_sqm=%.2f, owner_id='%s', status='%s' "
              "WHERE room_id='%s'",
              room->building_id, room->room_number, room->floor,
-             room->area_sqm, room->owner_id, room->status, // status应该是char数组
+             room->area_sqm, room->owner_id, room->status,
              room->room_id);
 
     if (!execute_update(db, query))
@@ -154,10 +177,19 @@ bool update_room(Database *db, const char *user_id, UserType user_type, Room *ro
     return true;
 }
 
-// 删除房屋
+/**
+ * 删除房屋
+ *
+ * 从系统中删除房屋记录，仅限管理员使用，且房屋不能有关联的交易记录
+ *
+ * @param db 数据库连接
+ * @param user_id 执行操作的用户ID
+ * @param user_type 执行操作的用户类型
+ * @param room_id 要删除的房屋ID
+ * @return 操作成功返回true，失败返回false
+ */
 bool delete_room(Database *db, const char *user_id, UserType user_type, const char *room_id)
 {
-    // 权限检查：只有管理员可以删除房屋
     if (user_type != USER_ADMIN)
     {
         log_error("用户 %s 无权删除房屋", user_id);
@@ -166,7 +198,6 @@ bool delete_room(Database *db, const char *user_id, UserType user_type, const ch
 
     char query[SQL_MAX_LENGTH];
 
-    // 检查房间是否存在
     snprintf(query, sizeof(query),
              "SELECT * FROM rooms WHERE room_id='%s'", room_id);
 
@@ -179,7 +210,6 @@ bool delete_room(Database *db, const char *user_id, UserType user_type, const ch
     }
     free_query_result(&result);
 
-    // 检查是否存在关联的交易记录
     snprintf(query, sizeof(query),
              "SELECT COUNT(*) FROM transactions WHERE room_id='%s'", room_id);
 
@@ -202,7 +232,6 @@ bool delete_room(Database *db, const char *user_id, UserType user_type, const ch
         return false;
     }
 
-    // 删除房屋记录
     snprintf(query, sizeof(query), "DELETE FROM rooms WHERE room_id='%s'", room_id);
 
     if (!execute_update(db, query))
@@ -215,7 +244,16 @@ bool delete_room(Database *db, const char *user_id, UserType user_type, const ch
     return true;
 }
 
-// 获取房屋信息
+/**
+ * 获取房屋信息
+ *
+ * 根据房屋ID获取详细信息
+ *
+ * @param db 数据库连接
+ * @param room_id 房屋ID
+ * @param room 用于存储房屋信息的结构体指针
+ * @return 获取成功返回true，失败返回false
+ */
 bool get_room(Database *db, const char *room_id, Room *room)
 {
     char query[SQL_MAX_LENGTH];
@@ -238,7 +276,6 @@ bool get_room(Database *db, const char *room_id, Room *room)
         return false;
     }
 
-    // 填充房屋信息
     QueryRow *row = &result.rows[0];
     strncpy(room->room_id, row->values[0], sizeof(room->room_id) - 1);
     strncpy(room->building_id, row->values[1], sizeof(room->building_id) - 1);
@@ -246,18 +283,28 @@ bool get_room(Database *db, const char *room_id, Room *room)
     room->floor = atoi(row->values[3]);
     room->area_sqm = atof(row->values[4]);
     strncpy(room->owner_id, row->values[5] ? row->values[5] : "", sizeof(room->owner_id) - 1);
-    strncpy(room->status, row->values[6], sizeof(room->status) - 1); // status应该是char数组
+    strncpy(room->status, row->values[6], sizeof(room->status) - 1);
 
     free_query_result(&result);
     return true;
 }
 
-// 获取某楼宇内所有房屋
+/**
+ * 获取某楼宇内所有房屋
+ *
+ * 查询并返回指定楼宇的所有房屋信息列表
+ *
+ * @param db 数据库连接
+ * @param user_id 执行操作的用户ID
+ * @param user_type 执行操作的用户类型
+ * @param building_id 楼宇ID
+ * @param result 查询结果存储结构体
+ * @return 操作成功返回true，失败返回false
+ */
 bool list_rooms_by_building(Database *db, const char *user_id, UserType user_type, const char *building_id, QueryResult *result)
 {
     char query[SQL_MAX_LENGTH];
 
-    // 查询房屋列表
     snprintf(query, sizeof(query),
              "SELECT r.room_id, r.building_id, r.room_number, r.floor, r.area_sqm, "
              "r.owner_id, u.name as owner_name, r.status "
@@ -277,10 +324,20 @@ bool list_rooms_by_building(Database *db, const char *user_id, UserType user_typ
     return true;
 }
 
-// 查询业主的房屋
+/**
+ * 查询业主的房屋
+ *
+ * 获取指定业主名下的所有房屋信息，需要管理员、物业服务人员或业主本人权限
+ *
+ * @param db 数据库连接
+ * @param user_id 执行操作的用户ID
+ * @param user_type 执行操作的用户类型
+ * @param owner_id 业主ID
+ * @param result 查询结果存储结构体
+ * @return 操作成功返回true，失败返回false
+ */
 bool get_owner_rooms(Database *db, const char *user_id, UserType user_type, const char *owner_id, QueryResult *result)
 {
-    // 权限检查：只有管理员、物业服务人员或房屋所有者本人可以查询业主房屋
     if (user_type != USER_ADMIN && user_type != USER_STAFF &&
         strcmp(user_id, owner_id) != 0)
     {
@@ -290,7 +347,6 @@ bool get_owner_rooms(Database *db, const char *user_id, UserType user_type, cons
 
     char query[SQL_MAX_LENGTH];
 
-    // 查询业主的房屋列表
     snprintf(query, sizeof(query),
              "SELECT r.room_id, r.building_id, b.building_name, r.room_number, "
              "r.floor, r.area_sqm, r.status "

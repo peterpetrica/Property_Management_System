@@ -21,18 +21,26 @@
 #include <string.h>
 #include <stdarg.h>
 
-// 查询回调函数，将结果添加到QueryResult结构中
+/**
+ * query_callback - 查询回调函数
+ *
+ * 将SQLite查询结果添加到QueryResult结构中
+ *
+ * @param data 指向QueryResult结构的指针
+ * @param argc 结果列数
+ * @param argv 结果值数组
+ * @param azColName 列名数组
+ * @return 0表示成功，1表示失败
+ */
 static int query_callback(void *data, int argc, char **argv, char **azColName)
 {
     QueryResult *result = (QueryResult *)data;
 
-    // 首次调用时，初始化结果结构
     if (result->rows == NULL)
     {
         result->column_count = argc;
         result->row_count = 0;
 
-        // 分配列名数组
         result->column_names = (char **)malloc(argc * sizeof(char *));
         if (!result->column_names)
         {
@@ -40,14 +48,12 @@ static int query_callback(void *data, int argc, char **argv, char **azColName)
             return 1;
         }
 
-        // 复制列名
         for (int i = 0; i < argc; i++)
         {
             result->column_names[i] = strdup(azColName[i]);
             if (!result->column_names[i])
             {
                 fprintf(stderr, "内存分配失败：列名\n");
-                // 释放之前分配的内存
                 for (int j = 0; j < i; j++)
                 {
                     free(result->column_names[j]);
@@ -59,7 +65,6 @@ static int query_callback(void *data, int argc, char **argv, char **azColName)
         }
     }
 
-    // 扩展行数组
     QueryRow *new_rows = (QueryRow *)realloc(result->rows, (result->row_count + 1) * sizeof(QueryRow));
     if (!new_rows)
     {
@@ -68,7 +73,6 @@ static int query_callback(void *data, int argc, char **argv, char **azColName)
     }
     result->rows = new_rows;
 
-    // 为当前行分配内存
     result->rows[result->row_count].columns = argc;
     result->rows[result->row_count].values = (char **)malloc(argc * sizeof(char *));
     if (!result->rows[result->row_count].values)
@@ -77,7 +81,6 @@ static int query_callback(void *data, int argc, char **argv, char **azColName)
         return 1;
     }
 
-    // 复制行数据
     for (int i = 0; i < argc; i++)
     {
         if (argv[i])
@@ -94,10 +97,18 @@ static int query_callback(void *data, int argc, char **argv, char **azColName)
     return 0;
 }
 
-// 执行查询并返回结果
+/**
+ * execute_query - 执行SQL查询
+ *
+ * 执行指定的SQL查询语句并将结果存入QueryResult结构
+ *
+ * @param db 数据库连接指针
+ * @param sql 要执行的SQL查询语句
+ * @param result 用于存储查询结果的结构指针
+ * @return true表示成功，false表示失败
+ */
 bool execute_query(Database *db, const char *sql, QueryResult *result)
 {
-    // 初始化查询结果
     memset(result, 0, sizeof(QueryResult));
 
     char *err_msg = NULL;
@@ -107,8 +118,6 @@ bool execute_query(Database *db, const char *sql, QueryResult *result)
     {
         fprintf(stderr, "SQL错误: %s\n", err_msg);
         sqlite3_free(err_msg);
-
-        // 清理已分配的内存
         free_query_result(result);
         return false;
     }
@@ -116,7 +125,15 @@ bool execute_query(Database *db, const char *sql, QueryResult *result)
     return true;
 }
 
-// 执行更新操作（插入、更新、删除）
+/**
+ * execute_update - 执行SQL更新操作
+ *
+ * 执行插入、更新或删除等修改数据库的SQL语句
+ *
+ * @param db 数据库连接指针
+ * @param sql 要执行的SQL语句
+ * @return true表示成功，false表示失败
+ */
 bool execute_update(Database *db, const char *sql)
 {
     char *err_msg = NULL;
@@ -132,13 +149,18 @@ bool execute_update(Database *db, const char *sql)
     return true;
 }
 
-// 释放查询结果资源
+/**
+ * free_query_result - 释放查询结果资源
+ *
+ * 释放QueryResult结构中分配的所有内存
+ *
+ * @param result 要释放的查询结果结构指针
+ */
 void free_query_result(QueryResult *result)
 {
     if (!result)
         return;
 
-    // 释放列名
     if (result->column_names)
     {
         for (int i = 0; i < result->column_count; i++)
@@ -152,7 +174,6 @@ void free_query_result(QueryResult *result)
         result->column_names = NULL;
     }
 
-    // 释放行数据
     if (result->rows)
     {
         for (int i = 0; i < result->row_count; i++)
@@ -177,9 +198,18 @@ void free_query_result(QueryResult *result)
     result->column_count = 0;
 }
 
+/**
+ * get_building_id_by_name - 通过建筑名称获取建筑ID
+ *
+ * 根据给定的建筑名称查询对应的建筑ID
+ *
+ * @param db 数据库连接指针
+ * @param building_name 建筑名称
+ * @param building_id 用于存储查询到的建筑ID的缓冲区
+ * @return true表示成功找到，false表示未找到或查询失败
+ */
 bool get_building_id_by_name(Database *db, const char *building_name, char *building_id)
 {
-    // 构建SQL语句
     char sql[256];
     snprintf(sql, sizeof(sql),
              "SELECT building_id FROM buildings WHERE building_name = '%s'",
@@ -196,37 +226,77 @@ bool get_building_id_by_name(Database *db, const char *building_name, char *buil
     free_query_result(&result);
     return true;
 }
-// 执行复合查询
+
+/**
+ * db_compound_query - 执行复合查询
+ *
+ * 执行涉及多表联合的复杂SQL查询
+ *
+ * @param db 数据库连接指针
+ * @param query 要执行的复合SQL查询
+ * @param result 用于存储查询结果的结构指针
+ * @return SQLITE_OK表示成功，其他值表示失败
+ */
 int db_compound_query(Database *db, const char *query, QueryResult *result)
 {
     // TODO: 实现复合查询
     return SQLITE_ERROR;
 }
 
-// 执行模糊查询
+/**
+ * db_fuzzy_query - 执行模糊查询
+ *
+ * 使用模糊匹配条件执行SQL查询
+ *
+ * @param db 数据库连接指针
+ * @param table 要查询的表名
+ * @param column 要进行模糊匹配的列名
+ * @param pattern 模糊匹配的模式
+ * @param result 用于存储查询结果的结构指针
+ * @return SQLITE_OK表示成功，其他值表示失败
+ */
 int db_fuzzy_query(Database *db, const char *table, const char *column, const char *pattern, QueryResult *result)
 {
     // TODO: 实现模糊查询
     return SQLITE_ERROR;
 }
 
-// 执行特权查询
+/**
+ * db_privileged_query - 执行特权查询
+ *
+ * 基于用户权重执行访问控制的查询
+ *
+ * @param db 数据库连接指针
+ * @param query 要执行的SQL查询
+ * @param weight 用户权重值
+ * @param result 用于存储查询结果的结构指针
+ * @return SQLITE_OK表示成功，其他值表示失败
+ */
 int db_privileged_query(Database *db, const char *query, int weight, QueryResult *result)
 {
     // TODO: 实现特权查询
     return SQLITE_ERROR;
 }
 
-// 执行参数化查询 (保留已有函数接口)
+/**
+ * db_parameterized_query - 执行参数化查询
+ *
+ * 使用预编译语句和参数绑定执行SQL查询，防止SQL注入
+ *
+ * @param db 数据库连接指针
+ * @param query 要执行的参数化SQL查询
+ * @param params 参数数据结构指针
+ * @param bind_params 用于绑定参数的回调函数
+ * @param result 用于存储查询结果的结构指针
+ * @return SQLITE_OK表示成功，其他值表示失败
+ */
 int db_parameterized_query(Database *db, const char *query, void *params,
                            void (*bind_params)(sqlite3_stmt *, void *),
                            QueryResult *result)
 {
-    // 参数化查询的实现
     sqlite3_stmt *stmt;
     int rc;
 
-    // 准备SQL语句
     rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
     if (rc != SQLITE_OK)
     {
@@ -234,20 +304,16 @@ int db_parameterized_query(Database *db, const char *query, void *params,
         return rc;
     }
 
-    // 绑定参数
     if (bind_params)
     {
         bind_params(stmt, params);
     }
 
-    // 初始化结果结构
     memset(result, 0, sizeof(QueryResult));
 
-    // 获取列数
     int column_count = sqlite3_column_count(stmt);
     result->column_count = column_count;
 
-    // 分配列名数组
     result->column_names = (char **)malloc(column_count * sizeof(char *));
     if (!result->column_names)
     {
@@ -255,17 +321,14 @@ int db_parameterized_query(Database *db, const char *query, void *params,
         return SQLITE_NOMEM;
     }
 
-    // 获取列名
     for (int i = 0; i < column_count; i++)
     {
         const char *column_name = sqlite3_column_name(stmt, i);
         result->column_names[i] = strdup(column_name);
     }
 
-    // 执行查询并获取结果
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
     {
-        // 扩展行数组
         QueryRow *new_rows = (QueryRow *)realloc(result->rows, (result->row_count + 1) * sizeof(QueryRow));
         if (!new_rows)
         {
@@ -275,7 +338,6 @@ int db_parameterized_query(Database *db, const char *query, void *params,
         }
         result->rows = new_rows;
 
-        // 设置当前行
         result->rows[result->row_count].columns = column_count;
         result->rows[result->row_count].values = (char **)malloc(column_count * sizeof(char *));
 
@@ -286,7 +348,6 @@ int db_parameterized_query(Database *db, const char *query, void *params,
             return SQLITE_NOMEM;
         }
 
-        // 获取行数据
         for (int i = 0; i < column_count; i++)
         {
             const unsigned char *value = sqlite3_column_text(stmt, i);
@@ -296,7 +357,6 @@ int db_parameterized_query(Database *db, const char *query, void *params,
         result->row_count++;
     }
 
-    // 完成查询
     sqlite3_finalize(stmt);
 
     if (rc != SQLITE_DONE)

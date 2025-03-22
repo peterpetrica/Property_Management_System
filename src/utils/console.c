@@ -19,7 +19,11 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-// Linux下所需的getch函数实现
+/**
+ * @brief 在Linux系统下获取单个字符输入，无回显
+ *
+ * @return int 返回读取的字符ASCII码
+ */
 int getch(void)
 {
     struct termios oldattr, newattr;
@@ -34,7 +38,12 @@ int getch(void)
 }
 #endif
 
-// 读取密码（不回显）
+/**
+ * @brief 安全读取密码，输入时显示星号，支持退格键
+ *
+ * @param password 存储密码的字符数组
+ * @param size 密码数组的最大容量
+ */
 void read_password(char *password, size_t size)
 {
     if (!password || size <= 0)
@@ -45,18 +54,18 @@ void read_password(char *password, size_t size)
 
     while (i < size - 1 && (ch = getch()) != '\n' && ch != '\r')
     {
-        if (ch == 127 || ch == 8) // 退格键
+        if (ch == 127 || ch == 8)
         {
             if (i > 0)
             {
                 i--;
-                printf("\b \b"); // 退格，空格，再退格
+                printf("\b \b");
             }
         }
         else
         {
             password[i++] = ch;
-            printf("*"); // 显示星号
+            printf("*");
         }
     }
 

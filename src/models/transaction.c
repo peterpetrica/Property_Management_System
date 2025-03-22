@@ -21,7 +21,13 @@
 #include <string.h>
 #include <time.h>
 
-// 生成交易ID
+/**
+ * 生成交易ID
+ *
+ * 创建一个唯一的UUID作为交易记录的标识符
+ *
+ * @return 返回生成的交易ID字符串
+ */
 char *generate_transaction_id()
 {
     static char transaction_id[40];
@@ -29,7 +35,17 @@ char *generate_transaction_id()
     return transaction_id;
 }
 
-// 添加费用标准
+/**
+ * 添加费用标准
+ *
+ * 向系统中添加新的费用标准，仅管理员可执行此操作
+ *
+ * @param db 数据库连接指针
+ * @param user_id 执行操作的用户ID
+ * @param user_type 用户类型，必须为管理员
+ * @param standard 费用标准结构体指针，包含要添加的标准详情
+ * @return 成功返回true，失败返回false
+ */
 bool add_fee_standard(Database *db, const char *user_id, UserType user_type, FeeStandard *standard)
 {
     if (user_type != USER_ADMIN)
@@ -38,13 +54,11 @@ bool add_fee_standard(Database *db, const char *user_id, UserType user_type, Fee
         return false;
     }
 
-    // 生成标准ID
     if (strlen(standard->standard_id) == 0)
     {
         generate_uuid(standard->standard_id);
     }
 
-    // 构建插入SQL语句
     char query[1024];
     snprintf(query, sizeof(query),
              "INSERT INTO fee_standards (standard_id, fee_type, price_per_unit, unit, effective_date, end_date) "
@@ -52,7 +66,6 @@ bool add_fee_standard(Database *db, const char *user_id, UserType user_type, Fee
              standard->standard_id, standard->fee_type, standard->price_per_unit,
              standard->unit, (long)standard->effective_date, (long)standard->end_date);
 
-    // 执行SQL语句
     if (!execute_query(db, query, NULL))
     {
         printf("添加费用标准失败: %s", query);
@@ -63,14 +76,22 @@ bool add_fee_standard(Database *db, const char *user_id, UserType user_type, Fee
     return true;
 }
 
-// 获取当前费用标准
+/**
+ * 获取当前费用标准
+ *
+ * 根据费用类型获取当前生效的费用标准
+ *
+ * @param db 数据库连接指针
+ * @param fee_type 要查询的费用类型
+ * @param standard 输出参数，用于存储查询到的费用标准
+ * @return 成功返回true，失败返回false
+ */
 bool get_current_fee_standard(Database *db, int fee_type, FeeStandard *standard)
 {
     time_t current_time = time(NULL);
     char query[512];
     QueryResult result;
 
-    // 查询当前生效的费用标准（生效日期在当前时间之前，且结束日期为0或在当前时间之后）
     snprintf(query, sizeof(query),
              "SELECT standard_id, fee_type, price_per_unit, unit, effective_date, end_date "
              "FROM fee_standards "
@@ -92,7 +113,6 @@ bool get_current_fee_standard(Database *db, int fee_type, FeeStandard *standard)
         return false;
     }
 
-    // 将查询结果填充到standard结构体
     strncpy(standard->standard_id, result.rows[0].values[0], sizeof(standard->standard_id) - 1);
     standard->fee_type = atoi(result.rows[0].values[1]);
     standard->price_per_unit = atof(result.rows[0].values[2]);
@@ -104,23 +124,30 @@ bool get_current_fee_standard(Database *db, int fee_type, FeeStandard *standard)
     return true;
 }
 
-// 添加交易记录
+/**
+ * 添加交易记录
+ *
+ * 向系统中添加新的交易记录
+ *
+ * @param db 数据库连接指针
+ * @param user_id 执行操作的用户ID
+ * @param user_type 用户类型
+ * @param transaction 交易记录结构体指针，包含要添加的交易详情
+ * @return 成功返回true，失败返回false
+ */
 bool add_transaction(Database *db, const char *user_id, UserType user_type, Transaction *transaction)
 {
-    // 生成交易ID
     if (strlen(transaction->transaction_id) == 0)
     {
         generate_uuid(transaction->transaction_id);
     }
 
-    // 验证交易数据
     if (transaction->amount <= 0)
     {
         printf("交易金额必须大于0");
         return false;
     }
 
-    // 根据费用类型验证相关ID
     if (transaction->fee_type == TRANS_PROPERTY_FEE && strlen(transaction->room_id) == 0)
     {
         printf("物业费交易必须指定房屋ID");
@@ -133,7 +160,6 @@ bool add_transaction(Database *db, const char *user_id, UserType user_type, Tran
         return false;
     }
 
-    // 构建插入SQL语句
     char query[1024];
     snprintf(query, sizeof(query),
              "INSERT INTO transactions (transaction_id, user_id, room_id, parking_id, fee_type, "
@@ -146,7 +172,6 @@ bool add_transaction(Database *db, const char *user_id, UserType user_type, Tran
              transaction->payment_method, transaction->status,
              (long)transaction->period_start, (long)transaction->period_end);
 
-    // 执行SQL语句
     if (!execute_query(db, query, NULL))
     {
         printf("添加交易记录失败: %s", query);
@@ -158,16 +183,25 @@ bool add_transaction(Database *db, const char *user_id, UserType user_type, Tran
     return true;
 }
 
-// 获取业主交易记录
+/**
+ * 获取业主交易记录
+ *
+ * 查询特定业主的所有交易历史记录
+ *
+ * @param db 数据库连接指针
+ * @param user_id 执行查询的用户ID
+ * @param user_type 用户类型
+ * @param owner_id 要查询的业主ID
+ * @param result 输出参数，存储查询结果
+ * @return 成功返回true，失败返回false
+ */
 bool get_owner_transactions(Database *db, const char *user_id, UserType user_type, const char *owner_id, QueryResult *result)
 {
-    // 验证权限 - 普通用户只能查看自己的交易记录
     if (user_type == USER_OWNER && strcmp(user_id, owner_id) != 0)
     {
         return false;
     }
 
-    // 构建查询SQL语句
     char query[512];
     snprintf(query, sizeof(query),
              "SELECT t.transaction_id, t.user_id, t.room_id, t.parking_id, t.fee_type, "
@@ -178,7 +212,6 @@ bool get_owner_transactions(Database *db, const char *user_id, UserType user_typ
              "ORDER BY t.payment_date DESC",
              owner_id);
 
-    // 执行查询
     if (!execute_query(db, query, result))
     {
         printf("查询业主交易记录失败: %s", query);
@@ -188,13 +221,22 @@ bool get_owner_transactions(Database *db, const char *user_id, UserType user_typ
     return true;
 }
 
-// 获取房屋交易记录
+/**
+ * 获取房屋交易记录
+ *
+ * 查询特定房屋的所有交易历史记录，包含权限验证
+ *
+ * @param db 数据库连接指针
+ * @param user_id 执行查询的用户ID
+ * @param user_type 用户类型
+ * @param room_id 要查询的房屋ID
+ * @param result 输出参数，存储查询结果
+ * @return 成功返回true，失败返回false
+ */
 bool get_room_transactions(Database *db, const char *user_id, UserType user_type, const char *room_id, QueryResult *result)
 {
-    // 验证权限
     if (user_type == USER_OWNER)
     {
-        // 检查房屋是否属于该业主
         char query[512];
         QueryResult owner_check;
 
@@ -208,7 +250,6 @@ bool get_room_transactions(Database *db, const char *user_id, UserType user_type
             return false;
         }
 
-        // 检查房屋是否存在且属于该业主
         bool is_owner = false;
         if (owner_check.row_count > 0 && owner_check.rows[0].values[0] != NULL)
         {
@@ -228,11 +269,9 @@ bool get_room_transactions(Database *db, const char *user_id, UserType user_type
     }
     else if (!validate_permission(db, user_id, user_type, 1))
     {
-        // 管理员和物业服务人员需要验证权限
         return false;
     }
 
-    // 构建查询SQL语句
     char query[512];
     snprintf(query, sizeof(query),
              "SELECT t.transaction_id, t.user_id, t.room_id, t.parking_id, t.fee_type, "
@@ -243,7 +282,6 @@ bool get_room_transactions(Database *db, const char *user_id, UserType user_type
              "ORDER BY t.payment_date DESC",
              room_id);
 
-    // 执行查询
     if (!execute_query(db, query, result))
     {
         printf("查询房屋交易记录失败: %s", query);
@@ -253,13 +291,22 @@ bool get_room_transactions(Database *db, const char *user_id, UserType user_type
     return true;
 }
 
-// 获取停车位交易记录
+/**
+ * 获取停车位交易记录
+ *
+ * 查询特定停车位的所有交易历史记录，包含权限验证
+ *
+ * @param db 数据库连接指针
+ * @param user_id 执行查询的用户ID
+ * @param user_type 用户类型
+ * @param parking_id 要查询的停车位ID
+ * @param result 输出参数，存储查询结果
+ * @return 成功返回true，失败返回false
+ */
 bool get_parking_transactions(Database *db, const char *user_id, UserType user_type, const char *parking_id, QueryResult *result)
 {
-    // 验证权限
     if (user_type == USER_OWNER)
     {
-        // 检查停车位是否属于该业主
         char query[512];
         QueryResult owner_check;
 
@@ -273,7 +320,6 @@ bool get_parking_transactions(Database *db, const char *user_id, UserType user_t
             return false;
         }
 
-        // 检查停车位是否存在且属于该业主
         bool is_owner = false;
         if (owner_check.row_count > 0 && owner_check.rows[0].values[0] != NULL)
         {
@@ -293,11 +339,9 @@ bool get_parking_transactions(Database *db, const char *user_id, UserType user_t
     }
     else if (!validate_permission(db, user_id, user_type, 1))
     {
-        // 管理员和物业服务人员需要验证权限
         return false;
     }
 
-    // 构建查询SQL语句
     char query[512];
     snprintf(query, sizeof(query),
              "SELECT t.transaction_id, t.user_id, t.room_id, t.parking_id, t.fee_type, "
@@ -308,7 +352,6 @@ bool get_parking_transactions(Database *db, const char *user_id, UserType user_t
              "ORDER BY t.payment_date DESC",
              parking_id);
 
-    // 执行查询
     if (!execute_query(db, query, result))
     {
         printf("查询停车位交易记录失败: %s", query);
