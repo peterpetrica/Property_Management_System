@@ -169,7 +169,7 @@ static const char *INSERT_DEFAULT_STAFF_TYPE =
 
 static const char *INSERT_DEFAULT_STAFF_USER =
     "INSERT OR IGNORE INTO users (user_id, username, password_hash, name, role_id, status, registration_date) "
-    "VALUES ('2', 'staff', 'staff123', '默认服务人员', 'role_staff', 1, strftime('%s','now'));";
+    "VALUES ('2', 'staff', 'staff123', 'test_staff', 'role_staff', 1, strftime('%s','now'));";
 
 static const char *INSERT_DEFAULT_STAFF =
     "INSERT OR IGNORE INTO staff (staff_id, user_id, staff_type_id, hire_date, status) "

@@ -216,7 +216,7 @@ bool update_staff(Database *db, const char *user_id, UserType user_type, Staff *
         return false;
     }
 
-    const char *query = "UPDATE users SET name = ?, phone_number = ? WHERE user_id = ? AND user_type = ?";
+    const char *query = "UPDATE users SET name = ?, phone_number = ? WHERE user_id = ? AND role_id = ?";
     sqlite3_stmt *stmt;
     int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
     if (rc != SQLITE_OK)
@@ -228,7 +228,7 @@ bool update_staff(Database *db, const char *user_id, UserType user_type, Staff *
     sqlite3_bind_text(stmt, 1, staff->name, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 2, staff->phone_number, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 3, user_id, -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt, 4, USER_STAFF);
+    sqlite3_bind_text(stmt, 4, "role_staff", -1, SQLITE_STATIC);
 
     rc = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
@@ -258,7 +258,14 @@ bool get_staff_by_id(Database *db, const char *staff_id, Staff *staff)
         return false;
     }
 
-    const char *query = "SELECT name, phone_number FROM users WHERE user_id =? AND role_id =?";
+    // 初始化staff结构体
+    memset(staff, 0, sizeof(Staff));
+
+    const char *query =
+        "SELECT u.name, u.phone_number, s.staff_type_id, s.staff_id "
+        "FROM users u JOIN staff s ON u.user_id = s.user_id "
+        "WHERE u.user_id = ? AND u.role_id = 'role_staff'";
+
     sqlite3_stmt *stmt;
     int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
     if (rc != SQLITE_OK)
@@ -268,19 +275,53 @@ bool get_staff_by_id(Database *db, const char *staff_id, Staff *staff)
     }
 
     sqlite3_bind_text(stmt, 1, staff_id, -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt, 2, USER_STAFF);
 
     rc = sqlite3_step(stmt);
     if (rc == SQLITE_ROW)
     {
-        strncpy(staff->name, (const char *)sqlite3_column_text(stmt, 0), sizeof(staff->name) - 1);
-        strncpy(staff->phone_number, (const char *)sqlite3_column_text(stmt, 1), sizeof(staff->phone_number) - 1);
+        // ID
+        strncpy(staff->user_id, staff_id, sizeof(staff->user_id) - 1);
+        staff->user_id[sizeof(staff->user_id) - 1] = '\0';
+
+        // 姓名
+        const char *name = (const char *)sqlite3_column_text(stmt, 0);
+        if (name)
+        {
+            strncpy(staff->name, name, sizeof(staff->name) - 1);
+            staff->name[sizeof(staff->name) - 1] = '\0';
+        }
+
+        // 电话
+        const char *phone = (const char *)sqlite3_column_text(stmt, 1);
+        if (phone)
+        {
+            strncpy(staff->phone_number, phone, sizeof(staff->phone_number) - 1);
+            staff->phone_number[sizeof(staff->phone_number) - 1] = '\0';
+        }
+
+        // 服务类型ID
+        const char *staff_type = (const char *)sqlite3_column_text(stmt, 2);
+        if (staff_type)
+        {
+            strncpy(staff->staff_type_id, staff_type, sizeof(staff->staff_type_id) - 1);
+            staff->staff_type_id[sizeof(staff->staff_type_id) - 1] = '\0';
+        }
+
+        // 员工ID
+        const char *staff_id_val = (const char *)sqlite3_column_text(stmt, 3);
+        if (staff_id_val)
+        {
+            strncpy(staff->staff_id, staff_id_val, sizeof(staff->staff_id) - 1);
+            staff->staff_id[sizeof(staff->staff_id) - 1] = '\0';
+        }
+
         sqlite3_finalize(stmt);
         return true;
     }
+
     sqlite3_finalize(stmt);
-    fprintf(stderr, "无法获取服务人员信息: %s\n", sqlite3_errmsg(db->db));
-    return true;
+    fprintf(stderr, "未找到服务人员信息\n");
+    return false;
 }
 
 /**

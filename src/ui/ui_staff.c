@@ -47,7 +47,7 @@ void show_staff_main_screen(Database *db, const char *user_id, UserType user_typ
     int choice = 0;
     do
     {
-        system("cls");
+        system("clear || cls"); // 修复清屏命令兼容性
         printf("欢迎来到服务人员主页面\n");
         printf("1.显示个人信息\n");
         printf("2.修改个人信息\n");
@@ -95,26 +95,30 @@ void show_staff_main_screen(Database *db, const char *user_id, UserType user_typ
 // 重命名为 show_staff_personal_info_screen
 void show_staff_personal_info_screen(Database *db, const char *user_id, UserType user_type)
 {
-    system("cls");
+    system("clear || cls");
     printf("个人信息界面\n");
+
     Staff staff;
+    memset(&staff, 0, sizeof(Staff));
+
     if (!get_staff_by_id(db, user_id, &staff))
     {
         printf("获取个人信息失败\n");
         wait_for_user();
         return;
     }
+
     printf("姓名: %s\n", staff.name);
     printf("联系方式: %s\n", staff.phone_number);
     printf("服务类型: %s\n", staff.staff_type_id);
-    printf("按任意键返回主菜单...\n");
+
     wait_for_user();
 }
 
 // 修改个人信息界面
 void modify_personal_info_screen(Database *db, const char *user_id, UserType user_type)
 {
-    system("cls");
+    system("clear || cls");
     printf("修改个人信息界面\n");
     Staff staff;
 
@@ -147,7 +151,7 @@ void modify_personal_info_screen(Database *db, const char *user_id, UserType use
 // 服务人员信息查询界面
 void show_staff_query_screen(Database *db, const char *user_id, UserType user_type)
 {
-    system("cls");
+    system("clear || cls");
     printf("服务人员信息查询界面\n");
 
     Staff staff_list[100];
@@ -181,7 +185,7 @@ int compare_staff_by_name(const void *a, const void *b)
 // 服务人员信息排序界面
 void show_staff_sort_screen(Database *db, const char *user_id, UserType user_type)
 {
-    system("cls");
+    system("clear || cls");
     printf("服务人员信息排序界面\n");
 
     Staff staff_list[100]; // 定义 staff_list 数组
@@ -209,7 +213,7 @@ void show_staff_sort_screen(Database *db, const char *user_id, UserType user_typ
 // 服务人员信息统计界面
 void show_staff_statistics_screen(Database *db, const char *user_id, UserType user_type)
 {
-    system("cls");
+    system("clear || cls");
     printf("服务人员数据统计界面\n");
 
     int total_staff = count_all_staff(db);
@@ -236,7 +240,7 @@ void show_staff_statistics_screen(Database *db, const char *user_id, UserType us
 // 服务人员系统维护界面
 void show_staff_maintenance_screen(Database *db, const char *user_id, UserType user_type)
 {
-    system("cls");
+    system("clear || cls");
     printf("服务人员系统维护界面\n");
 
     printf("1. 数据备份\n");
