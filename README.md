@@ -87,7 +87,7 @@ zzm：
 ubuntu 下仅需：
 
 ```bash
-sudo apt-get install -y ninja-build git gcc cmake pkg-config
+sudo apt-get install -y ninja-build git gcc g++ cmake pkg-config
 ```
 
 #### 安装 vcpkg 并进行必要配置
