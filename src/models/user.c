@@ -258,7 +258,7 @@ bool get_staff_by_id(Database *db, const char *staff_id, Staff *staff)
         return false;
     }
 
-    const char *query = "SELECT name, phone_number FROM users WHERE user_id =? AND user_type =?";
+    const char *query = "SELECT name, phone_number FROM users WHERE user_id =? AND role_id =?";
     sqlite3_stmt *stmt;
     int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
     if (rc != SQLITE_OK)

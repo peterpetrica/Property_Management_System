@@ -10,6 +10,7 @@
  * 主要功能：
  * - db_init_tables: 创建所有必要的数据库表
  * - db_init_admin: 初始化默认管理员账户
+ * - db_init_staff: 初始化默认物业服务人员账户
  */
 
 #include "db/database.h"
@@ -161,6 +162,19 @@ static const char *INSERT_DEFAULT_ADMIN =
     "INSERT OR IGNORE INTO users (user_id, username, password_hash, name, role_id, status, registration_date) "
     "VALUES ('1', 'admin', 'admin123', '系统管理员', 'role_admin', 1, strftime('%s','now'));";
 
+// 初始化默认物业服务人员账户
+static const char *INSERT_DEFAULT_STAFF_TYPE =
+    "INSERT OR IGNORE INTO staff_types (staff_type_id, type_name, description) "
+    "VALUES ('default_type', '普通物业人员', '默认物业服务人员类型');";
+
+static const char *INSERT_DEFAULT_STAFF_USER =
+    "INSERT OR IGNORE INTO users (user_id, username, password_hash, name, role_id, status, registration_date) "
+    "VALUES ('2', 'staff', 'staff123', '默认服务人员', 'role_staff', 1, strftime('%s','now'));";
+
+static const char *INSERT_DEFAULT_STAFF =
+    "INSERT OR IGNORE INTO staff (staff_id, user_id, staff_type_id, hire_date, status) "
+    "VALUES ('1', '2', 'default_type', strftime('%s','now'), 1);";
+
 /**
  * db_init_tables
  *
@@ -233,5 +247,45 @@ int db_init_admin(Database *db)
     }
 
     printf("管理员账户初始化完成\n");
+    return SQLITE_OK;
+}
+
+/**
+ * db_init_staff
+ *
+ * 初始化系统默认物业服务人员账户
+ *
+ * @param db 数据库连接指针
+ * @return SQLITE_OK 表示成功，其他值表示失败
+ */
+int db_init_staff(Database *db)
+{
+    int result;
+
+    // 插入默认物业人员类型
+    result = db_execute(db, INSERT_DEFAULT_STAFF_TYPE);
+    if (result != SQLITE_OK)
+    {
+        fprintf(stderr, "初始化物业人员类型失败: %s\n", sqlite3_errmsg(db->db));
+        return result;
+    }
+
+    // 插入默认物业人员用户
+    result = db_execute(db, INSERT_DEFAULT_STAFF_USER);
+    if (result != SQLITE_OK)
+    {
+        fprintf(stderr, "初始化物业人员用户失败: %s\n", sqlite3_errmsg(db->db));
+        return result;
+    }
+
+    // 插入默认物业人员记录
+    result = db_execute(db, INSERT_DEFAULT_STAFF);
+    if (result != SQLITE_OK)
+    {
+        fprintf(stderr, "初始化物业人员记录失败: %s\n", sqlite3_errmsg(db->db));
+        return result;
+    }
+
+    printf("物业服务人员账户初始化完成\n");
     return SQLITE_OK;
 }

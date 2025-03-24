@@ -57,7 +57,6 @@ void show_staff_main_screen(Database *db, const char *user_id, UserType user_typ
         printf("0.退出\n");
         printf("请选择: \n");
         if (scanf("%d", &choice) != 1)
-            ;
         {
             printf("输入错误，请重试\n");
             while (getchar() != '\n')

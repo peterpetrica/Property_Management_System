@@ -62,6 +62,27 @@ int main()
         return 1;
     }
 
+    // 初始化数据库表
+    if (db_init_tables(&db) != SQLITE_OK)
+    {
+        fprintf(stderr, "无法初始化数据库表\n");
+        return 1;
+    }
+
+    // 初始化默认管理员账户
+    if (db_init_admin(&db) != SQLITE_OK)
+    {
+        fprintf(stderr, "无法初始化默认管理员账户\n");
+        return 1;
+    }
+
+    // 初始化默认物业服务人员账户
+    if (db_init_staff(&db) != SQLITE_OK)
+    {
+        fprintf(stderr, "无法初始化默认物业服务人员账户\n");
+        return 1;
+    }
+
     system("clear||cls");
 
     LoginResult login_result = show_login_screen(&db);
