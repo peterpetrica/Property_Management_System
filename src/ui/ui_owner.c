@@ -36,8 +36,7 @@ bool query_username_by_user_id(Database *db, const char *user_id, char *username
 void clear_input_buffer()
 {
     int c;
-    while ((c = getchar()) != '\n' && c != EOF)
-        ;
+    while ((c = getchar()) != '\n' && c != EOF);
 }
 
 // 显示缴费记录
