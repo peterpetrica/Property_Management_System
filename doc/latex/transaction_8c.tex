@@ -1,0 +1,223 @@
+\hypertarget{transaction_8c}{}\doxysection{src/models/transaction.c 文件参考}
+\label{transaction_8c}\index{src/models/transaction.c@{src/models/transaction.c}}
+{\ttfamily \#include \char`\"{}models/transaction.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}auth/auth.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}utils/utils.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$time.\+h$>$}\newline
+transaction.\+c 的引用(Include)关系图\+:
+% FIG 0
+\doxysubsection*{函数}
+\begin{DoxyCompactItemize}
+\item 
+char $\ast$ \mbox{\hyperlink{transaction_8c_adc8ec87ffc99084abadde5f985eabfa7}{generate\+\_\+transaction\+\_\+id}} ()
+\item 
+bool \mbox{\hyperlink{transaction_8c_a4d17744da0eddfe6f758f935b79ed99e}{add\+\_\+fee\+\_\+standard}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type, Fee\+Standard $\ast$standard)
+\item 
+bool \mbox{\hyperlink{transaction_8c_af75f92e36a69175063fdf306b3a69534}{get\+\_\+current\+\_\+fee\+\_\+standard}} (Database $\ast$db, int fee\+\_\+type, Fee\+Standard $\ast$standard)
+\item 
+bool \mbox{\hyperlink{transaction_8c_ac83e1833361d46781d99f292bc67c48e}{add\+\_\+transaction}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type, Transaction $\ast$transaction)
+\item 
+bool \mbox{\hyperlink{transaction_8c_a53cf9a26c545a88fd107e171830fbd1e}{get\+\_\+owner\+\_\+transactions}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type, const char $\ast$owner\+\_\+id, Query\+Result $\ast$result)
+\item 
+bool \mbox{\hyperlink{transaction_8c_a3723cd95f922f8ce31c8cea5fdc513d5}{get\+\_\+room\+\_\+transactions}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type, const char $\ast$room\+\_\+id, Query\+Result $\ast$result)
+\item 
+bool \mbox{\hyperlink{transaction_8c_a5d2c47446eeedb6a3805bb46c98d023b}{get\+\_\+parking\+\_\+transactions}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type, const char $\ast$parking\+\_\+id, Query\+Result $\ast$result)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{函数说明}
+\mbox{\Hypertarget{transaction_8c_a4d17744da0eddfe6f758f935b79ed99e}\label{transaction_8c_a4d17744da0eddfe6f758f935b79ed99e}} 
+\index{transaction.c@{transaction.c}!add\_fee\_standard@{add\_fee\_standard}}
+\index{add\_fee\_standard@{add\_fee\_standard}!transaction.c@{transaction.c}}
+\doxysubsubsection{\texorpdfstring{add\_fee\_standard()}{add\_fee\_standard()}}
+{\footnotesize\ttfamily bool add\+\_\+fee\+\_\+standard (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type,  }\item[{Fee\+Standard $\ast$}]{standard }\end{DoxyParamCaption})}
+
+添加费用标准
+
+向系统中添加新的费用标准，仅管理员可执行此操作
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接指针 \\
+\hline
+{\em user\+\_\+id} & 执行操作的用户\+ID \\
+\hline
+{\em user\+\_\+type} & 用户类型，必须为管理员 \\
+\hline
+{\em standard} & 费用标准结构体指针，包含要添加的标准详情 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+成功返回true，失败返回false 
+\end{DoxyReturn}
+函数调用图\+:
+% FIG 1
+\mbox{\Hypertarget{transaction_8c_ac83e1833361d46781d99f292bc67c48e}\label{transaction_8c_ac83e1833361d46781d99f292bc67c48e}} 
+\index{transaction.c@{transaction.c}!add\_transaction@{add\_transaction}}
+\index{add\_transaction@{add\_transaction}!transaction.c@{transaction.c}}
+\doxysubsubsection{\texorpdfstring{add\_transaction()}{add\_transaction()}}
+{\footnotesize\ttfamily bool add\+\_\+transaction (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type,  }\item[{Transaction $\ast$}]{transaction }\end{DoxyParamCaption})}
+
+添加交易记录
+
+向系统中添加新的交易记录
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接指针 \\
+\hline
+{\em user\+\_\+id} & 执行操作的用户\+ID \\
+\hline
+{\em user\+\_\+type} & 用户类型 \\
+\hline
+{\em transaction} & 交易记录结构体指针，包含要添加的交易详情 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+成功返回true，失败返回false 
+\end{DoxyReturn}
+函数调用图\+:
+% FIG 2
+\mbox{\Hypertarget{transaction_8c_adc8ec87ffc99084abadde5f985eabfa7}\label{transaction_8c_adc8ec87ffc99084abadde5f985eabfa7}} 
+\index{transaction.c@{transaction.c}!generate\_transaction\_id@{generate\_transaction\_id}}
+\index{generate\_transaction\_id@{generate\_transaction\_id}!transaction.c@{transaction.c}}
+\doxysubsubsection{\texorpdfstring{generate\_transaction\_id()}{generate\_transaction\_id()}}
+{\footnotesize\ttfamily char$\ast$ generate\+\_\+transaction\+\_\+id (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\hyperlink{transaction_8c}{transaction.\+c}} 交易记录和费用标准管理模块
+
+该模块实现物业管理系统中与财务交易相关的功能，包括：
+\begin{DoxyEnumerate}
+\item 费用标准的添加和查询
+\item 交易记录的添加和查询
+\item 支持按业主查询交易历史
+\end{DoxyEnumerate}
+
+预期实现：
+\begin{DoxyItemize}
+\item 添加费用标准：管理员可设置不同类型的费用标准
+\item 获取当前费用标准：根据交易类型获取当前有效的费用标准
+\item 添加交易记录：记录业主的缴费信息
+\item 查询业主交易记录：获取特定业主的所有交易历史 生成交易\+ID
+\end{DoxyItemize}
+
+创建一个唯一的\+UUID作为交易记录的标识符
+
+\begin{DoxyReturn}{返回}
+返回生成的交易\+ID字符串 
+\end{DoxyReturn}
+函数调用图\+:
+% FIG 3
+这是这个函数的调用关系图\+:
+% FIG 4
+\mbox{\Hypertarget{transaction_8c_af75f92e36a69175063fdf306b3a69534}\label{transaction_8c_af75f92e36a69175063fdf306b3a69534}} 
+\index{transaction.c@{transaction.c}!get\_current\_fee\_standard@{get\_current\_fee\_standard}}
+\index{get\_current\_fee\_standard@{get\_current\_fee\_standard}!transaction.c@{transaction.c}}
+\doxysubsubsection{\texorpdfstring{get\_current\_fee\_standard()}{get\_current\_fee\_standard()}}
+{\footnotesize\ttfamily bool get\+\_\+current\+\_\+fee\+\_\+standard (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{int}]{fee\+\_\+type,  }\item[{Fee\+Standard $\ast$}]{standard }\end{DoxyParamCaption})}
+
+获取当前费用标准
+
+根据费用类型获取当前生效的费用标准
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接指针 \\
+\hline
+{\em fee\+\_\+type} & 要查询的费用类型 \\
+\hline
+{\em standard} & 输出参数，用于存储查询到的费用标准 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+成功返回true，失败返回false 
+\end{DoxyReturn}
+函数调用图\+:
+% FIG 5
+\mbox{\Hypertarget{transaction_8c_a53cf9a26c545a88fd107e171830fbd1e}\label{transaction_8c_a53cf9a26c545a88fd107e171830fbd1e}} 
+\index{transaction.c@{transaction.c}!get\_owner\_transactions@{get\_owner\_transactions}}
+\index{get\_owner\_transactions@{get\_owner\_transactions}!transaction.c@{transaction.c}}
+\doxysubsubsection{\texorpdfstring{get\_owner\_transactions()}{get\_owner\_transactions()}}
+{\footnotesize\ttfamily bool get\+\_\+owner\+\_\+transactions (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type,  }\item[{const char $\ast$}]{owner\+\_\+id,  }\item[{Query\+Result $\ast$}]{result }\end{DoxyParamCaption})}
+
+获取业主交易记录
+
+查询特定业主的所有交易历史记录
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接指针 \\
+\hline
+{\em user\+\_\+id} & 执行查询的用户\+ID \\
+\hline
+{\em user\+\_\+type} & 用户类型 \\
+\hline
+{\em owner\+\_\+id} & 要查询的业主\+ID \\
+\hline
+{\em result} & 输出参数，存储查询结果 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+成功返回true，失败返回false 
+\end{DoxyReturn}
+函数调用图\+:
+% FIG 6
+\mbox{\Hypertarget{transaction_8c_a5d2c47446eeedb6a3805bb46c98d023b}\label{transaction_8c_a5d2c47446eeedb6a3805bb46c98d023b}} 
+\index{transaction.c@{transaction.c}!get\_parking\_transactions@{get\_parking\_transactions}}
+\index{get\_parking\_transactions@{get\_parking\_transactions}!transaction.c@{transaction.c}}
+\doxysubsubsection{\texorpdfstring{get\_parking\_transactions()}{get\_parking\_transactions()}}
+{\footnotesize\ttfamily bool get\+\_\+parking\+\_\+transactions (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type,  }\item[{const char $\ast$}]{parking\+\_\+id,  }\item[{Query\+Result $\ast$}]{result }\end{DoxyParamCaption})}
+
+获取停车位交易记录
+
+查询特定停车位的所有交易历史记录，包含权限验证
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接指针 \\
+\hline
+{\em user\+\_\+id} & 执行查询的用户\+ID \\
+\hline
+{\em user\+\_\+type} & 用户类型 \\
+\hline
+{\em parking\+\_\+id} & 要查询的停车位\+ID \\
+\hline
+{\em result} & 输出参数，存储查询结果 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+成功返回true，失败返回false 
+\end{DoxyReturn}
+函数调用图\+:
+% FIG 7
+\mbox{\Hypertarget{transaction_8c_a3723cd95f922f8ce31c8cea5fdc513d5}\label{transaction_8c_a3723cd95f922f8ce31c8cea5fdc513d5}} 
+\index{transaction.c@{transaction.c}!get\_room\_transactions@{get\_room\_transactions}}
+\index{get\_room\_transactions@{get\_room\_transactions}!transaction.c@{transaction.c}}
+\doxysubsubsection{\texorpdfstring{get\_room\_transactions()}{get\_room\_transactions()}}
+{\footnotesize\ttfamily bool get\+\_\+room\+\_\+transactions (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type,  }\item[{const char $\ast$}]{room\+\_\+id,  }\item[{Query\+Result $\ast$}]{result }\end{DoxyParamCaption})}
+
+获取房屋交易记录
+
+查询特定房屋的所有交易历史记录，包含权限验证
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接指针 \\
+\hline
+{\em user\+\_\+id} & 执行查询的用户\+ID \\
+\hline
+{\em user\+\_\+type} & 用户类型 \\
+\hline
+{\em room\+\_\+id} & 要查询的房屋\+ID \\
+\hline
+{\em result} & 输出参数，存储查询结果 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+成功返回true，失败返回false 
+\end{DoxyReturn}
+函数调用图\+:
+% FIG 8

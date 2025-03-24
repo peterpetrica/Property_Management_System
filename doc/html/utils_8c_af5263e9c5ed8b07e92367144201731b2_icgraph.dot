@@ -1,0 +1,56 @@
+digraph "generate_uuid"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="RL";
+  Node1 [label="generate_uuid",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="生成UUID字符串"];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="add_building",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$building_8c.html#ab6750d60c5152fc84ff4f6f9ef084365",tooltip=" "];
+  Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="show_building_test\l_screen",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$ui__admin_8c.html#a9867a3e3ca13d713114fb0e364e0aabb",tooltip=" "];
+  Node3 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="show_admin_main_screen",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$ui__admin_8c.html#adc4f1afd300f7fedcbfd7fe7497147d8",tooltip=" "];
+  Node4 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="main",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$main_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4",tooltip=" "];
+  Node4 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="show_apartment_test\l_screen",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$ui__admin_8c.html#afb1825a611f2a3637dd802beeb235f60",tooltip=" "];
+  Node6 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 -> Node7 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="add_fee_standard",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$transaction_8c.html#a4d17744da0eddfe6f758f935b79ed99e",tooltip=" "];
+  Node1 -> Node8 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="add_parking_space",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$parking_8c.html#a83809b0515417c15b87a4a4c34f89949",tooltip="添加新的停车位"];
+  Node1 -> Node9 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node9 [label="add_room",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$apartment_8c.html#a63ea4ea26e546d75de3f1c096fd42b35",tooltip=" "];
+  Node9 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 -> Node10 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node10 [label="add_service_type",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$service_8c.html#aacdc0fdc305aad4393f95938521e2dd0",tooltip="添加服务类型"];
+  Node1 -> Node11 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node11 [label="add_staff_type",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$service_8c.html#a0e7f560f7fe8f1fddadf76f03654aaf3",tooltip="添加服务人员类型"];
+  Node1 -> Node12 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node12 [label="add_transaction",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$transaction_8c.html#ac83e1833361d46781d99f292bc67c48e",tooltip=" "];
+  Node1 -> Node13 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node13 [label="assign_service_area",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$service_8c.html#a3bb4aa85f3f514471267fb80c1f74a4e",tooltip="分配服务区域"];
+  Node1 -> Node14 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node14 [label="assign_staff_to_building",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$building_8c.html#ae867efc49ab44e71f009e49da6c67f3d",tooltip=" "];
+  Node14 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 -> Node15 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node15 [label="generate_transaction_id",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$transaction_8c.html#adc8ec87ffc99084abadde5f985eabfa7",tooltip=" "];
+  Node15 -> Node16 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node16 [label="process_payment_screen",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$ui__owner_8c.html#a4f5818448720530cf7e6b86beeee7ee2",tooltip=" "];
+  Node16 -> Node17 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node17 [label="show_payment_management\l_screen",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$ui__owner_8c.html#a7bb381d22063df3101f7be48097ca03f",tooltip=" "];
+  Node17 -> Node18 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node18 [label="main_screen_owner",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$ui__owner_8c.html#af9d2ae3e1b2ffd5a65ed854683be4f4e",tooltip=" "];
+  Node18 -> Node19 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node19 [label="show_owner_main_screen",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$ui__owner_8c.html#a6cf4aab57bd57dc103a492c001d864bb",tooltip=" "];
+  Node19 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 -> Node20 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node20 [label="record_service",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$service_8c.html#a028b9266585b850930840cfcdc2e4ca3",tooltip="记录服务"];
+  Node1 -> Node21 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node21 [label="show_registration_screen",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$ui__login_8c.html#afbf6c751ea9059c966e22dd72e4661b2",tooltip="显示用户注册界面并处理注册流程"];
+  Node21 -> Node22 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node22 [label="show_login_screen",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$ui__login_8c.html#acc3f6f9447ac0a14ff726716b36e35c3",tooltip="显示系统登录界面并处理用户登录"];
+  Node22 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+}

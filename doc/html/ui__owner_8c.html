@@ -1,0 +1,1004 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Property_Management_System: src/ui/ui_owner.c 文件参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">Property_Management_System
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.9.1 -->
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(function() {
+  initMenu('',false,false,'search.php','搜索');
+});
+/* @license-end */</script>
+<div id="main-nav"></div>
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_da5c6b39c0a2f54e57df6799511cd3ab.html">ui</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#func-members">函数</a>  </div>
+  <div class="headertitle">
+<div class="title">ui_owner.c 文件参考</div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><code>#include &quot;ui/ui_owner.h&quot;</code><br />
+<code>#include &quot;ui/ui_login.h&quot;</code><br />
+<code>#include &quot;models/building.h&quot;</code><br />
+<code>#include &quot;models/apartment.h&quot;</code><br />
+<code>#include &quot;models/user.h&quot;</code><br />
+<code>#include &quot;models/transaction.h&quot;</code><br />
+<code>#include &quot;models/service.h&quot;</code><br />
+<code>#include &quot;db/db_query.h&quot;</code><br />
+<code>#include &quot;utils/utils.h&quot;</code><br />
+<code>#include &quot;utils/console.h&quot;</code><br />
+<code>#include &quot;auth/auth.h&quot;</code><br />
+<code>#include &lt;stdio.h&gt;</code><br />
+<code>#include &lt;stdlib.h&gt;</code><br />
+<code>#include &lt;string.h&gt;</code><br />
+<code>#include &lt;time.h&gt;</code><br />
+</div><div class="textblock"><div class="dynheader">
+ui_owner.c 的引用(Include)关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c__incl.png" border="0" usemap="#asrc_2ui_2ui__owner_8c" alt=""/></div>
+</div>
+</div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:ae15af65350309ebdca05ea8a04036fbd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui__owner_8c.html#ae15af65350309ebdca05ea8a04036fbd">query_username_by_user_id</a> (Database *db, const char *user_id, char *username)</td></tr>
+<tr class="memdesc:ae15af65350309ebdca05ea8a04036fbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">根据用户ID查询用户名  <a href="ui__owner_8c.html#ae15af65350309ebdca05ea8a04036fbd">更多...</a><br /></td></tr>
+<tr class="separator:ae15af65350309ebdca05ea8a04036fbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a569ba2b1701b459754653701d8a49998"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui__owner_8c.html#a569ba2b1701b459754653701d8a49998">clear_input_buffer</a> ()</td></tr>
+<tr class="separator:a569ba2b1701b459754653701d8a49998"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a699ba3cb4bbea23388f711c9ca769d20"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui__owner_8c.html#a699ba3cb4bbea23388f711c9ca769d20">show_payment_history</a> (Database *db, const char *user_id)</td></tr>
+<tr class="separator:a699ba3cb4bbea23388f711c9ca769d20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4f5818448720530cf7e6b86beeee7ee2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui__owner_8c.html#a4f5818448720530cf7e6b86beeee7ee2">process_payment_screen</a> (Database *db, const char *user_id)</td></tr>
+<tr class="separator:a4f5818448720530cf7e6b86beeee7ee2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a612a13b347ba66b6e42abb0c5224a3dc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui__owner_8c.html#a612a13b347ba66b6e42abb0c5224a3dc">query_due_amount</a> (Database *db, const char *user_id)</td></tr>
+<tr class="separator:a612a13b347ba66b6e42abb0c5224a3dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a87055ee919ae9978f468658399bcfa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui__owner_8c.html#a6a87055ee919ae9978f468658399bcfa">query_remaining_balance</a> (Database *db, const char *user_id)</td></tr>
+<tr class="separator:a6a87055ee919ae9978f468658399bcfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea93375a6a9e7a06d97d6f2bfb621bf4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui__owner_8c.html#aea93375a6a9e7a06d97d6f2bfb621bf4">query_community_info</a> (Database *db)</td></tr>
+<tr class="separator:aea93375a6a9e7a06d97d6f2bfb621bf4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55074914acb7697e0d415a588208bedd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui__owner_8c.html#a55074914acb7697e0d415a588208bedd">query_fee_info</a> (Database *db, const char *user_id)</td></tr>
+<tr class="separator:a55074914acb7697e0d415a588208bedd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78212aa3e86be78d06da6b83840d3e06"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui__owner_8c.html#a78212aa3e86be78d06da6b83840d3e06">query_service_staff_info</a> (Database *db, const char *user_id)</td></tr>
+<tr class="separator:a78212aa3e86be78d06da6b83840d3e06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a99c33b19c2660c4cc274b85b5478b1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui__owner_8c.html#a1a99c33b19c2660c4cc274b85b5478b1">change_username</a> (Database *db, const char *user_id, char *username)</td></tr>
+<tr class="separator:a1a99c33b19c2660c4cc274b85b5478b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a86511be00589adbf9754f67f1ad4693b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui__owner_8c.html#a86511be00589adbf9754f67f1ad4693b">handle_change_password</a> (Database *db, const char *user_id, UserType user_type)</td></tr>
+<tr class="separator:a86511be00589adbf9754f67f1ad4693b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9d2ae3e1b2ffd5a65ed854683be4f4e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui__owner_8c.html#af9d2ae3e1b2ffd5a65ed854683be4f4e">main_screen_owner</a> (Database *db, const char *user_id, UserType user_type)</td></tr>
+<tr class="separator:af9d2ae3e1b2ffd5a65ed854683be4f4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af29bb62ecbe95a31f1e3df0b2ffc3e05"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui__owner_8c.html#af29bb62ecbe95a31f1e3df0b2ffc3e05">show_owner_personal_info_screen</a> (Database *db, const char *user_id, UserType user_type)</td></tr>
+<tr class="separator:af29bb62ecbe95a31f1e3df0b2ffc3e05"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7bb381d22063df3101f7be48097ca03f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui__owner_8c.html#a7bb381d22063df3101f7be48097ca03f">show_payment_management_screen</a> (Database *db, const char *user_id, UserType user_type)</td></tr>
+<tr class="separator:a7bb381d22063df3101f7be48097ca03f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72e3a31f23c6bd0aafbe050f4b573148"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui__owner_8c.html#a72e3a31f23c6bd0aafbe050f4b573148">show_owner_query_screen</a> (Database *db, const char *user_id, UserType user_type)</td></tr>
+<tr class="separator:a72e3a31f23c6bd0aafbe050f4b573148"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8de8ae21b93a65a0d3c117448db4a776"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui__owner_8c.html#a8de8ae21b93a65a0d3c117448db4a776">compare_owner_id_asc</a> (const void *a, const void *b)</td></tr>
+<tr class="separator:a8de8ae21b93a65a0d3c117448db4a776"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25e506881afb788d8f110c0ba4f10417"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui__owner_8c.html#a25e506881afb788d8f110c0ba4f10417">compare_owner_id_desc</a> (const void *a, const void *b)</td></tr>
+<tr class="separator:a25e506881afb788d8f110c0ba4f10417"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0aef51629b6aa70a8f808040e9c0d2c3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui__owner_8c.html#a0aef51629b6aa70a8f808040e9c0d2c3">compare_owner_name_asc</a> (const void *a, const void *b)</td></tr>
+<tr class="separator:a0aef51629b6aa70a8f808040e9c0d2c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e77bf52497d179ffa5440b35b647df0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui__owner_8c.html#a5e77bf52497d179ffa5440b35b647df0">compare_owner_name_desc</a> (const void *a, const void *b)</td></tr>
+<tr class="separator:a5e77bf52497d179ffa5440b35b647df0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8893620bf672e5a76719a42150192d8c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui__owner_8c.html#a8893620bf672e5a76719a42150192d8c">show_owner_sort_screen</a> (Database *db, const char *user_id, UserType user_type)</td></tr>
+<tr class="separator:a8893620bf672e5a76719a42150192d8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0139f42b045bb8cab80d53de3a33abaa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui__owner_8c.html#a0139f42b045bb8cab80d53de3a33abaa">show_owner_statistics_screen</a> (Database *db, const char *user_id, UserType user_type)</td></tr>
+<tr class="separator:a0139f42b045bb8cab80d53de3a33abaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace3fb059bea4989bec18f9e462be42e2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui__owner_8c.html#ace3fb059bea4989bec18f9e462be42e2">show_owner_maintenance_screen</a> (Database *db, const char *user_id, UserType user_type)</td></tr>
+<tr class="separator:ace3fb059bea4989bec18f9e462be42e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6cf4aab57bd57dc103a492c001d864bb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui__owner_8c.html#a6cf4aab57bd57dc103a492c001d864bb">show_owner_main_screen</a> (Database *db, const char *user_id, UserType user_type)</td></tr>
+<tr class="separator:a6cf4aab57bd57dc103a492c001d864bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">函数说明</h2>
+<a id="a1a99c33b19c2660c4cc274b85b5478b1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1a99c33b19c2660c4cc274b85b5478b1">&#9670;&nbsp;</a></span>change_username()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool change_username </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>username</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a1a99c33b19c2660c4cc274b85b5478b1_icgraph.png" border="0" usemap="#aui__owner_8c_a1a99c33b19c2660c4cc274b85b5478b1_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a569ba2b1701b459754653701d8a49998"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a569ba2b1701b459754653701d8a49998">&#9670;&nbsp;</a></span>clear_input_buffer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void clear_input_buffer </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a569ba2b1701b459754653701d8a49998_icgraph.png" border="0" usemap="#aui__owner_8c_a569ba2b1701b459754653701d8a49998_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a8de8ae21b93a65a0d3c117448db4a776"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8de8ae21b93a65a0d3c117448db4a776">&#9670;&nbsp;</a></span>compare_owner_id_asc()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int compare_owner_id_asc </td>
+          <td>(</td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>b</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a8de8ae21b93a65a0d3c117448db4a776_icgraph.png" border="0" usemap="#aui__owner_8c_a8de8ae21b93a65a0d3c117448db4a776_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a25e506881afb788d8f110c0ba4f10417"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25e506881afb788d8f110c0ba4f10417">&#9670;&nbsp;</a></span>compare_owner_id_desc()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int compare_owner_id_desc </td>
+          <td>(</td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>b</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a25e506881afb788d8f110c0ba4f10417_icgraph.png" border="0" usemap="#aui__owner_8c_a25e506881afb788d8f110c0ba4f10417_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a0aef51629b6aa70a8f808040e9c0d2c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0aef51629b6aa70a8f808040e9c0d2c3">&#9670;&nbsp;</a></span>compare_owner_name_asc()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int compare_owner_name_asc </td>
+          <td>(</td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>b</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a0aef51629b6aa70a8f808040e9c0d2c3_icgraph.png" border="0" usemap="#aui__owner_8c_a0aef51629b6aa70a8f808040e9c0d2c3_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a5e77bf52497d179ffa5440b35b647df0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5e77bf52497d179ffa5440b35b647df0">&#9670;&nbsp;</a></span>compare_owner_name_desc()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int compare_owner_name_desc </td>
+          <td>(</td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>b</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a5e77bf52497d179ffa5440b35b647df0_icgraph.png" border="0" usemap="#aui__owner_8c_a5e77bf52497d179ffa5440b35b647df0_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a86511be00589adbf9754f67f1ad4693b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a86511be00589adbf9754f67f1ad4693b">&#9670;&nbsp;</a></span>handle_change_password()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void handle_change_password </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a86511be00589adbf9754f67f1ad4693b_cgraph.png" border="0" usemap="#aui__owner_8c_a86511be00589adbf9754f67f1ad4693b_cgraph" alt=""/></div>
+</div>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a86511be00589adbf9754f67f1ad4693b_icgraph.png" border="0" usemap="#aui__owner_8c_a86511be00589adbf9754f67f1ad4693b_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="af9d2ae3e1b2ffd5a65ed854683be4f4e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af9d2ae3e1b2ffd5a65ed854683be4f4e">&#9670;&nbsp;</a></span>main_screen_owner()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void main_screen_owner </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_af9d2ae3e1b2ffd5a65ed854683be4f4e_cgraph.png" border="0" usemap="#aui__owner_8c_af9d2ae3e1b2ffd5a65ed854683be4f4e_cgraph" alt=""/></div>
+</div>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_af9d2ae3e1b2ffd5a65ed854683be4f4e_icgraph.png" border="0" usemap="#aui__owner_8c_af9d2ae3e1b2ffd5a65ed854683be4f4e_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a4f5818448720530cf7e6b86beeee7ee2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4f5818448720530cf7e6b86beeee7ee2">&#9670;&nbsp;</a></span>process_payment_screen()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void process_payment_screen </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a4f5818448720530cf7e6b86beeee7ee2_cgraph.png" border="0" usemap="#aui__owner_8c_a4f5818448720530cf7e6b86beeee7ee2_cgraph" alt=""/></div>
+</div>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a4f5818448720530cf7e6b86beeee7ee2_icgraph.png" border="0" usemap="#aui__owner_8c_a4f5818448720530cf7e6b86beeee7ee2_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="aea93375a6a9e7a06d97d6f2bfb621bf4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aea93375a6a9e7a06d97d6f2bfb621bf4">&#9670;&nbsp;</a></span>query_community_info()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void query_community_info </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_aea93375a6a9e7a06d97d6f2bfb621bf4_cgraph.png" border="0" usemap="#aui__owner_8c_aea93375a6a9e7a06d97d6f2bfb621bf4_cgraph" alt=""/></div>
+</div>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_aea93375a6a9e7a06d97d6f2bfb621bf4_icgraph.png" border="0" usemap="#aui__owner_8c_aea93375a6a9e7a06d97d6f2bfb621bf4_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a612a13b347ba66b6e42abb0c5224a3dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a612a13b347ba66b6e42abb0c5224a3dc">&#9670;&nbsp;</a></span>query_due_amount()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void query_due_amount </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a612a13b347ba66b6e42abb0c5224a3dc_cgraph.png" border="0" usemap="#aui__owner_8c_a612a13b347ba66b6e42abb0c5224a3dc_cgraph" alt=""/></div>
+</div>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a612a13b347ba66b6e42abb0c5224a3dc_icgraph.png" border="0" usemap="#aui__owner_8c_a612a13b347ba66b6e42abb0c5224a3dc_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a55074914acb7697e0d415a588208bedd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a55074914acb7697e0d415a588208bedd">&#9670;&nbsp;</a></span>query_fee_info()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void query_fee_info </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a55074914acb7697e0d415a588208bedd_cgraph.png" border="0" usemap="#aui__owner_8c_a55074914acb7697e0d415a588208bedd_cgraph" alt=""/></div>
+</div>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a55074914acb7697e0d415a588208bedd_icgraph.png" border="0" usemap="#aui__owner_8c_a55074914acb7697e0d415a588208bedd_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a6a87055ee919ae9978f468658399bcfa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a87055ee919ae9978f468658399bcfa">&#9670;&nbsp;</a></span>query_remaining_balance()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void query_remaining_balance </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a6a87055ee919ae9978f468658399bcfa_cgraph.png" border="0" usemap="#aui__owner_8c_a6a87055ee919ae9978f468658399bcfa_cgraph" alt=""/></div>
+</div>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a6a87055ee919ae9978f468658399bcfa_icgraph.png" border="0" usemap="#aui__owner_8c_a6a87055ee919ae9978f468658399bcfa_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a78212aa3e86be78d06da6b83840d3e06"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a78212aa3e86be78d06da6b83840d3e06">&#9670;&nbsp;</a></span>query_service_staff_info()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void query_service_staff_info </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a78212aa3e86be78d06da6b83840d3e06_cgraph.png" border="0" usemap="#aui__owner_8c_a78212aa3e86be78d06da6b83840d3e06_cgraph" alt=""/></div>
+</div>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a78212aa3e86be78d06da6b83840d3e06_icgraph.png" border="0" usemap="#aui__owner_8c_a78212aa3e86be78d06da6b83840d3e06_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="ae15af65350309ebdca05ea8a04036fbd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae15af65350309ebdca05ea8a04036fbd">&#9670;&nbsp;</a></span>query_username_by_user_id()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool query_username_by_user_id </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>username</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>根据用户ID查询用户名 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>用户ID </td></tr>
+    <tr><td class="paramname">username</td><td>用于存储查询结果的用户名字符串 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 查询成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_ae15af65350309ebdca05ea8a04036fbd_icgraph.png" border="0" usemap="#aui__owner_8c_ae15af65350309ebdca05ea8a04036fbd_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a6cf4aab57bd57dc103a492c001d864bb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6cf4aab57bd57dc103a492c001d864bb">&#9670;&nbsp;</a></span>show_owner_main_screen()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void show_owner_main_screen </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a6cf4aab57bd57dc103a492c001d864bb_cgraph.png" border="0" usemap="#aui__owner_8c_a6cf4aab57bd57dc103a492c001d864bb_cgraph" alt=""/></div>
+</div>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a6cf4aab57bd57dc103a492c001d864bb_icgraph.png" border="0" usemap="#aui__owner_8c_a6cf4aab57bd57dc103a492c001d864bb_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="ace3fb059bea4989bec18f9e462be42e2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace3fb059bea4989bec18f9e462be42e2">&#9670;&nbsp;</a></span>show_owner_maintenance_screen()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void show_owner_maintenance_screen </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af29bb62ecbe95a31f1e3df0b2ffc3e05"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af29bb62ecbe95a31f1e3df0b2ffc3e05">&#9670;&nbsp;</a></span>show_owner_personal_info_screen()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void show_owner_personal_info_screen </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_af29bb62ecbe95a31f1e3df0b2ffc3e05_cgraph.png" border="0" usemap="#aui__owner_8c_af29bb62ecbe95a31f1e3df0b2ffc3e05_cgraph" alt=""/></div>
+</div>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_af29bb62ecbe95a31f1e3df0b2ffc3e05_icgraph.png" border="0" usemap="#aui__owner_8c_af29bb62ecbe95a31f1e3df0b2ffc3e05_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a72e3a31f23c6bd0aafbe050f4b573148"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a72e3a31f23c6bd0aafbe050f4b573148">&#9670;&nbsp;</a></span>show_owner_query_screen()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void show_owner_query_screen </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a72e3a31f23c6bd0aafbe050f4b573148_cgraph.png" border="0" usemap="#aui__owner_8c_a72e3a31f23c6bd0aafbe050f4b573148_cgraph" alt=""/></div>
+</div>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a72e3a31f23c6bd0aafbe050f4b573148_icgraph.png" border="0" usemap="#aui__owner_8c_a72e3a31f23c6bd0aafbe050f4b573148_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a8893620bf672e5a76719a42150192d8c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8893620bf672e5a76719a42150192d8c">&#9670;&nbsp;</a></span>show_owner_sort_screen()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void show_owner_sort_screen </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a8893620bf672e5a76719a42150192d8c_cgraph.png" border="0" usemap="#aui__owner_8c_a8893620bf672e5a76719a42150192d8c_cgraph" alt=""/></div>
+</div>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a8893620bf672e5a76719a42150192d8c_icgraph.png" border="0" usemap="#aui__owner_8c_a8893620bf672e5a76719a42150192d8c_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a0139f42b045bb8cab80d53de3a33abaa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0139f42b045bb8cab80d53de3a33abaa">&#9670;&nbsp;</a></span>show_owner_statistics_screen()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void show_owner_statistics_screen </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a699ba3cb4bbea23388f711c9ca769d20"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a699ba3cb4bbea23388f711c9ca769d20">&#9670;&nbsp;</a></span>show_payment_history()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void show_payment_history </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a699ba3cb4bbea23388f711c9ca769d20_cgraph.png" border="0" usemap="#aui__owner_8c_a699ba3cb4bbea23388f711c9ca769d20_cgraph" alt=""/></div>
+</div>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a699ba3cb4bbea23388f711c9ca769d20_icgraph.png" border="0" usemap="#aui__owner_8c_a699ba3cb4bbea23388f711c9ca769d20_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a7bb381d22063df3101f7be48097ca03f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7bb381d22063df3101f7be48097ca03f">&#9670;&nbsp;</a></span>show_payment_management_screen()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void show_payment_management_screen </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a7bb381d22063df3101f7be48097ca03f_cgraph.png" border="0" usemap="#aui__owner_8c_a7bb381d22063df3101f7be48097ca03f_cgraph" alt=""/></div>
+</div>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ui__owner_8c_a7bb381d22063df3101f7be48097ca03f_icgraph.png" border="0" usemap="#aui__owner_8c_a7bb381d22063df3101f7be48097ca03f_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+</small></address>
+</body>
+</html>

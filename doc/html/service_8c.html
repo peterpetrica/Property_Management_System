@@ -1,0 +1,980 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Property_Management_System: src/models/service.c 文件参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">Property_Management_System
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.9.1 -->
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(function() {
+  initMenu('',false,false,'search.php','搜索');
+});
+/* @license-end */</script>
+<div id="main-nav"></div>
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_bdeba5f06b852fec80257c0bf4c3c36e.html">models</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#func-members">函数</a>  </div>
+  <div class="headertitle">
+<div class="title">service.c 文件参考</div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><code>#include &quot;models/service.h&quot;</code><br />
+<code>#include &quot;auth/auth.h&quot;</code><br />
+<code>#include &quot;utils/utils.h&quot;</code><br />
+<code>#include &lt;stdio.h&gt;</code><br />
+<code>#include &lt;stdlib.h&gt;</code><br />
+<code>#include &lt;string.h&gt;</code><br />
+<code>#include &lt;time.h&gt;</code><br />
+</div><div class="textblock"><div class="dynheader">
+service.c 的引用(Include)关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="service_8c__incl.png" border="0" usemap="#asrc_2models_2service_8c" alt=""/></div>
+</div>
+</div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:aacdc0fdc305aad4393f95938521e2dd0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="service_8c.html#aacdc0fdc305aad4393f95938521e2dd0">add_service_type</a> (Database *db, const char *user_id, UserType user_type, ServiceType *type)</td></tr>
+<tr class="memdesc:aacdc0fdc305aad4393f95938521e2dd0"><td class="mdescLeft">&#160;</td><td class="mdescRight">添加服务类型  <a href="service_8c.html#aacdc0fdc305aad4393f95938521e2dd0">更多...</a><br /></td></tr>
+<tr class="separator:aacdc0fdc305aad4393f95938521e2dd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0bb2b679126c43ec5876ba85747bd990"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="service_8c.html#a0bb2b679126c43ec5876ba85747bd990">update_service_type</a> (Database *db, const char *user_id, UserType user_type, ServiceType *type)</td></tr>
+<tr class="memdesc:a0bb2b679126c43ec5876ba85747bd990"><td class="mdescLeft">&#160;</td><td class="mdescRight">修改服务类型  <a href="service_8c.html#a0bb2b679126c43ec5876ba85747bd990">更多...</a><br /></td></tr>
+<tr class="separator:a0bb2b679126c43ec5876ba85747bd990"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a59e6f9fa3a9107aef05ee0febc27786a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="service_8c.html#a59e6f9fa3a9107aef05ee0febc27786a">delete_service_type</a> (Database *db, const char *user_id, UserType user_type, const char *type_id)</td></tr>
+<tr class="memdesc:a59e6f9fa3a9107aef05ee0febc27786a"><td class="mdescLeft">&#160;</td><td class="mdescRight">删除服务类型  <a href="service_8c.html#a59e6f9fa3a9107aef05ee0febc27786a">更多...</a><br /></td></tr>
+<tr class="separator:a59e6f9fa3a9107aef05ee0febc27786a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68c1eaefc6ee5b6f0ccbb902002d064b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="service_8c.html#a68c1eaefc6ee5b6f0ccbb902002d064b">list_service_types</a> (Database *db, QueryResult *result)</td></tr>
+<tr class="memdesc:a68c1eaefc6ee5b6f0ccbb902002d064b"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取所有服务类型列表  <a href="service_8c.html#a68c1eaefc6ee5b6f0ccbb902002d064b">更多...</a><br /></td></tr>
+<tr class="separator:a68c1eaefc6ee5b6f0ccbb902002d064b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e7f560f7fe8f1fddadf76f03654aaf3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="service_8c.html#a0e7f560f7fe8f1fddadf76f03654aaf3">add_staff_type</a> (Database *db, const char *user_id, UserType user_type, StaffType *type)</td></tr>
+<tr class="memdesc:a0e7f560f7fe8f1fddadf76f03654aaf3"><td class="mdescLeft">&#160;</td><td class="mdescRight">添加服务人员类型  <a href="service_8c.html#a0e7f560f7fe8f1fddadf76f03654aaf3">更多...</a><br /></td></tr>
+<tr class="separator:a0e7f560f7fe8f1fddadf76f03654aaf3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78c669c200ec78906cb378390e0ed08d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="service_8c.html#a78c669c200ec78906cb378390e0ed08d">update_staff_type</a> (Database *db, const char *user_id, UserType user_type, StaffType *type)</td></tr>
+<tr class="memdesc:a78c669c200ec78906cb378390e0ed08d"><td class="mdescLeft">&#160;</td><td class="mdescRight">修改服务人员类型  <a href="service_8c.html#a78c669c200ec78906cb378390e0ed08d">更多...</a><br /></td></tr>
+<tr class="separator:a78c669c200ec78906cb378390e0ed08d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2de414c2d5e3480516bee0d548351b6d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="service_8c.html#a2de414c2d5e3480516bee0d548351b6d">delete_staff_type</a> (Database *db, const char *user_id, UserType user_type, const char *staff_type_id)</td></tr>
+<tr class="memdesc:a2de414c2d5e3480516bee0d548351b6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">删除服务人员类型  <a href="service_8c.html#a2de414c2d5e3480516bee0d548351b6d">更多...</a><br /></td></tr>
+<tr class="separator:a2de414c2d5e3480516bee0d548351b6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93fdf9756dfb30b4e5582eaf7c11b87f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="service_8c.html#a93fdf9756dfb30b4e5582eaf7c11b87f">list_staff_types</a> (Database *db, QueryResult *result)</td></tr>
+<tr class="memdesc:a93fdf9756dfb30b4e5582eaf7c11b87f"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取所有服务人员类型列表  <a href="service_8c.html#a93fdf9756dfb30b4e5582eaf7c11b87f">更多...</a><br /></td></tr>
+<tr class="separator:a93fdf9756dfb30b4e5582eaf7c11b87f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3bb4aa85f3f514471267fb80c1f74a4e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="service_8c.html#a3bb4aa85f3f514471267fb80c1f74a4e">assign_service_area</a> (Database *db, const char *user_id, UserType user_type, ServiceArea *area)</td></tr>
+<tr class="memdesc:a3bb4aa85f3f514471267fb80c1f74a4e"><td class="mdescLeft">&#160;</td><td class="mdescRight">分配服务区域  <a href="service_8c.html#a3bb4aa85f3f514471267fb80c1f74a4e">更多...</a><br /></td></tr>
+<tr class="separator:a3bb4aa85f3f514471267fb80c1f74a4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78eba90aae9167c6df3a8be58c7a849e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="service_8c.html#a78eba90aae9167c6df3a8be58c7a849e">unassign_service_area</a> (Database *db, const char *user_id, UserType user_type, const char *area_id)</td></tr>
+<tr class="memdesc:a78eba90aae9167c6df3a8be58c7a849e"><td class="mdescLeft">&#160;</td><td class="mdescRight">取消服务区域分配  <a href="service_8c.html#a78eba90aae9167c6df3a8be58c7a849e">更多...</a><br /></td></tr>
+<tr class="separator:a78eba90aae9167c6df3a8be58c7a849e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af07e5a5919fd1e3a0f9862f7fdee4c82"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="service_8c.html#af07e5a5919fd1e3a0f9862f7fdee4c82">get_staff_service_areas</a> (Database *db, const char *user_id, UserType user_type, const char *staff_id, QueryResult *result)</td></tr>
+<tr class="memdesc:af07e5a5919fd1e3a0f9862f7fdee4c82"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取服务人员的服务区域列表  <a href="service_8c.html#af07e5a5919fd1e3a0f9862f7fdee4c82">更多...</a><br /></td></tr>
+<tr class="separator:af07e5a5919fd1e3a0f9862f7fdee4c82"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a028b9266585b850930840cfcdc2e4ca3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="service_8c.html#a028b9266585b850930840cfcdc2e4ca3">record_service</a> (Database *db, const char *user_id, UserType user_type, ServiceRecord *record)</td></tr>
+<tr class="memdesc:a028b9266585b850930840cfcdc2e4ca3"><td class="mdescLeft">&#160;</td><td class="mdescRight">记录服务  <a href="service_8c.html#a028b9266585b850930840cfcdc2e4ca3">更多...</a><br /></td></tr>
+<tr class="separator:a028b9266585b850930840cfcdc2e4ca3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf4495e881beb0d9fa752b28dfc0aa9b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="service_8c.html#acf4495e881beb0d9fa752b28dfc0aa9b">get_service_records_by_staff</a> (Database *db, const char *user_id, UserType user_type, const char *staff_id, QueryResult *result)</td></tr>
+<tr class="memdesc:acf4495e881beb0d9fa752b28dfc0aa9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取服务人员的服务记录  <a href="service_8c.html#acf4495e881beb0d9fa752b28dfc0aa9b">更多...</a><br /></td></tr>
+<tr class="separator:acf4495e881beb0d9fa752b28dfc0aa9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6086cd555f05a25727c474a5369be592"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="service_8c.html#a6086cd555f05a25727c474a5369be592">get_service_records_by_room</a> (Database *db, const char *user_id, UserType user_type, const char *room_id, QueryResult *result)</td></tr>
+<tr class="memdesc:a6086cd555f05a25727c474a5369be592"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取房屋的服务记录  <a href="service_8c.html#a6086cd555f05a25727c474a5369be592">更多...</a><br /></td></tr>
+<tr class="separator:a6086cd555f05a25727c474a5369be592"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7619d58da8006a5904f18554cadad159"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="service_8c.html#a7619d58da8006a5904f18554cadad159">get_service_records_by_building</a> (Database *db, const char *user_id, UserType user_type, const char *building_id, QueryResult *result)</td></tr>
+<tr class="memdesc:a7619d58da8006a5904f18554cadad159"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取楼宇的服务记录  <a href="service_8c.html#a7619d58da8006a5904f18554cadad159">更多...</a><br /></td></tr>
+<tr class="separator:a7619d58da8006a5904f18554cadad159"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">函数说明</h2>
+<a id="aacdc0fdc305aad4393f95938521e2dd0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aacdc0fdc305aad4393f95938521e2dd0">&#9670;&nbsp;</a></span>add_service_type()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool add_service_type </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ServiceType *&#160;</td>
+          <td class="paramname"><em>type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>添加服务类型 </p>
+<p><a class="el" href="service_8c.html">models/service.c</a> 物业管理系统 - 服务管理模块实现</p>
+<p>本文件实现了物业管理系统中与服务相关的功能，包括：</p><ul>
+<li>服务类型管理：添加、修改、删除和查询服务类型</li>
+<li>服务记录管理：创建服务记录、查询服务记录</li>
+</ul>
+<p>服务记录可以按照员工ID或房屋ID进行查询，支持物业管理人员 对各类服务进行全面管理和统计分析。</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>用户类型 </td></tr>
+    <tr><td class="paramname">type</td><td>服务类型结构体指针 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 操作成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="service_8c_aacdc0fdc305aad4393f95938521e2dd0_cgraph.png" border="0" usemap="#aservice_8c_aacdc0fdc305aad4393f95938521e2dd0_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a0e7f560f7fe8f1fddadf76f03654aaf3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e7f560f7fe8f1fddadf76f03654aaf3">&#9670;&nbsp;</a></span>add_staff_type()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool add_staff_type </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">StaffType *&#160;</td>
+          <td class="paramname"><em>type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>添加服务人员类型 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>用户类型 </td></tr>
+    <tr><td class="paramname">type</td><td>服务人员类型结构体指针 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 操作成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="service_8c_a0e7f560f7fe8f1fddadf76f03654aaf3_cgraph.png" border="0" usemap="#aservice_8c_a0e7f560f7fe8f1fddadf76f03654aaf3_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a3bb4aa85f3f514471267fb80c1f74a4e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3bb4aa85f3f514471267fb80c1f74a4e">&#9670;&nbsp;</a></span>assign_service_area()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool assign_service_area </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ServiceArea *&#160;</td>
+          <td class="paramname"><em>area</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>分配服务区域 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>用户类型 </td></tr>
+    <tr><td class="paramname">area</td><td>服务区域结构体指针 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 操作成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="service_8c_a3bb4aa85f3f514471267fb80c1f74a4e_cgraph.png" border="0" usemap="#aservice_8c_a3bb4aa85f3f514471267fb80c1f74a4e_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a59e6f9fa3a9107aef05ee0febc27786a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59e6f9fa3a9107aef05ee0febc27786a">&#9670;&nbsp;</a></span>delete_service_type()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool delete_service_type </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>type_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>删除服务类型 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>用户类型 </td></tr>
+    <tr><td class="paramname">type_id</td><td>要删除的服务类型ID </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 操作成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="service_8c_a59e6f9fa3a9107aef05ee0febc27786a_cgraph.png" border="0" usemap="#aservice_8c_a59e6f9fa3a9107aef05ee0febc27786a_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a2de414c2d5e3480516bee0d548351b6d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2de414c2d5e3480516bee0d548351b6d">&#9670;&nbsp;</a></span>delete_staff_type()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool delete_staff_type </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>staff_type_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>删除服务人员类型 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>用户类型 </td></tr>
+    <tr><td class="paramname">staff_type_id</td><td>要删除的服务人员类型ID </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 操作成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="service_8c_a2de414c2d5e3480516bee0d548351b6d_cgraph.png" border="0" usemap="#aservice_8c_a2de414c2d5e3480516bee0d548351b6d_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a7619d58da8006a5904f18554cadad159"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7619d58da8006a5904f18554cadad159">&#9670;&nbsp;</a></span>get_service_records_by_building()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool get_service_records_by_building </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>building_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QueryResult *&#160;</td>
+          <td class="paramname"><em>result</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>获取楼宇的服务记录 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>用户类型 </td></tr>
+    <tr><td class="paramname">building_id</td><td>楼宇ID </td></tr>
+    <tr><td class="paramname">result</td><td>查询结果 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 操作成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="service_8c_a7619d58da8006a5904f18554cadad159_cgraph.png" border="0" usemap="#aservice_8c_a7619d58da8006a5904f18554cadad159_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a6086cd555f05a25727c474a5369be592"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6086cd555f05a25727c474a5369be592">&#9670;&nbsp;</a></span>get_service_records_by_room()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool get_service_records_by_room </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>room_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QueryResult *&#160;</td>
+          <td class="paramname"><em>result</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>获取房屋的服务记录 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>用户类型 </td></tr>
+    <tr><td class="paramname">room_id</td><td>房屋ID </td></tr>
+    <tr><td class="paramname">result</td><td>查询结果 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 操作成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="service_8c_a6086cd555f05a25727c474a5369be592_cgraph.png" border="0" usemap="#aservice_8c_a6086cd555f05a25727c474a5369be592_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="acf4495e881beb0d9fa752b28dfc0aa9b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acf4495e881beb0d9fa752b28dfc0aa9b">&#9670;&nbsp;</a></span>get_service_records_by_staff()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool get_service_records_by_staff </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>staff_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QueryResult *&#160;</td>
+          <td class="paramname"><em>result</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>获取服务人员的服务记录 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>用户类型 </td></tr>
+    <tr><td class="paramname">staff_id</td><td>服务人员ID </td></tr>
+    <tr><td class="paramname">result</td><td>查询结果 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 操作成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="service_8c_acf4495e881beb0d9fa752b28dfc0aa9b_cgraph.png" border="0" usemap="#aservice_8c_acf4495e881beb0d9fa752b28dfc0aa9b_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="af07e5a5919fd1e3a0f9862f7fdee4c82"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af07e5a5919fd1e3a0f9862f7fdee4c82">&#9670;&nbsp;</a></span>get_staff_service_areas()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool get_staff_service_areas </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>staff_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QueryResult *&#160;</td>
+          <td class="paramname"><em>result</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>获取服务人员的服务区域列表 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>用户类型 </td></tr>
+    <tr><td class="paramname">staff_id</td><td>服务人员ID </td></tr>
+    <tr><td class="paramname">result</td><td>查询结果 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 操作成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="service_8c_af07e5a5919fd1e3a0f9862f7fdee4c82_cgraph.png" border="0" usemap="#aservice_8c_af07e5a5919fd1e3a0f9862f7fdee4c82_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a68c1eaefc6ee5b6f0ccbb902002d064b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68c1eaefc6ee5b6f0ccbb902002d064b">&#9670;&nbsp;</a></span>list_service_types()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool list_service_types </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QueryResult *&#160;</td>
+          <td class="paramname"><em>result</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>获取所有服务类型列表 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">result</td><td>查询结果 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 操作成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="service_8c_a68c1eaefc6ee5b6f0ccbb902002d064b_cgraph.png" border="0" usemap="#aservice_8c_a68c1eaefc6ee5b6f0ccbb902002d064b_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a93fdf9756dfb30b4e5582eaf7c11b87f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a93fdf9756dfb30b4e5582eaf7c11b87f">&#9670;&nbsp;</a></span>list_staff_types()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool list_staff_types </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QueryResult *&#160;</td>
+          <td class="paramname"><em>result</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>获取所有服务人员类型列表 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">result</td><td>查询结果 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 操作成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="service_8c_a93fdf9756dfb30b4e5582eaf7c11b87f_cgraph.png" border="0" usemap="#aservice_8c_a93fdf9756dfb30b4e5582eaf7c11b87f_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a028b9266585b850930840cfcdc2e4ca3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a028b9266585b850930840cfcdc2e4ca3">&#9670;&nbsp;</a></span>record_service()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool record_service </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ServiceRecord *&#160;</td>
+          <td class="paramname"><em>record</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>记录服务 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>用户类型 </td></tr>
+    <tr><td class="paramname">record</td><td>服务记录结构体指针 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 操作成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="service_8c_a028b9266585b850930840cfcdc2e4ca3_cgraph.png" border="0" usemap="#aservice_8c_a028b9266585b850930840cfcdc2e4ca3_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a78eba90aae9167c6df3a8be58c7a849e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a78eba90aae9167c6df3a8be58c7a849e">&#9670;&nbsp;</a></span>unassign_service_area()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool unassign_service_area </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>area_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>取消服务区域分配 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>用户类型 </td></tr>
+    <tr><td class="paramname">area_id</td><td>要取消的服务区域ID </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 操作成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="service_8c_a78eba90aae9167c6df3a8be58c7a849e_cgraph.png" border="0" usemap="#aservice_8c_a78eba90aae9167c6df3a8be58c7a849e_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a0bb2b679126c43ec5876ba85747bd990"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0bb2b679126c43ec5876ba85747bd990">&#9670;&nbsp;</a></span>update_service_type()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool update_service_type </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ServiceType *&#160;</td>
+          <td class="paramname"><em>type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>修改服务类型 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>用户类型 </td></tr>
+    <tr><td class="paramname">type</td><td>更新后的服务类型结构体指针 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 操作成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="service_8c_a0bb2b679126c43ec5876ba85747bd990_cgraph.png" border="0" usemap="#aservice_8c_a0bb2b679126c43ec5876ba85747bd990_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a78c669c200ec78906cb378390e0ed08d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a78c669c200ec78906cb378390e0ed08d">&#9670;&nbsp;</a></span>update_staff_type()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool update_staff_type </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">StaffType *&#160;</td>
+          <td class="paramname"><em>type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>修改服务人员类型 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>用户类型 </td></tr>
+    <tr><td class="paramname">type</td><td>更新后的服务人员类型结构体指针 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 操作成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="service_8c_a78c669c200ec78906cb378390e0ed08d_cgraph.png" border="0" usemap="#aservice_8c_a78c669c200ec78906cb378390e0ed08d_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+</small></address>
+</body>
+</html>

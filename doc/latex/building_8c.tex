@@ -1,0 +1,229 @@
+\hypertarget{building_8c}{}\doxysection{src/models/building.c 文件参考}
+\label{building_8c}\index{src/models/building.c@{src/models/building.c}}
+{\ttfamily \#include \char`\"{}models/building.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}auth/auth.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}utils/utils.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$time.\+h$>$}\newline
+building.\+c 的引用(Include)关系图\+:
+% FIG 0
+\doxysubsection*{函数}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{building_8c_ab6750d60c5152fc84ff4f6f9ef084365}{add\+\_\+building}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type, Building $\ast$building)
+\item 
+bool \mbox{\hyperlink{building_8c_a4e0f73fd25765595a6a751f684e3ab50}{update\+\_\+building}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type, Building $\ast$building)
+\item 
+bool \mbox{\hyperlink{building_8c_a9f44de6beffd02b8eadb9fc6c838cf0e}{delete\+\_\+building}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type, const char $\ast$building\+\_\+id)
+\item 
+bool \mbox{\hyperlink{building_8c_aed1ee9543944b8a88ebf7b7ac952e127}{get\+\_\+building}} (Database $\ast$db, const char $\ast$building\+\_\+id, Building $\ast$building)
+\item 
+bool \mbox{\hyperlink{building_8c_a7d69df1acd0b028d644fb952b70394e6}{list\+\_\+buildings}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type, Query\+Result $\ast$result)
+\item 
+bool \mbox{\hyperlink{building_8c_ae867efc49ab44e71f009e49da6c67f3d}{assign\+\_\+staff\+\_\+to\+\_\+building}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type, const char $\ast$staff\+\_\+id, const char $\ast$building\+\_\+id)
+\item 
+bool \mbox{\hyperlink{building_8c_a6d4890d6a03a0cd23d7c327274d79c3a}{unassign\+\_\+staff\+\_\+from\+\_\+building}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type, const char $\ast$staff\+\_\+id, const char $\ast$building\+\_\+id)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{函数说明}
+\mbox{\Hypertarget{building_8c_ab6750d60c5152fc84ff4f6f9ef084365}\label{building_8c_ab6750d60c5152fc84ff4f6f9ef084365}} 
+\index{building.c@{building.c}!add\_building@{add\_building}}
+\index{add\_building@{add\_building}!building.c@{building.c}}
+\doxysubsubsection{\texorpdfstring{add\_building()}{add\_building()}}
+{\footnotesize\ttfamily bool add\+\_\+building (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type,  }\item[{Building $\ast$}]{building }\end{DoxyParamCaption})}
+
+添加楼宇
+
+向系统中添加新的楼宇信息，需要管理员权限
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em user\+\_\+id} & 用户\+ID \\
+\hline
+{\em user\+\_\+type} & 用户类型 \\
+\hline
+{\em building} & 楼宇信息结构体，包含楼宇的基本信息 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+添加成功返回true，失败返回false 
+\end{DoxyReturn}
+函数调用图\+:
+% FIG 1
+这是这个函数的调用关系图\+:
+% FIG 2
+\mbox{\Hypertarget{building_8c_ae867efc49ab44e71f009e49da6c67f3d}\label{building_8c_ae867efc49ab44e71f009e49da6c67f3d}} 
+\index{building.c@{building.c}!assign\_staff\_to\_building@{assign\_staff\_to\_building}}
+\index{assign\_staff\_to\_building@{assign\_staff\_to\_building}!building.c@{building.c}}
+\doxysubsubsection{\texorpdfstring{assign\_staff\_to\_building()}{assign\_staff\_to\_building()}}
+{\footnotesize\ttfamily bool assign\+\_\+staff\+\_\+to\+\_\+building (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type,  }\item[{const char $\ast$}]{staff\+\_\+id,  }\item[{const char $\ast$}]{building\+\_\+id }\end{DoxyParamCaption})}
+
+分配服务人员到楼宇
+
+创建服务人员与楼宇之间的关联关系，需要管理员权限
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em user\+\_\+id} & 用户\+ID \\
+\hline
+{\em user\+\_\+type} & 用户类型 \\
+\hline
+{\em staff\+\_\+id} & 服务人员\+ID \\
+\hline
+{\em building\+\_\+id} & 楼宇\+ID \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+分配成功返回true，失败返回false 
+\end{DoxyReturn}
+函数调用图\+:
+% FIG 3
+这是这个函数的调用关系图\+:
+% FIG 4
+\mbox{\Hypertarget{building_8c_a9f44de6beffd02b8eadb9fc6c838cf0e}\label{building_8c_a9f44de6beffd02b8eadb9fc6c838cf0e}} 
+\index{building.c@{building.c}!delete\_building@{delete\_building}}
+\index{delete\_building@{delete\_building}!building.c@{building.c}}
+\doxysubsubsection{\texorpdfstring{delete\_building()}{delete\_building()}}
+{\footnotesize\ttfamily bool delete\+\_\+building (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type,  }\item[{const char $\ast$}]{building\+\_\+id }\end{DoxyParamCaption})}
+
+删除楼宇
+
+从系统中删除指定楼宇，需要管理员权限 如果楼宇存在关联的房屋，则无法删除 如果存在关联的服务区域，会先删除关联关系
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em user\+\_\+id} & 用户\+ID \\
+\hline
+{\em user\+\_\+type} & 用户类型 \\
+\hline
+{\em building\+\_\+id} & 要删除的楼宇\+ID \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+删除成功返回true，失败返回false 
+\end{DoxyReturn}
+函数调用图\+:
+% FIG 5
+这是这个函数的调用关系图\+:
+% FIG 6
+\mbox{\Hypertarget{building_8c_aed1ee9543944b8a88ebf7b7ac952e127}\label{building_8c_aed1ee9543944b8a88ebf7b7ac952e127}} 
+\index{building.c@{building.c}!get\_building@{get\_building}}
+\index{get\_building@{get\_building}!building.c@{building.c}}
+\doxysubsubsection{\texorpdfstring{get\_building()}{get\_building()}}
+{\footnotesize\ttfamily bool get\+\_\+building (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{building\+\_\+id,  }\item[{Building $\ast$}]{building }\end{DoxyParamCaption})}
+
+获取楼宇信息
+
+根据楼宇\+ID获取楼宇的详细信息
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em building\+\_\+id} & 要查询的楼宇\+ID \\
+\hline
+{\em building} & 用于存储查询结果的楼宇结构体 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+查询成功返回true，失败返回false 
+\end{DoxyReturn}
+函数调用图\+:
+% FIG 7
+这是这个函数的调用关系图\+:
+% FIG 8
+\mbox{\Hypertarget{building_8c_a7d69df1acd0b028d644fb952b70394e6}\label{building_8c_a7d69df1acd0b028d644fb952b70394e6}} 
+\index{building.c@{building.c}!list\_buildings@{list\_buildings}}
+\index{list\_buildings@{list\_buildings}!building.c@{building.c}}
+\doxysubsubsection{\texorpdfstring{list\_buildings()}{list\_buildings()}}
+{\footnotesize\ttfamily bool list\+\_\+buildings (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type,  }\item[{Query\+Result $\ast$}]{result }\end{DoxyParamCaption})}
+
+获取所有楼宇列表
+
+查询系统中所有楼宇的基本信息
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em user\+\_\+id} & 用户\+ID \\
+\hline
+{\em user\+\_\+type} & 用户类型 \\
+\hline
+{\em result} & 查询结果结构体 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+查询成功返回true，失败返回false 
+\end{DoxyReturn}
+函数调用图\+:
+% FIG 9
+这是这个函数的调用关系图\+:
+% FIG 10
+\mbox{\Hypertarget{building_8c_a6d4890d6a03a0cd23d7c327274d79c3a}\label{building_8c_a6d4890d6a03a0cd23d7c327274d79c3a}} 
+\index{building.c@{building.c}!unassign\_staff\_from\_building@{unassign\_staff\_from\_building}}
+\index{unassign\_staff\_from\_building@{unassign\_staff\_from\_building}!building.c@{building.c}}
+\doxysubsubsection{\texorpdfstring{unassign\_staff\_from\_building()}{unassign\_staff\_from\_building()}}
+{\footnotesize\ttfamily bool unassign\+\_\+staff\+\_\+from\+\_\+building (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type,  }\item[{const char $\ast$}]{staff\+\_\+id,  }\item[{const char $\ast$}]{building\+\_\+id }\end{DoxyParamCaption})}
+
+取消服务人员的楼宇分配
+
+删除服务人员与楼宇之间的关联关系，需要管理员权限
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em user\+\_\+id} & 用户\+ID \\
+\hline
+{\em user\+\_\+type} & 用户类型 \\
+\hline
+{\em staff\+\_\+id} & 服务人员\+ID \\
+\hline
+{\em building\+\_\+id} & 楼宇\+ID \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+取消分配成功返回true，失败返回false 
+\end{DoxyReturn}
+函数调用图\+:
+% FIG 11
+这是这个函数的调用关系图\+:
+% FIG 12
+\mbox{\Hypertarget{building_8c_a4e0f73fd25765595a6a751f684e3ab50}\label{building_8c_a4e0f73fd25765595a6a751f684e3ab50}} 
+\index{building.c@{building.c}!update\_building@{update\_building}}
+\index{update\_building@{update\_building}!building.c@{building.c}}
+\doxysubsubsection{\texorpdfstring{update\_building()}{update\_building()}}
+{\footnotesize\ttfamily bool update\+\_\+building (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type,  }\item[{Building $\ast$}]{building }\end{DoxyParamCaption})}
+
+修改楼宇信息
+
+更新系统中已存在楼宇的信息，需要管理员权限
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em user\+\_\+id} & 用户\+ID \\
+\hline
+{\em user\+\_\+type} & 用户类型 \\
+\hline
+{\em building} & 包含更新信息的楼宇结构体 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+修改成功返回true，失败返回false 
+\end{DoxyReturn}
+函数调用图\+:
+% FIG 13
+这是这个函数的调用关系图\+:
+% FIG 14

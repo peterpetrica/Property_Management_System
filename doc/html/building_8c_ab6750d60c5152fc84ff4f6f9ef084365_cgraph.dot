@@ -1,0 +1,14 @@
+digraph "add_building"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="add_building",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="execute_update",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$db__query_8c.html#a8e8357f0e514181200d759cc87a3a088",tooltip=" "];
+  Node1 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="generate_uuid",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$utils_8c.html#af5263e9c5ed8b07e92367144201731b2",tooltip="生成UUID字符串"];
+  Node1 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="validate_permission",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$auth_8c.html#a4147a77cb3537ed3be427279c07b8f38",tooltip="验证用户是否具有执行特定操作的权限"];
+}

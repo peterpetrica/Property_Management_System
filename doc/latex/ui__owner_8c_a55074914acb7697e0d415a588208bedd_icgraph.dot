@@ -1,0 +1,16 @@
+digraph "query_fee_info"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="RL";
+  Node1 [label="query_fee_info",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+  Node2 [label="show_owner_query_screen",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$ui__owner_8c.html#a72e3a31f23c6bd0aafbe050f4b573148",tooltip=" "];
+  Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+  Node3 [label="main_screen_owner",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$ui__owner_8c.html#af9d2ae3e1b2ffd5a65ed854683be4f4e",tooltip=" "];
+  Node3 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+  Node4 [label="show_owner_main_screen",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$ui__owner_8c.html#a6cf4aab57bd57dc103a492c001d864bb",tooltip=" "];
+  Node4 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+  Node5 [label="main",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$main_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4",tooltip=" "];
+}

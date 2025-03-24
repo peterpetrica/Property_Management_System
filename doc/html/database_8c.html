@@ -1,0 +1,348 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Property_Management_System: src/db/database.c 文件参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">Property_Management_System
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.9.1 -->
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(function() {
+  initMenu('',false,false,'search.php','搜索');
+});
+/* @license-end */</script>
+<div id="main-nav"></div>
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_18fd539062cd3a2de3dfd78991cf728d.html">db</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#func-members">函数</a>  </div>
+  <div class="headertitle">
+<div class="title">database.c 文件参考</div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><code>#include &quot;db/database.h&quot;</code><br />
+<code>#include &quot;db/db_init.h&quot;</code><br />
+<code>#include &lt;stdio.h&gt;</code><br />
+<code>#include &lt;stdlib.h&gt;</code><br />
+<code>#include &lt;string.h&gt;</code><br />
+</div><div class="textblock"><div class="dynheader">
+database.c 的引用(Include)关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="database_8c__incl.png" border="0" usemap="#asrc_2db_2database_8c" alt=""/></div>
+</div>
+</div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:a52fdd9fcc6e0644bd418dca950c1f0de"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="database_8c.html#a52fdd9fcc6e0644bd418dca950c1f0de">db_init</a> (Database *db, const char *db_path)</td></tr>
+<tr class="memdesc:a52fdd9fcc6e0644bd418dca950c1f0de"><td class="mdescLeft">&#160;</td><td class="mdescRight">初始化数据库  <a href="database_8c.html#a52fdd9fcc6e0644bd418dca950c1f0de">更多...</a><br /></td></tr>
+<tr class="separator:a52fdd9fcc6e0644bd418dca950c1f0de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4eb6282b34dc0ef2afe1153fc3baa79c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="database_8c.html#a4eb6282b34dc0ef2afe1153fc3baa79c">db_close</a> (Database *db)</td></tr>
+<tr class="memdesc:a4eb6282b34dc0ef2afe1153fc3baa79c"><td class="mdescLeft">&#160;</td><td class="mdescRight">关闭数据库连接  <a href="database_8c.html#a4eb6282b34dc0ef2afe1153fc3baa79c">更多...</a><br /></td></tr>
+<tr class="separator:a4eb6282b34dc0ef2afe1153fc3baa79c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a272c71b015b2a321e080226a2169a360"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="database_8c.html#a272c71b015b2a321e080226a2169a360">db_execute</a> (Database *db, const char *sql)</td></tr>
+<tr class="memdesc:a272c71b015b2a321e080226a2169a360"><td class="mdescLeft">&#160;</td><td class="mdescRight">执行SQL语句  <a href="database_8c.html#a272c71b015b2a321e080226a2169a360">更多...</a><br /></td></tr>
+<tr class="separator:a272c71b015b2a321e080226a2169a360"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d547268f39d4da2eed27e533dff1ba4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="database_8c.html#a5d547268f39d4da2eed27e533dff1ba4">db_prepare</a> (Database *db, const char *sql, sqlite3_stmt **stmt)</td></tr>
+<tr class="memdesc:a5d547268f39d4da2eed27e533dff1ba4"><td class="mdescLeft">&#160;</td><td class="mdescRight">准备SQL语句  <a href="database_8c.html#a5d547268f39d4da2eed27e533dff1ba4">更多...</a><br /></td></tr>
+<tr class="separator:a5d547268f39d4da2eed27e533dff1ba4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2d334436c88b33ac87de9e39a934fca"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="database_8c.html#ad2d334436c88b33ac87de9e39a934fca">db_backup</a> (Database *db, const char *backup_path)</td></tr>
+<tr class="memdesc:ad2d334436c88b33ac87de9e39a934fca"><td class="mdescLeft">&#160;</td><td class="mdescRight">数据库备份  <a href="database_8c.html#ad2d334436c88b33ac87de9e39a934fca">更多...</a><br /></td></tr>
+<tr class="separator:ad2d334436c88b33ac87de9e39a934fca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a996f8531ef8649b3dad353338cdefd91"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="database_8c.html#a996f8531ef8649b3dad353338cdefd91">db_restore</a> (Database *db, const char *backup_path)</td></tr>
+<tr class="memdesc:a996f8531ef8649b3dad353338cdefd91"><td class="mdescLeft">&#160;</td><td class="mdescRight">从备份文件恢复数据库  <a href="database_8c.html#a996f8531ef8649b3dad353338cdefd91">更多...</a><br /></td></tr>
+<tr class="separator:a996f8531ef8649b3dad353338cdefd91"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">函数说明</h2>
+<a id="ad2d334436c88b33ac87de9e39a934fca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad2d334436c88b33ac87de9e39a934fca">&#9670;&nbsp;</a></span>db_backup()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int db_backup </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>backup_path</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>数据库备份 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库结构体指针 </td></tr>
+    <tr><td class="paramname">backup_path</td><td>备份文件路径 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>int SQLITE_OK表示成功，其他值表示错误码 </dd></dl>
+
+</div>
+</div>
+<a id="a4eb6282b34dc0ef2afe1153fc3baa79c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4eb6282b34dc0ef2afe1153fc3baa79c">&#9670;&nbsp;</a></span>db_close()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void db_close </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>关闭数据库连接 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库结构体指针 </td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="database_8c_a4eb6282b34dc0ef2afe1153fc3baa79c_icgraph.png" border="0" usemap="#adatabase_8c_a4eb6282b34dc0ef2afe1153fc3baa79c_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a272c71b015b2a321e080226a2169a360"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a272c71b015b2a321e080226a2169a360">&#9670;&nbsp;</a></span>db_execute()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int db_execute </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>sql</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>执行SQL语句 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库结构体指针 </td></tr>
+    <tr><td class="paramname">sql</td><td>要执行的SQL语句 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>int SQLITE_OK表示成功，其他值表示错误码 </dd></dl>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="database_8c_a272c71b015b2a321e080226a2169a360_icgraph.png" border="0" usemap="#adatabase_8c_a272c71b015b2a321e080226a2169a360_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a52fdd9fcc6e0644bd418dca950c1f0de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a52fdd9fcc6e0644bd418dca950c1f0de">&#9670;&nbsp;</a></span>db_init()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int db_init </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>db_path</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>初始化数据库 </p>
+<p><a class="el" href="database_8c.html">database.c</a> 数据库操作模块的实现</p>
+<p>本模块提供物业管理系统所需的数据库访问接口，实现了数据库的基本操作功能：</p><ul>
+<li>数据库的初始化和连接</li>
+<li>关闭数据库连接</li>
+<li>SQL语句的执行</li>
+<li>数据库的备份功能</li>
+<li>数据库的恢复功能</li>
+</ul>
+<p>该模块是系统与数据存储层之间的桥梁，为上层业务逻辑提供数据持久化支持。</p>
+<p>所有函数需要进行适当的错误处理和资源管理</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库结构体指针 </td></tr>
+    <tr><td class="paramname">db_path</td><td>数据库文件路径 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>int SQLITE_OK表示成功，其他值表示错误码 </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="database_8c_a52fdd9fcc6e0644bd418dca950c1f0de_cgraph.png" border="0" usemap="#adatabase_8c_a52fdd9fcc6e0644bd418dca950c1f0de_cgraph" alt=""/></div>
+</div>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="database_8c_a52fdd9fcc6e0644bd418dca950c1f0de_icgraph.png" border="0" usemap="#adatabase_8c_a52fdd9fcc6e0644bd418dca950c1f0de_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a5d547268f39d4da2eed27e533dff1ba4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5d547268f39d4da2eed27e533dff1ba4">&#9670;&nbsp;</a></span>db_prepare()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int db_prepare </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>sql</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">sqlite3_stmt **&#160;</td>
+          <td class="paramname"><em>stmt</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>准备SQL语句 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库结构体指针 </td></tr>
+    <tr><td class="paramname">sql</td><td>要准备的SQL语句 </td></tr>
+    <tr><td class="paramname">stmt</td><td>准备好的语句句柄 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>int SQLITE_OK表示成功，其他值表示错误码 </dd></dl>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="database_8c_a5d547268f39d4da2eed27e533dff1ba4_icgraph.png" border="0" usemap="#adatabase_8c_a5d547268f39d4da2eed27e533dff1ba4_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a996f8531ef8649b3dad353338cdefd91"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a996f8531ef8649b3dad353338cdefd91">&#9670;&nbsp;</a></span>db_restore()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int db_restore </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>backup_path</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>从备份文件恢复数据库 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库结构体指针 </td></tr>
+    <tr><td class="paramname">backup_path</td><td>备份文件路径 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>int SQLITE_OK表示成功，其他值表示错误码 </dd></dl>
+
+</div>
+</div>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+</small></address>
+</body>
+</html>

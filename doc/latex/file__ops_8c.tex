@@ -1,0 +1,141 @@
+\hypertarget{file__ops_8c}{}\doxysection{src/utils/file\+\_\+ops.c 文件参考}
+\label{file__ops_8c}\index{src/utils/file\_ops.c@{src/utils/file\_ops.c}}
+{\ttfamily \#include \char`\"{}utils/file\+\_\+ops.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$sys/stat.\+h$>$}\newline
+{\ttfamily \#include $<$errno.\+h$>$}\newline
+file\+\_\+ops.\+c 的引用(Include)关系图\+:
+% FIG 0
+\doxysubsection*{函数}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{file__ops_8c_ac25b043ee29105f0aeb5b839fee57b44}{copy\+\_\+file}} (const char $\ast$src, const char $\ast$dest)
+\begin{DoxyCompactList}\small\item\em 复制文件 \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{file__ops_8c_a352995c1685c4d200531e2ddbe3ce0eb}{delete\+\_\+file}} (const char $\ast$path)
+\begin{DoxyCompactList}\small\item\em 删除文件 \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{file__ops_8c_aba2db2f17a82cb9f949de86a2f783ce6}{file\+\_\+exists}} (const char $\ast$path)
+\begin{DoxyCompactList}\small\item\em 检查文件是否存在 \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{file__ops_8c_aca3791df724ee1ae3b5b092fa1b65c63}{create\+\_\+directory}} (const char $\ast$path)
+\begin{DoxyCompactList}\small\item\em 创建目录 \end{DoxyCompactList}\item 
+char $\ast$ \mbox{\hyperlink{file__ops_8c_a10bbee71efd660a92c5762e17209c654}{get\+\_\+data\+\_\+dir}} (char $\ast$buffer, size\+\_\+t size)
+\begin{DoxyCompactList}\small\item\em 获取程序的数据目录路径 \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{函数说明}
+\mbox{\Hypertarget{file__ops_8c_ac25b043ee29105f0aeb5b839fee57b44}\label{file__ops_8c_ac25b043ee29105f0aeb5b839fee57b44}} 
+\index{file\_ops.c@{file\_ops.c}!copy\_file@{copy\_file}}
+\index{copy\_file@{copy\_file}!file\_ops.c@{file\_ops.c}}
+\doxysubsubsection{\texorpdfstring{copy\_file()}{copy\_file()}}
+{\footnotesize\ttfamily bool copy\+\_\+file (\begin{DoxyParamCaption}\item[{const char $\ast$}]{src,  }\item[{const char $\ast$}]{dest }\end{DoxyParamCaption})}
+
+
+
+复制文件 
+
+\mbox{\hyperlink{file__ops_8c}{file\+\_\+ops.\+c}} 文件操作工具函数实现
+
+本文件提供了一系列文件操作函数，包括：
+\begin{DoxyItemize}
+\item 复制文件
+\item 删除文件
+\item 检查文件是否存在
+\item 创建目录
+\item 获取程序的数据目录路径
+\end{DoxyItemize}
+
+这些函数旨在简化程序中的文件操作，并提供跨平台(Windows/\+Linux)支持
+
+
+\begin{DoxyParams}{参数}
+{\em src} & 源文件路径 \\
+\hline
+{\em dest} & 目标文件路径 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+bool 操作成功返回true，失败返回false 
+\end{DoxyReturn}
+\mbox{\Hypertarget{file__ops_8c_aca3791df724ee1ae3b5b092fa1b65c63}\label{file__ops_8c_aca3791df724ee1ae3b5b092fa1b65c63}} 
+\index{file\_ops.c@{file\_ops.c}!create\_directory@{create\_directory}}
+\index{create\_directory@{create\_directory}!file\_ops.c@{file\_ops.c}}
+\doxysubsubsection{\texorpdfstring{create\_directory()}{create\_directory()}}
+{\footnotesize\ttfamily bool create\+\_\+directory (\begin{DoxyParamCaption}\item[{const char $\ast$}]{path }\end{DoxyParamCaption})}
+
+
+
+创建目录 
+
+
+\begin{DoxyParams}{参数}
+{\em path} & 要创建的目录路径 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+bool 创建成功或目录已存在返回true，失败返回false 
+\end{DoxyReturn}
+这是这个函数的调用关系图\+:
+% FIG 1
+\mbox{\Hypertarget{file__ops_8c_a352995c1685c4d200531e2ddbe3ce0eb}\label{file__ops_8c_a352995c1685c4d200531e2ddbe3ce0eb}} 
+\index{file\_ops.c@{file\_ops.c}!delete\_file@{delete\_file}}
+\index{delete\_file@{delete\_file}!file\_ops.c@{file\_ops.c}}
+\doxysubsubsection{\texorpdfstring{delete\_file()}{delete\_file()}}
+{\footnotesize\ttfamily bool delete\+\_\+file (\begin{DoxyParamCaption}\item[{const char $\ast$}]{path }\end{DoxyParamCaption})}
+
+
+
+删除文件 
+
+
+\begin{DoxyParams}{参数}
+{\em path} & 要删除的文件路径 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+bool 操作成功返回true，失败返回false 
+\end{DoxyReturn}
+\mbox{\Hypertarget{file__ops_8c_aba2db2f17a82cb9f949de86a2f783ce6}\label{file__ops_8c_aba2db2f17a82cb9f949de86a2f783ce6}} 
+\index{file\_ops.c@{file\_ops.c}!file\_exists@{file\_exists}}
+\index{file\_exists@{file\_exists}!file\_ops.c@{file\_ops.c}}
+\doxysubsubsection{\texorpdfstring{file\_exists()}{file\_exists()}}
+{\footnotesize\ttfamily bool file\+\_\+exists (\begin{DoxyParamCaption}\item[{const char $\ast$}]{path }\end{DoxyParamCaption})}
+
+
+
+检查文件是否存在 
+
+
+\begin{DoxyParams}{参数}
+{\em path} & 要检查的文件路径 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+bool 文件存在返回true，不存在返回false 
+\end{DoxyReturn}
+这是这个函数的调用关系图\+:
+% FIG 2
+\mbox{\Hypertarget{file__ops_8c_a10bbee71efd660a92c5762e17209c654}\label{file__ops_8c_a10bbee71efd660a92c5762e17209c654}} 
+\index{file\_ops.c@{file\_ops.c}!get\_data\_dir@{get\_data\_dir}}
+\index{get\_data\_dir@{get\_data\_dir}!file\_ops.c@{file\_ops.c}}
+\doxysubsubsection{\texorpdfstring{get\_data\_dir()}{get\_data\_dir()}}
+{\footnotesize\ttfamily char$\ast$ get\+\_\+data\+\_\+dir (\begin{DoxyParamCaption}\item[{char $\ast$}]{buffer,  }\item[{size\+\_\+t}]{size }\end{DoxyParamCaption})}
+
+
+
+获取程序的数据目录路径 
+
+
+\begin{DoxyParams}{参数}
+{\em buffer} & 用于存储路径的缓冲区 \\
+\hline
+{\em size} & 缓冲区大小 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+char$\ast$ 成功返回缓冲区指针，失败返回\+NULL 
+\end{DoxyReturn}
+函数调用图\+:
+% FIG 3
+这是这个函数的调用关系图\+:
+% FIG 4

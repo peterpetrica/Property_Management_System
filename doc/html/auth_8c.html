@@ -1,0 +1,321 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Property_Management_System: src/auth/auth.c 文件参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">Property_Management_System
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.9.1 -->
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(function() {
+  initMenu('',false,false,'search.php','搜索');
+});
+/* @license-end */</script>
+<div id="main-nav"></div>
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_ecb37285c0bc658c97bb749f37c59e79.html">auth</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#func-members">函数</a>  </div>
+  <div class="headertitle">
+<div class="title">auth.c 文件参考</div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><code>#include &quot;auth/auth.h&quot;</code><br />
+<code>#include &quot;utils/utils.h&quot;</code><br />
+<code>#include &lt;stdio.h&gt;</code><br />
+<code>#include &lt;stdlib.h&gt;</code><br />
+<code>#include &lt;string.h&gt;</code><br />
+<code>#include &lt;time.h&gt;</code><br />
+<code>#include &lt;openssl/sha.h&gt;</code><br />
+</div><div class="textblock"><div class="dynheader">
+auth.c 的引用(Include)关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="auth_8c__incl.png" border="0" usemap="#asrc_2auth_2auth_8c" alt=""/></div>
+</div>
+</div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:af8ec5b8912ae6023809fc9aa3a0c75cb"><td class="memItemLeft" align="right" valign="top">LoginResult&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="auth_8c.html#af8ec5b8912ae6023809fc9aa3a0c75cb">authenticate_user</a> (Database *db, const char *username, const char *password)</td></tr>
+<tr class="memdesc:af8ec5b8912ae6023809fc9aa3a0c75cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">验证用户登录信息并返回登录结果  <a href="auth_8c.html#af8ec5b8912ae6023809fc9aa3a0c75cb">更多...</a><br /></td></tr>
+<tr class="separator:af8ec5b8912ae6023809fc9aa3a0c75cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4147a77cb3537ed3be427279c07b8f38"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="auth_8c.html#a4147a77cb3537ed3be427279c07b8f38">validate_permission</a> (Database *db, const char *user_id, UserType user_type, int min_permission_level)</td></tr>
+<tr class="memdesc:a4147a77cb3537ed3be427279c07b8f38"><td class="mdescLeft">&#160;</td><td class="mdescRight">验证用户是否具有执行特定操作的权限  <a href="auth_8c.html#a4147a77cb3537ed3be427279c07b8f38">更多...</a><br /></td></tr>
+<tr class="separator:a4147a77cb3537ed3be427279c07b8f38"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5dec1261f68e6ad3d0c56db959f49dca"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="auth_8c.html#a5dec1261f68e6ad3d0c56db959f49dca">change_password</a> (Database *db, const char *user_id, UserType user_type, const char *old_password, const char *new_password)</td></tr>
+<tr class="memdesc:a5dec1261f68e6ad3d0c56db959f49dca"><td class="mdescLeft">&#160;</td><td class="mdescRight">修改用户密码  <a href="auth_8c.html#a5dec1261f68e6ad3d0c56db959f49dca">更多...</a><br /></td></tr>
+<tr class="separator:a5dec1261f68e6ad3d0c56db959f49dca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa3c7c22f3ab8daab77a43d5e47c22e9d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="auth_8c.html#aa3c7c22f3ab8daab77a43d5e47c22e9d">reset_password</a> (Database *db, const char *admin_id, UserType admin_type, const char *user_id, UserType user_type)</td></tr>
+<tr class="memdesc:aa3c7c22f3ab8daab77a43d5e47c22e9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">重置用户密码为默认密码（仅管理员可操作）  <a href="auth_8c.html#aa3c7c22f3ab8daab77a43d5e47c22e9d">更多...</a><br /></td></tr>
+<tr class="separator:aa3c7c22f3ab8daab77a43d5e47c22e9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">函数说明</h2>
+<a id="af8ec5b8912ae6023809fc9aa3a0c75cb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8ec5b8912ae6023809fc9aa3a0c75cb">&#9670;&nbsp;</a></span>authenticate_user()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">LoginResult authenticate_user </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>username</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>password</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>验证用户登录信息并返回登录结果 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">username</td><td>用户名 </td></tr>
+    <tr><td class="paramname">password</td><td>密码 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>LoginResult 包含登录结果的结构体，成功时包含用户信息 </dd></dl>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="auth_8c_af8ec5b8912ae6023809fc9aa3a0c75cb_icgraph.png" border="0" usemap="#aauth_8c_af8ec5b8912ae6023809fc9aa3a0c75cb_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a5dec1261f68e6ad3d0c56db959f49dca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5dec1261f68e6ad3d0c56db959f49dca">&#9670;&nbsp;</a></span>change_password()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool change_password </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>old_password</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>new_password</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>修改用户密码 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>用户类型 </td></tr>
+    <tr><td class="paramname">old_password</td><td>旧密码 </td></tr>
+    <tr><td class="paramname">new_password</td><td>新密码 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 密码修改成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="auth_8c_a5dec1261f68e6ad3d0c56db959f49dca_icgraph.png" border="0" usemap="#aauth_8c_a5dec1261f68e6ad3d0c56db959f49dca_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="aa3c7c22f3ab8daab77a43d5e47c22e9d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3c7c22f3ab8daab77a43d5e47c22e9d">&#9670;&nbsp;</a></span>reset_password()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool reset_password </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>admin_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>admin_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>重置用户密码为默认密码（仅管理员可操作） </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">admin_id</td><td>管理员ID </td></tr>
+    <tr><td class="paramname">admin_type</td><td>管理员类型 </td></tr>
+    <tr><td class="paramname">user_id</td><td>要重置密码的用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>要重置密码的用户类型 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 重置成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="auth_8c_aa3c7c22f3ab8daab77a43d5e47c22e9d_cgraph.png" border="0" usemap="#aauth_8c_aa3c7c22f3ab8daab77a43d5e47c22e9d_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a4147a77cb3537ed3be427279c07b8f38"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4147a77cb3537ed3be427279c07b8f38">&#9670;&nbsp;</a></span>validate_permission()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool validate_permission </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>min_permission_level</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>验证用户是否具有执行特定操作的权限 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>用户类型 </td></tr>
+    <tr><td class="paramname">min_permission_level</td><td>需要的最低权限级别 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 用户具有足够权限返回true，否则返回false </dd></dl>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="auth_8c_a4147a77cb3537ed3be427279c07b8f38_icgraph.png" border="0" usemap="#aauth_8c_a4147a77cb3537ed3be427279c07b8f38_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+</small></address>
+</body>
+</html>

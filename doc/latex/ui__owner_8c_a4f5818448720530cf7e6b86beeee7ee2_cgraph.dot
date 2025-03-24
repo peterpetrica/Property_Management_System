@@ -1,0 +1,14 @@
+digraph "process_payment_screen"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="process_payment_screen",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid"];
+  Node2 [label="clear_input_buffer",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$ui__owner_8c.html#a569ba2b1701b459754653701d8a49998",tooltip=" "];
+  Node1 -> Node3 [color="midnightblue",fontsize="10",style="solid"];
+  Node3 [label="generate_transaction_id",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$transaction_8c.html#adc8ec87ffc99084abadde5f985eabfa7",tooltip=" "];
+  Node3 -> Node4 [color="midnightblue",fontsize="10",style="solid"];
+  Node4 [label="generate_uuid",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$utils_8c.html#af5263e9c5ed8b07e92367144201731b2",tooltip="生成UUID字符串"];
+}

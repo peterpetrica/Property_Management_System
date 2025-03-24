@@ -7,15 +7,18 @@
 dch：
 
 ptc：
+
 - 我在下面的项目总要求里添加了数据库的表单数据结构预期实现，请按照那个作为预期的数据库结构
-- user_id是字符串！(至少需要40位的数组来存放)
+- user_id 是字符串！(至少需要 40 位的数组来存放)
 
 - [x] apartment.c 已完成，实现增删查改房屋功能
 - [x] building.c 已完成，实现楼宇的增删查改
 - [x] transaction.c 已初步完成，实现交易记录的添加
 - [x] parking.c
-- [x] service.c 
+- [x] service.c
+
 以上函数由我负责维护，有需求请联系我
+
 fxl：
 
 zzm：
@@ -127,13 +130,30 @@ cmake --build build
 ```bash
 ./run.sh
 ```
+
 ## 初始化工作环境 $^{*}$
 
-1. 根据您的操作系统及CPU指令架构，在仓库根目录下的 `.filter-tools` 目录中选择对应的文件，记录其文件名 $^{**}$
-2. 在克隆的仓库中启动终端，使用以下命令在仓库中使用如下命令添加Filter
+1.  根据您的操作系统及 CPU 指令架构，在仓库根目录下的 `.filter-tools` 目录中选择对应的文件，记录其文件名 $^{**}$
+2.  在克隆的仓库中启动终端，使用以下命令在仓库中使用如下命令添加 Filter
 
         # 仅替换 `<platform>` `<arch>` 为您的平台，不要更改相对路径
         ## 除非你知道你在做什么
 
         git config --local filter.garbage2null.smudge "./.filter-tools/garbage2null-<platform>-<arch>"
         git config --local filter.garbage2null.clean "./.filter-tools/garbage2null-<platform>-<arch>"
+
+## 自动化文档生成
+
+本项目采用 Doxygen/JavaDoc 风格的注释，可以使用 doxygen 来自动化生成文档
+
+先安装 doxygen
+
+```bash
+sudo apt install -y doxygen doxygen-gui
+```
+
+运行即可
+
+```bash
+doxywizard
+```

@@ -1,0 +1,936 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Property_Management_System: src/models/user.c 文件参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">Property_Management_System
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.9.1 -->
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(function() {
+  initMenu('',false,false,'search.php','搜索');
+});
+/* @license-end */</script>
+<div id="main-nav"></div>
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_bdeba5f06b852fec80257c0bf4c3c36e.html">models</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#func-members">函数</a>  </div>
+  <div class="headertitle">
+<div class="title">user.c 文件参考</div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><code>#include &quot;models/user.h&quot;</code><br />
+<code>#include &quot;utils/utils.h&quot;</code><br />
+<code>#include &quot;auth/auth.h&quot;</code><br />
+<code>#include &lt;stdio.h&gt;</code><br />
+<code>#include &lt;stdlib.h&gt;</code><br />
+<code>#include &lt;string.h&gt;</code><br />
+</div><div class="textblock"><div class="dynheader">
+user.c 的引用(Include)关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="user_8c__incl.png" border="0" usemap="#asrc_2models_2user_8c" alt=""/></div>
+</div>
+</div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:a368176270b82bfc80691cd4969cc8f14"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="user_8c.html#a368176270b82bfc80691cd4969cc8f14">create_owner</a> (Database *db, Owner *owner, const char *password)</td></tr>
+<tr class="memdesc:a368176270b82bfc80691cd4969cc8f14"><td class="mdescLeft">&#160;</td><td class="mdescRight">创建业主账户  <a href="user_8c.html#a368176270b82bfc80691cd4969cc8f14">更多...</a><br /></td></tr>
+<tr class="separator:a368176270b82bfc80691cd4969cc8f14"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a567859a17e3d2139f02d4d0e996de213"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="user_8c.html#a567859a17e3d2139f02d4d0e996de213">update_owner</a> (Database *db, const char *user_id, UserType user_type, Owner *owner)</td></tr>
+<tr class="memdesc:a567859a17e3d2139f02d4d0e996de213"><td class="mdescLeft">&#160;</td><td class="mdescRight">更新业主信息  <a href="user_8c.html#a567859a17e3d2139f02d4d0e996de213">更多...</a><br /></td></tr>
+<tr class="separator:a567859a17e3d2139f02d4d0e996de213"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7bad56fd926017718e56a14aad8e9843"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="user_8c.html#a7bad56fd926017718e56a14aad8e9843">get_owner_by_id</a> (Database *db, const char *owner_id, Owner *owner)</td></tr>
+<tr class="memdesc:a7bad56fd926017718e56a14aad8e9843"><td class="mdescLeft">&#160;</td><td class="mdescRight">通过ID获取业主信息  <a href="user_8c.html#a7bad56fd926017718e56a14aad8e9843">更多...</a><br /></td></tr>
+<tr class="separator:a7bad56fd926017718e56a14aad8e9843"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7486a7b32c198fb34f2c2eac93180704"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="user_8c.html#a7486a7b32c198fb34f2c2eac93180704">create_staff</a> (Database *db, Staff *staff, const char *password)</td></tr>
+<tr class="memdesc:a7486a7b32c198fb34f2c2eac93180704"><td class="mdescLeft">&#160;</td><td class="mdescRight">创建服务人员账户  <a href="user_8c.html#a7486a7b32c198fb34f2c2eac93180704">更多...</a><br /></td></tr>
+<tr class="separator:a7486a7b32c198fb34f2c2eac93180704"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a86ce46c46c3890427f89b171779c3525"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="user_8c.html#a86ce46c46c3890427f89b171779c3525">update_staff</a> (Database *db, const char *user_id, UserType user_type, Staff *staff)</td></tr>
+<tr class="memdesc:a86ce46c46c3890427f89b171779c3525"><td class="mdescLeft">&#160;</td><td class="mdescRight">更新服务人员信息  <a href="user_8c.html#a86ce46c46c3890427f89b171779c3525">更多...</a><br /></td></tr>
+<tr class="separator:a86ce46c46c3890427f89b171779c3525"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ea99c3aa114cb22a6ec4339760a9701"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="user_8c.html#a3ea99c3aa114cb22a6ec4339760a9701">get_staff_by_id</a> (Database *db, const char *staff_id, Staff *staff)</td></tr>
+<tr class="memdesc:a3ea99c3aa114cb22a6ec4339760a9701"><td class="mdescLeft">&#160;</td><td class="mdescRight">通过ID获取服务人员信息  <a href="user_8c.html#a3ea99c3aa114cb22a6ec4339760a9701">更多...</a><br /></td></tr>
+<tr class="separator:a3ea99c3aa114cb22a6ec4339760a9701"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1378b2f4d5ccc76846ad28e42f1e1b45"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="user_8c.html#a1378b2f4d5ccc76846ad28e42f1e1b45">create_admin</a> (Database *db, Admin *admin, const char *password)</td></tr>
+<tr class="memdesc:a1378b2f4d5ccc76846ad28e42f1e1b45"><td class="mdescLeft">&#160;</td><td class="mdescRight">创建管理员账户  <a href="user_8c.html#a1378b2f4d5ccc76846ad28e42f1e1b45">更多...</a><br /></td></tr>
+<tr class="separator:a1378b2f4d5ccc76846ad28e42f1e1b45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:affb901f9dc279c720f63c333bac75243"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="user_8c.html#affb901f9dc279c720f63c333bac75243">update_admin</a> (Database *db, const char *user_id, UserType user_type, Admin *admin)</td></tr>
+<tr class="memdesc:affb901f9dc279c720f63c333bac75243"><td class="mdescLeft">&#160;</td><td class="mdescRight">更新管理员信息  <a href="user_8c.html#affb901f9dc279c720f63c333bac75243">更多...</a><br /></td></tr>
+<tr class="separator:affb901f9dc279c720f63c333bac75243"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a374c233c120c298c1ad4e24154db3e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="user_8c.html#a0a374c233c120c298c1ad4e24154db3e">get_admin_by_id</a> (Database *db, const char *admin_id, Admin *admin)</td></tr>
+<tr class="memdesc:a0a374c233c120c298c1ad4e24154db3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">通过ID获取管理员信息  <a href="user_8c.html#a0a374c233c120c298c1ad4e24154db3e">更多...</a><br /></td></tr>
+<tr class="separator:a0a374c233c120c298c1ad4e24154db3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad04ce1fa44ede593c18d70ccebf7dc13"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="user_8c.html#ad04ce1fa44ede593c18d70ccebf7dc13">delete_user</a> (Database *db, const char *admin_id, UserType admin_type, const char *user_id, UserType user_type)</td></tr>
+<tr class="memdesc:ad04ce1fa44ede593c18d70ccebf7dc13"><td class="mdescLeft">&#160;</td><td class="mdescRight">删除用户（仅限管理员使用）  <a href="user_8c.html#ad04ce1fa44ede593c18d70ccebf7dc13">更多...</a><br /></td></tr>
+<tr class="separator:ad04ce1fa44ede593c18d70ccebf7dc13"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae15af65350309ebdca05ea8a04036fbd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="user_8c.html#ae15af65350309ebdca05ea8a04036fbd">query_username_by_user_id</a> (Database *db, const char *user_id, char *username)</td></tr>
+<tr class="memdesc:ae15af65350309ebdca05ea8a04036fbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">根据用户ID查询用户名  <a href="user_8c.html#ae15af65350309ebdca05ea8a04036fbd">更多...</a><br /></td></tr>
+<tr class="separator:ae15af65350309ebdca05ea8a04036fbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1555f4d7d175c7c102585abf355ef691"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="user_8c.html#a1555f4d7d175c7c102585abf355ef691">query_user_id_by_name</a> (Database *db, const char *name, char *user_id)</td></tr>
+<tr class="memdesc:a1555f4d7d175c7c102585abf355ef691"><td class="mdescLeft">&#160;</td><td class="mdescRight">通过用户姓名查询用户ID  <a href="user_8c.html#a1555f4d7d175c7c102585abf355ef691">更多...</a><br /></td></tr>
+<tr class="separator:a1555f4d7d175c7c102585abf355ef691"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1fbd5e15e6716d40eb368da695cc8589"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="user_8c.html#a1fbd5e15e6716d40eb368da695cc8589">compare_id_asc</a> (const void *a, const void *b)</td></tr>
+<tr class="memdesc:a1fbd5e15e6716d40eb368da695cc8589"><td class="mdescLeft">&#160;</td><td class="mdescRight">比较函数 - 按ID升序排序  <a href="user_8c.html#a1fbd5e15e6716d40eb368da695cc8589">更多...</a><br /></td></tr>
+<tr class="separator:a1fbd5e15e6716d40eb368da695cc8589"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac706a8a1976266645acf0e7682c55457"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="user_8c.html#ac706a8a1976266645acf0e7682c55457">sort_owners</a> (Database *db, int(*compare_func)(const void *, const void *))</td></tr>
+<tr class="memdesc:ac706a8a1976266645acf0e7682c55457"><td class="mdescLeft">&#160;</td><td class="mdescRight">排序业主列表  <a href="user_8c.html#ac706a8a1976266645acf0e7682c55457">更多...</a><br /></td></tr>
+<tr class="separator:ac706a8a1976266645acf0e7682c55457"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62366d2f423064f14203e2ca8efb4774"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="user_8c.html#a62366d2f423064f14203e2ca8efb4774">display_owners</a> (Database *db)</td></tr>
+<tr class="memdesc:a62366d2f423064f14203e2ca8efb4774"><td class="mdescLeft">&#160;</td><td class="mdescRight">显示业主列表  <a href="user_8c.html#a62366d2f423064f14203e2ca8efb4774">更多...</a><br /></td></tr>
+<tr class="separator:a62366d2f423064f14203e2ca8efb4774"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b0bbade4033d5de2645b9eb45c37fb0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="user_8c.html#a1b0bbade4033d5de2645b9eb45c37fb0">query_all_staff</a> (Database *db, Staff *staff_list, int max_count)</td></tr>
+<tr class="memdesc:a1b0bbade4033d5de2645b9eb45c37fb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">查询所有服务人员  <a href="user_8c.html#a1b0bbade4033d5de2645b9eb45c37fb0">更多...</a><br /></td></tr>
+<tr class="separator:a1b0bbade4033d5de2645b9eb45c37fb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87a052e09a6fdfb31114924758823e3d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="user_8c.html#a87a052e09a6fdfb31114924758823e3d">count_all_staff</a> (Database *db)</td></tr>
+<tr class="memdesc:a87a052e09a6fdfb31114924758823e3d"><td class="mdescLeft">&#160;</td><td class="mdescRight">统计服务人员总数  <a href="user_8c.html#a87a052e09a6fdfb31114924758823e3d">更多...</a><br /></td></tr>
+<tr class="separator:a87a052e09a6fdfb31114924758823e3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">函数说明</h2>
+<a id="a1fbd5e15e6716d40eb368da695cc8589"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1fbd5e15e6716d40eb368da695cc8589">&#9670;&nbsp;</a></span>compare_id_asc()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int compare_id_asc </td>
+          <td>(</td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>b</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>比较函数 - 按ID升序排序 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">a</td><td>第一个比较对象 </td></tr>
+    <tr><td class="paramname">b</td><td>第二个比较对象 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>int 比较结果：&lt; 0表示a小于b，0表示相等，&gt; 0表示a大于b </dd></dl>
+
+</div>
+</div>
+<a id="a87a052e09a6fdfb31114924758823e3d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87a052e09a6fdfb31114924758823e3d">&#9670;&nbsp;</a></span>count_all_staff()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int count_all_staff </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>统计服务人员总数 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>int 服务人员总数 </dd></dl>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="user_8c_a87a052e09a6fdfb31114924758823e3d_icgraph.png" border="0" usemap="#auser_8c_a87a052e09a6fdfb31114924758823e3d_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a1378b2f4d5ccc76846ad28e42f1e1b45"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1378b2f4d5ccc76846ad28e42f1e1b45">&#9670;&nbsp;</a></span>create_admin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool create_admin </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Admin *&#160;</td>
+          <td class="paramname"><em>admin</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>password</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>创建管理员账户 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">admin</td><td>管理员信息结构体 </td></tr>
+    <tr><td class="paramname">password</td><td>管理员密码（明文） </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 创建成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="user_8c_a1378b2f4d5ccc76846ad28e42f1e1b45_cgraph.png" border="0" usemap="#auser_8c_a1378b2f4d5ccc76846ad28e42f1e1b45_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a368176270b82bfc80691cd4969cc8f14"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a368176270b82bfc80691cd4969cc8f14">&#9670;&nbsp;</a></span>create_owner()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool create_owner </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Owner *&#160;</td>
+          <td class="paramname"><em>owner</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>password</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>创建业主账户 </p>
+<p>用户模型实现文件 (<a class="el" href="user_8c.html">user.c</a>)</p>
+<p>功能： 本文件提供物业管理系统中用户相关操作的实现，包括业主、服务人员和管理员 三种用户类型的账户创建、信息更新、信息获取以及用户删除功能。</p>
+<p>主要功能：</p><ol type="1">
+<li>业主(Owner)账户管理：创建、更新和获取业主信息</li>
+<li>服务人员(Staff)账户管理：创建、更新和获取服务人员信息</li>
+<li>管理员(Admin)账户管理：创建、更新和获取管理员信息</li>
+<li>用户删除功能：仅限管理员使用</li>
+</ol>
+<p>预期实现：</p><ul>
+<li>所有函数应与数据库交互，确保用户数据的持久化存储</li>
+<li>用户操作应进行适当的权限验证</li>
+<li>敏感信息如密码应进行加密处理</li>
+<li>所有函数应有适当的错误处理和状态返回</li>
+</ul>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">owner</td><td>业主信息结构体 </td></tr>
+    <tr><td class="paramname">password</td><td>业主密码（明文） </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 创建成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="user_8c_a368176270b82bfc80691cd4969cc8f14_cgraph.png" border="0" usemap="#auser_8c_a368176270b82bfc80691cd4969cc8f14_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a7486a7b32c198fb34f2c2eac93180704"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7486a7b32c198fb34f2c2eac93180704">&#9670;&nbsp;</a></span>create_staff()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool create_staff </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Staff *&#160;</td>
+          <td class="paramname"><em>staff</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>password</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>创建服务人员账户 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">staff</td><td>服务人员信息结构体 </td></tr>
+    <tr><td class="paramname">password</td><td>服务人员密码（明文） </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 创建成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="user_8c_a7486a7b32c198fb34f2c2eac93180704_cgraph.png" border="0" usemap="#auser_8c_a7486a7b32c198fb34f2c2eac93180704_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="ad04ce1fa44ede593c18d70ccebf7dc13"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad04ce1fa44ede593c18d70ccebf7dc13">&#9670;&nbsp;</a></span>delete_user()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool delete_user </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>admin_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>admin_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>删除用户（仅限管理员使用） </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">admin_id</td><td>执行删除操作的管理员ID </td></tr>
+    <tr><td class="paramname">admin_type</td><td>执行删除操作的用户类型，必须为USER_ADMIN </td></tr>
+    <tr><td class="paramname">user_id</td><td>被删除的用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>被删除的用户类型 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 删除成功返回true，失败返回false </dd></dl>
+
+</div>
+</div>
+<a id="a62366d2f423064f14203e2ca8efb4774"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a62366d2f423064f14203e2ca8efb4774">&#9670;&nbsp;</a></span>display_owners()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void display_owners </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>显示业主列表 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="user_8c_a62366d2f423064f14203e2ca8efb4774_icgraph.png" border="0" usemap="#auser_8c_a62366d2f423064f14203e2ca8efb4774_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a0a374c233c120c298c1ad4e24154db3e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0a374c233c120c298c1ad4e24154db3e">&#9670;&nbsp;</a></span>get_admin_by_id()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool get_admin_by_id </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>admin_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Admin *&#160;</td>
+          <td class="paramname"><em>admin</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>通过ID获取管理员信息 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">admin_id</td><td>管理员ID </td></tr>
+    <tr><td class="paramname">admin</td><td>用于存储查询结果的管理员结构体 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 查询成功返回true，失败返回false </dd></dl>
+
+</div>
+</div>
+<a id="a7bad56fd926017718e56a14aad8e9843"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7bad56fd926017718e56a14aad8e9843">&#9670;&nbsp;</a></span>get_owner_by_id()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool get_owner_by_id </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>owner_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Owner *&#160;</td>
+          <td class="paramname"><em>owner</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>通过ID获取业主信息 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">owner_id</td><td>业主ID </td></tr>
+    <tr><td class="paramname">owner</td><td>用于存储查询结果的业主结构体 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 查询成功返回true，失败返回false </dd></dl>
+
+</div>
+</div>
+<a id="a3ea99c3aa114cb22a6ec4339760a9701"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3ea99c3aa114cb22a6ec4339760a9701">&#9670;&nbsp;</a></span>get_staff_by_id()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool get_staff_by_id </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>staff_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Staff *&#160;</td>
+          <td class="paramname"><em>staff</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>通过ID获取服务人员信息 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">staff_id</td><td>服务人员ID </td></tr>
+    <tr><td class="paramname">staff</td><td>用于存储查询结果的服务人员结构体 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 查询成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="user_8c_a3ea99c3aa114cb22a6ec4339760a9701_icgraph.png" border="0" usemap="#auser_8c_a3ea99c3aa114cb22a6ec4339760a9701_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a1b0bbade4033d5de2645b9eb45c37fb0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b0bbade4033d5de2645b9eb45c37fb0">&#9670;&nbsp;</a></span>query_all_staff()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int query_all_staff </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Staff *&#160;</td>
+          <td class="paramname"><em>staff_list</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>max_count</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>查询所有服务人员 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">staff_list</td><td>用于存储查询结果的服务人员数组 </td></tr>
+    <tr><td class="paramname">max_count</td><td>数组最大容量 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>int 实际查询到的服务人员数量 </dd></dl>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="user_8c_a1b0bbade4033d5de2645b9eb45c37fb0_icgraph.png" border="0" usemap="#auser_8c_a1b0bbade4033d5de2645b9eb45c37fb0_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a1555f4d7d175c7c102585abf355ef691"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1555f4d7d175c7c102585abf355ef691">&#9670;&nbsp;</a></span>query_user_id_by_name()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool query_user_id_by_name </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>user_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>通过用户姓名查询用户ID </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">name</td><td>用户姓名 </td></tr>
+    <tr><td class="paramname">user_id</td><td>用于存储查询结果的用户ID字符串 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 查询成功返回true，失败返回false </dd></dl>
+
+</div>
+</div>
+<a id="ae15af65350309ebdca05ea8a04036fbd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae15af65350309ebdca05ea8a04036fbd">&#9670;&nbsp;</a></span>query_username_by_user_id()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool query_username_by_user_id </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>username</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>根据用户ID查询用户名 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>用户ID </td></tr>
+    <tr><td class="paramname">username</td><td>用于存储查询结果的用户名字符串 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 查询成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="user_8c_ae15af65350309ebdca05ea8a04036fbd_icgraph.png" border="0" usemap="#auser_8c_ae15af65350309ebdca05ea8a04036fbd_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="ac706a8a1976266645acf0e7682c55457"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac706a8a1976266645acf0e7682c55457">&#9670;&nbsp;</a></span>sort_owners()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void sort_owners </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int(*)(const void *, const void *)&#160;</td>
+          <td class="paramname"><em>compare_func</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>排序业主列表 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">compare_func</td><td>用于排序的比较函数 </td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="user_8c_ac706a8a1976266645acf0e7682c55457_icgraph.png" border="0" usemap="#auser_8c_ac706a8a1976266645acf0e7682c55457_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="affb901f9dc279c720f63c333bac75243"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#affb901f9dc279c720f63c333bac75243">&#9670;&nbsp;</a></span>update_admin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool update_admin </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Admin *&#160;</td>
+          <td class="paramname"><em>admin</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>更新管理员信息 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>管理员ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>用户类型，必须为USER_ADMIN </td></tr>
+    <tr><td class="paramname">admin</td><td>更新后的管理员信息 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 更新成功返回true，失败返回false </dd></dl>
+
+</div>
+</div>
+<a id="a567859a17e3d2139f02d4d0e996de213"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a567859a17e3d2139f02d4d0e996de213">&#9670;&nbsp;</a></span>update_owner()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool update_owner </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Owner *&#160;</td>
+          <td class="paramname"><em>owner</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>更新业主信息 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>业主ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>用户类型 </td></tr>
+    <tr><td class="paramname">owner</td><td>更新后的业主信息 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 更新成功返回true，失败返回false </dd></dl>
+
+</div>
+</div>
+<a id="a86ce46c46c3890427f89b171779c3525"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a86ce46c46c3890427f89b171779c3525">&#9670;&nbsp;</a></span>update_staff()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool update_staff </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Staff *&#160;</td>
+          <td class="paramname"><em>staff</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>更新服务人员信息 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>服务人员ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>用户类型，必须为USER_STAFF </td></tr>
+    <tr><td class="paramname">staff</td><td>更新后的服务人员信息 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 更新成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="user_8c_a86ce46c46c3890427f89b171779c3525_icgraph.png" border="0" usemap="#auser_8c_a86ce46c46c3890427f89b171779c3525_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+</small></address>
+</body>
+</html>
