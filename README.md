@@ -19,9 +19,9 @@
 
 - [ ] 查看自己负责哪些区域以及相关信息
 - [ ] 给业主发送缴费提醒
-- [ ] 查询某业主某年是否缴费、查询某业主所有缴费情况（同Admin）
+- [ ] 查询某业主某年是否缴费、查询某业主所有缴费情况（同 Admin）
 - [ ] 对查询出来的业主按照姓名进行排序，或多属性排序
-- [ ] 统计某年所有未缴费的业主数量、截止某时间已经缴费的业主数量（同Admin）
+- [ ] 统计某年所有未缴费的业主数量、截止某时间已经缴费的业主数量（同 Admin）
 
 ### Owner
 
@@ -32,7 +32,6 @@
 - [ ] 查询小区楼宇信息、物业收费标准信息
 - [ ] 查询出来的缴费记录按照缴费时间进行排序
 - [ ] 统计几年内缴费的总金额
-
 
 ## 目前在做的事
 
@@ -76,6 +75,8 @@ zzm：
 请在 VS 的扩展商店搜索并安装`force utf-8`插件，来统一项目中文编码（需要推出 VS 来完成插件安装）
 
 ### 使用 Linux 开始
+
+如果你还没有 linux 环境，可以参照[如何安装 wsl 及 Ubuntu](#如何安装-wsl-及-ubuntu)部分进行操作后再继续本节。
 
 #### 安装所需的必要软件
 
@@ -183,3 +184,45 @@ sudo apt install -y doxygen doxygen-gui
 ```bash
 doxywizard
 ```
+
+## 如何安装 wsl 及 Ubuntu
+
+### 启用 windows 功能
+
+在启用或关闭 window 功能选项卡（可以搜索得到）中打开虚拟机平台（Virtual Machine Platform）和适用于 Linux 的 Windows 子系统选项，重启电脑
+
+### 更新 wsl 内核并安装 ubuntu22.04
+
+打开 powershell，依次运行：
+
+```powershell
+wsl --set-default-version 2
+
+wsl --update
+
+# 目前建议版本使用 22.04 为宜
+wsl --install -d Ubuntu-22.04
+```
+
+过程中会要求给 ubuntu 取个用户名和密码（密码不会显示你输入的，输入完直接回车即可）
+
+### 配置 vscode
+
+下载[vscode](https://code.visualstudio.com/Download)并安装
+
+打开，在扩展选项卡（几个小方块那个图标）中的搜索栏搜索 Chinese，选择简体中文插件安装；然后搜索 wsl，选择 WSL 插件安装。然后右下角会提示重启 vscode，点击重启即可。
+
+然后点击 vscode 左下角的`><`状图标，在顶部选择连接到 WSL（也可能是英文的），即可进入刚安装好的 ubuntu 环境
+
+此时按下`ctrl + ~ `即可打开终端，输入
+
+```bash
+sudo apt update
+# 会提示你输入密码，密码就是创建 ubuntu 时你取的那个，直接输入、回车即可，密码不会显示在屏幕上
+```
+
+```bash
+sudo apt upgrade -y
+```
+
+更新完成后，请参照[使用 Linux 开始](#使用-linux-开始)部分继续。

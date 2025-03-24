@@ -1,21 +1,17 @@
-//////////////////////////////////////////////////////////////
-// 文件名: ui_admin.c
-//
-// 功能: 实现物业管理系统的管理员界面相关功能
-//
-// 主要模块:
-// 1. 管理员主界面 - 显示管理员可以访问的所有功能入口
-// 2. 信息管理界面 - 提供对楼盘、住户、用户等基本信息的增删改查功能
-// 3. 服务分配界面 - 管理员分配物业服务请求给相应工作人员
-// 4. 信息查询界面 - 按照不同条件查询系统内的各类信息
-// 5. 信息排序界面 - 根据不同条件对查询结果进行排序展示
-// 6. 信息统计界面 - 对系统内数据进行统计分析并呈现
-// 7. 系统维护界面 - 系统备份、恢复和维护相关功能
-//
-// 预期实现: 为管理员提供友好的命令行交互界面，展示菜单选项，
-// 接收用户输入，调用相应的数据库操作函数，并展示操作结果。
-// 确保系统操作安全性并提供适当的错误处理和用户反馈。
-//////////////////////////////////////////////////////////////
+/**
+ * @file ui_admin.c
+ * @brief 物业管理系统管理员界面功能实现
+ *
+ * 本文件实现了物业管理系统中管理员界面的所有相关功能：
+ * - 管理员主界面
+ * - 信息管理界面
+ * - 服务分配界面
+ * - 信息查询界面
+ * - 信息排序界面
+ * - 信息统计界面
+ * - 系统维护界面
+ * - 测试功能界面
+ */
 
 #include "ui/ui_admin.h"
 #include "ui/ui_login.h"
@@ -25,6 +21,7 @@
 #include "models/transaction.h"
 #include "models/service.h"
 #include "db/db_query.h"
+#include "db/db_utils.h"
 #include "utils/utils.h"
 #include "utils/file_ops.h"
 #include "utils/console.h"
@@ -32,23 +29,26 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-void show_info_management_screen(Database *db, const char *user_id, UserType user_type);
-void show_service_assignment_screen(Database *db, const char *user_id, UserType user_type);
-void show_info_query_screen(Database *db, const char *user_id, UserType user_type);
-void show_info_sort_screen(Database *db, const char *user_id, UserType user_type);
-void show_info_statistics_screen(Database *db, const char *user_id, UserType user_type);
-void show_system_maintenance_screen(Database *db, const char *user_id, UserType user_type);
-void show_apartment_test_screen(Database *db, const char *user_id, UserType user_type);
-// 添加楼宇测试界面函数声明
-void show_building_test_screen(Database *db, const char *user_id, UserType user_type);
 
-// 在文件顶部添加这个函数声明
+/**
+ * @brief 清屏函数
+ *
+ * 清除控制台显示内容，适用于Windows和Unix/Linux系统
+ */
 void clear_screen()
 {
     system("clear||cls");
 }
 
-// 显示管理员主界面
+/**
+ * @brief 显示管理员主界面
+ *
+ * 显示管理员系统的主菜单，提供各功能模块的入口
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
 void show_admin_main_screen(Database *db, const char *user_id, UserType user_type)
 {
     printf("\n=== 物业服务管理系统主页面 ===\n");
@@ -101,37 +101,85 @@ void show_admin_main_screen(Database *db, const char *user_id, UserType user_typ
     }
 }
 
-// 信息管理界面
+/**
+ * @brief 显示信息管理界面
+ *
+ * 提供对系统基本信息（如楼盘、住户、用户等）的增删改查功能
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
 void show_info_management_screen(Database *db, const char *user_id, UserType user_type)
 {
     // TODO: 实现信息管理界面功能
 }
 
-// 服务分配界面
+/**
+ * @brief 显示服务分配界面
+ *
+ * 管理员将物业服务请求分配给相应工作人员的界面
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
 void show_service_assignment_screen(Database *db, const char *user_id, UserType user_type)
 {
     // TODO: 实现服务分配界面功能
 }
 
-// 信息查询界面
+/**
+ * @brief 显示信息查询界面
+ *
+ * 提供按不同条件查询系统内各类信息的功能
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
 void show_info_query_screen(Database *db, const char *user_id, UserType user_type)
 {
     // TODO: 实现信息查询界面功能
 }
 
-// 信息排序界面
+/**
+ * @brief 显示信息排序界面
+ *
+ * 根据不同条件对查询结果进行排序展示的功能
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
 void show_info_sort_screen(Database *db, const char *user_id, UserType user_type)
 {
     // TODO: 实现信息排序界面功能
 }
 
-// 信息统计界面
+/**
+ * @brief 显示信息统计界面
+ *
+ * 对系统内数据进行统计分析并呈现的功能
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
 void show_info_statistics_screen(Database *db, const char *user_id, UserType user_type)
 {
     // TODO: 实现信息统计界面功能
 }
 
-// 修改系统维护界面，添加费用标准管理选项
+/**
+ * @brief 显示系统维护界面
+ *
+ * 提供系统备份、恢复、用户信息更新和费用标准管理等功能
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
 void show_system_maintenance_screen(Database *db, const char *user_id, UserType user_type)
 {
     int choice;
@@ -154,13 +202,13 @@ void show_system_maintenance_screen(Database *db, const char *user_id, UserType 
         switch (choice)
         {
         case 1:
-            backup_database(db, "backup.db");
+            backup_database(db);
             printf("数据备份完成\n");
             printf("按任意键继续...");
             getchar();
             break;
         case 2:
-            restore_database(db, "backup.db");
+            restore_database(db);
             printf("数据恢复完成\n");
             printf("按任意键继续...");
             getchar();
@@ -196,6 +244,15 @@ void show_system_maintenance_screen(Database *db, const char *user_id, UserType 
 //                                            //
 ////////////////////////////////////////////////
 
+/**
+ * @brief 显示房屋管理测试界面
+ *
+ * 提供添加、更新、删除、查询房屋信息等功能，用于测试
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
 void show_apartment_test_screen(Database *db, const char *user_id, UserType user_type)
 {
     while (1)
@@ -480,7 +537,15 @@ void show_apartment_test_screen(Database *db, const char *user_id, UserType user
     }
 }
 
-// 实现楼宇管理测试界面
+/**
+ * @brief 显示楼宇管理测试界面
+ *
+ * 提供添加、修改、删除、查询楼宇信息等功能，用于测试
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
 void show_building_test_screen(Database *db, const char *user_id, UserType user_type)
 {
     while (1)
@@ -765,7 +830,15 @@ void show_building_test_screen(Database *db, const char *user_id, UserType user_
     }
 }
 
-// 生成周期性费用界面
+/**
+ * @brief 生成周期性费用界面
+ *
+ * 按年月生成物业费、停车费等周期性费用的界面
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
 void generate_periodic_fees_screen(Database *db, const char *user_id, UserType user_type)
 {
     if (user_type != USER_ADMIN)
@@ -844,7 +917,15 @@ void generate_periodic_fees_screen(Database *db, const char *user_id, UserType u
     getchar();
 }
 
-// 费用标准管理界面
+/**
+ * @brief 费用标准管理界面
+ *
+ * 提供查看、添加费用标准和生成周期性费用的功能
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
 void manage_fee_standards_screen(Database *db, const char *user_id, UserType user_type)
 {
     if (user_type != USER_ADMIN)

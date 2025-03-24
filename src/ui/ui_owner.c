@@ -30,10 +30,6 @@
 #include <string.h>
 #include <time.h>
 
-bool query_username_by_user_id(Database *db, const char *user_id, char *username);
-void query_due_payments(Database *db, const char *user_id);
-bool update_overdue_transactions(Database *db);
-
 // 清除输入缓冲区
 void clear_input_buffer()
 {
