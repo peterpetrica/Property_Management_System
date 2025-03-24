@@ -246,7 +246,7 @@ int db_compound_query(Database *db, const char *query, QueryResult *result)
 /**
  * db_fuzzy_query - 执行模糊查询
  *
- * 使用模糊匹配条件执行SQL查询
+ * 使用模糊匹配条件执行SQL查询，支持使用通配符进行字符串模式匹配
  *
  * @param db 数据库连接指针
  * @param table 要查询的表名
@@ -254,11 +254,51 @@ int db_compound_query(Database *db, const char *query, QueryResult *result)
  * @param pattern 模糊匹配的模式
  * @param result 用于存储查询结果的结构指针
  * @return SQLITE_OK表示成功，其他值表示失败
+ *
+ * 示例:
+ *   QueryResult result;
+ *   int rc = db_fuzzy_query(db, "users", "name", "张", &result);
+ *   if (rc == SQLITE_OK) {
+ *       // 处理查询结果
+ *       free_query_result(&result);
+ *   }
  */
 int db_fuzzy_query(Database *db, const char *table, const char *column, const char *pattern, QueryResult *result)
 {
-    // TODO: 实现模糊查询
-    return SQLITE_ERROR;
+    if (!db || !table || !column || !pattern || !result)
+    {
+        fprintf(stderr, "模糊查询参数无效\n");
+        return SQLITE_ERROR;
+    }
+
+    // 分配足够大的缓冲区构建SQL语句
+    char sql[512];
+
+    // 使用SQLite的安全转义机制
+    char *safe_pattern = sqlite3_mprintf("%%%q%%", pattern);
+    if (!safe_pattern)
+    {
+        fprintf(stderr, "内存分配失败：安全转义模式\n");
+        return SQLITE_NOMEM;
+    }
+
+    // 构建安全的SQL查询语句
+    snprintf(sql, sizeof(sql), "SELECT * FROM %s WHERE %s LIKE '%s'",
+             table, column, safe_pattern);
+
+    // 释放转义后的模式字符串
+    sqlite3_free(safe_pattern);
+
+    // 执行查询并存储结果
+    bool success = execute_query(db, sql, result);
+
+    if (!success)
+    {
+        fprintf(stderr, "执行模糊查询失败\n");
+        return SQLITE_ERROR;
+    }
+
+    return SQLITE_OK;
 }
 
 /**
