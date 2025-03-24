@@ -131,10 +131,61 @@ void show_info_statistics_screen(Database *db, const char *user_id, UserType use
     // TODO: 实现信息统计界面功能
 }
 
-// 系统维护界面
+// 修改系统维护界面，添加费用标准管理选项
 void show_system_maintenance_screen(Database *db, const char *user_id, UserType user_type)
 {
-    // TODO: 实现系统维护界面功能
+    int choice;
+
+    while (1)
+    {
+        system("cls");
+        printf("\n===== 系统维护 =====\n");
+        printf("1. 数据备份\n");
+        printf("2. 数据恢复\n");
+        printf("3. 更新用户信息\n");
+        printf("4. 更新费用标准\n");
+        printf("5. 用户权限设置\n");
+        printf("6. 费用标准管理\n");
+        printf("0. 返回上一级\n");
+        printf("请输入您的选择: ");
+        scanf("%d", &choice);
+        getchar(); // 清除输入缓冲区
+
+        switch (choice)
+        {
+        case 1:
+            backup_database(db, "backup.db");
+            printf("数据备份完成\n");
+            printf("按任意键继续...");
+            getchar();
+            break;
+        case 2:
+            restore_database(db, "backup.db");
+            printf("数据恢复完成\n");
+            printf("按任意键继续...");
+            getchar();
+            break;
+        case 3:
+            // 更新用户信息的实现
+            break;
+        case 4:
+            // 更新费用标准的实现
+            break;
+        case 5:
+            // 用户权限设置的实现
+            break;
+        case 6:
+            manage_fee_standards_screen(db, user_id, user_type);
+            break;
+        case 0:
+            return;
+        default:
+            printf("无效的选择\n");
+            printf("按任意键继续...");
+            getchar();
+            break;
+        }
+    }
 }
 
 ////////////////////////////////////////////////
@@ -711,5 +762,314 @@ void show_building_test_screen(Database *db, const char *user_id, UserType user_
 
         printf("\n按Enter键继续...");
         getchar();
+    }
+}
+
+// 生成周期性费用界面
+void generate_periodic_fees_screen(Database *db, const char *user_id, UserType user_type)
+{
+    if (user_type != USER_ADMIN)
+    {
+        printf("权限不足，无法访问此功能\n");
+        return;
+    }
+
+    int year, month, fee_type, due_days;
+
+    system("cls");
+    printf("\n===== 生成周期性费用 =====\n");
+    printf("请输入年份: ");
+    scanf("%d", &year);
+    getchar(); // 清除输入缓冲区
+
+    printf("请输入月份(1-12): ");
+    scanf("%d", &month);
+    getchar(); // 清除输入缓冲区
+
+    if (month < 1 || month > 12)
+    {
+        printf("无效的月份\n");
+        printf("按任意键返回...");
+        getchar();
+        return;
+    }
+
+    printf("请选择费用类型:\n");
+    printf("1. 物业费\n");
+    printf("2. 停车费\n");
+    printf("3. 全部\n");
+    printf("请输入(1-3): ");
+    scanf("%d", &fee_type);
+    getchar(); // 清除输入缓冲区
+
+    printf("请输入付款截止天数(从月底开始计算): ");
+    scanf("%d", &due_days);
+    getchar(); // 清除输入缓冲区
+
+    // 计算账单开始和结束日期
+    struct tm start_tm = {0}, end_tm = {0};
+    start_tm.tm_year = year - 1900;
+    start_tm.tm_mon = month - 1;
+    start_tm.tm_mday = 1;
+
+    end_tm.tm_year = year - 1900;
+    end_tm.tm_mon = month;
+    end_tm.tm_mday = 0; // 这会自动调整为上个月的最后一天
+
+    time_t period_start = mktime(&start_tm);
+    time_t period_end = mktime(&end_tm);
+
+    bool success = true;
+
+    if (fee_type == 1 || fee_type == 3)
+    {
+        success &= generate_property_fees(db, period_start, period_end, due_days);
+    }
+
+    if (fee_type == 2 || fee_type == 3)
+    {
+        success &= generate_parking_fees(db, period_start, period_end, due_days);
+    }
+
+    if (success)
+    {
+        printf("成功生成%d年%d月的费用账单\n", year, month);
+    }
+    else
+    {
+        printf("生成费用账单时发生错误\n");
+    }
+
+    printf("按任意键返回...");
+    getchar();
+}
+
+// 费用标准管理界面
+void manage_fee_standards_screen(Database *db, const char *user_id, UserType user_type)
+{
+    if (user_type != USER_ADMIN)
+    {
+        printf("权限不足，无法访问此功能\n");
+        return;
+    }
+
+    int choice;
+    while (1)
+    {
+        system("cls");
+        printf("\n===== 费用标准管理 =====\n");
+        printf("1. 查看现有费用标准\n");
+        printf("2. 添加新费用标准\n");
+        printf("3. 生成周期性费用\n");
+        printf("0. 返回上一级\n");
+        printf("请输入您的选择: ");
+        scanf("%d", &choice);
+        getchar(); // 清除输入缓冲区
+
+        switch (choice)
+        {
+        case 1:
+            // 查看费用标准实现
+            {
+                system("cls");
+                printf("\n===== 现有费用标准 =====\n");
+
+                char query[512];
+                QueryResult result;
+
+                snprintf(query, sizeof(query),
+                         "SELECT standard_id, fee_type, price_per_unit, unit, effective_date, end_date "
+                         "FROM fee_standards "
+                         "ORDER BY fee_type, effective_date DESC");
+
+                if (!execute_query(db, query, &result))
+                {
+                    printf("查询费用标准失败\n");
+                    printf("按任意键返回...");
+                    getchar();
+                    break;
+                }
+
+                if (result.row_count == 0)
+                {
+                    printf("暂无费用标准记录\n");
+                    free_query_result(&result);
+                    printf("按任意键返回...");
+                    getchar();
+                    break;
+                }
+
+                printf("%-12s %-15s %-12s %-10s %-15s %-15s\n",
+                       "标准ID", "费用类型", "单价", "单位", "生效日期", "终止日期");
+
+                char fee_type_str[20];
+                struct tm tm_info;
+                char start_date_str[20], end_date_str[20];
+
+                for (int i = 0; i < result.row_count; i++)
+                {
+                    // 费用类型
+                    int fee_type = atoi(result.rows[i].values[1]);
+                    switch (fee_type)
+                    {
+                    case TRANS_PROPERTY_FEE:
+                        strcpy(fee_type_str, "物业费");
+                        break;
+                    case TRANS_PARKING_FEE:
+                        strcpy(fee_type_str, "停车费");
+                        break;
+                    case TRANS_WATER_FEE:
+                        strcpy(fee_type_str, "水费");
+                        break;
+                    case TRANS_ELECTRICITY_FEE:
+                        strcpy(fee_type_str, "电费");
+                        break;
+                    case TRANS_GAS_FEE:
+                        strcpy(fee_type_str, "燃气费");
+                        break;
+                    default:
+                        strcpy(fee_type_str, "其他费用");
+                        break;
+                    }
+
+                    // 生效日期
+                    time_t effective_date = (time_t)atol(result.rows[i].values[4]);
+                    localtime_r(&effective_date, &tm_info);
+                    strftime(start_date_str, sizeof(start_date_str), "%Y-%m-%d", &tm_info);
+
+                    // 终止日期
+                    time_t end_date = (time_t)atol(result.rows[i].values[5]);
+                    if (end_date == 0)
+                    {
+                        strcpy(end_date_str, "无限期");
+                    }
+                    else
+                    {
+                        localtime_r(&end_date, &tm_info);
+                        strftime(end_date_str, sizeof(end_date_str), "%Y-%m-%d", &tm_info);
+                    }
+
+                    printf("%-12s %-15s %-12.2f %-10s %-15s %-15s\n",
+                           result.rows[i].values[0], // 标准ID
+                           fee_type_str,
+                           atof(result.rows[i].values[2]), // 单价
+                           result.rows[i].values[3],       // 单位
+                           start_date_str,
+                           end_date_str);
+                }
+
+                free_query_result(&result);
+                printf("\n按任意键返回...");
+                getchar();
+            }
+            break;
+        case 2:
+            // 添加费用标准实现
+            {
+                system("cls");
+                printf("\n===== 添加新费用标准 =====\n");
+
+                FeeStandard standard;
+                memset(&standard, 0, sizeof(FeeStandard));
+
+                generate_uuid(standard.standard_id);
+
+                printf("请选择费用类型:\n");
+                printf("1. 物业费\n");
+                printf("2. 停车费\n");
+                printf("3. 水费\n");
+                printf("4. 电费\n");
+                printf("5. 燃气费\n");
+                printf("99. 其他费用\n");
+                printf("请输入: ");
+                scanf("%d", &standard.fee_type);
+                getchar(); // 清除输入缓冲区
+
+                printf("请输入单价: ");
+                scanf("%f", &standard.price_per_unit);
+                getchar(); // 清除输入缓冲区
+
+                printf("请输入计费单位(如元/平方米/月、元/个/月): ");
+                scanf("%15s", standard.unit);
+                getchar(); // 清除输入缓冲区
+
+                printf("请输入生效日期(格式: YYYY-MM-DD): ");
+                char date_str[20];
+                scanf("%19s", date_str);
+                getchar(); // 清除输入缓冲区
+
+                // 解析日期
+                struct tm tm_info = {0};
+                if (sscanf(date_str, "%d-%d-%d", &tm_info.tm_year, &tm_info.tm_mon, &tm_info.tm_mday) == 3)
+                {
+                    tm_info.tm_year -= 1900; // 年份需要减去1900
+                    tm_info.tm_mon -= 1;     // 月份是从0开始的
+                    standard.effective_date = mktime(&tm_info);
+                }
+                else
+                {
+                    printf("日期格式错误\n");
+                    printf("按任意键返回...");
+                    getchar();
+                    break;
+                }
+
+                printf("是否设置终止日期? (1-是, 0-无限期): ");
+                int has_end_date;
+                scanf("%d", &has_end_date);
+                getchar(); // 清除输入缓冲区
+
+                if (has_end_date)
+                {
+                    printf("请输入终止日期(格式: YYYY-MM-DD): ");
+                    scanf("%19s", date_str);
+                    getchar(); // 清除输入缓冲区
+
+                    // 解析日期
+                    struct tm end_tm = {0};
+                    if (sscanf(date_str, "%d-%d-%d", &end_tm.tm_year, &end_tm.tm_mon, &end_tm.tm_mday) == 3)
+                    {
+                        end_tm.tm_year -= 1900; // 年份需要减去1900
+                        end_tm.tm_mon -= 1;     // 月份是从0开始的
+                        standard.end_date = mktime(&end_tm);
+                    }
+                    else
+                    {
+                        printf("日期格式错误\n");
+                        printf("按任意键返回...");
+                        getchar();
+                        break;
+                    }
+                }
+                else
+                {
+                    standard.end_date = 0; // 无限期
+                }
+
+                // 添加费用标准
+                if (add_fee_standard(db, user_id, user_type, &standard))
+                {
+                    printf("成功添加费用标准\n");
+                }
+                else
+                {
+                    printf("添加费用标准失败\n");
+                }
+
+                printf("按任意键返回...");
+                getchar();
+            }
+            break;
+        case 3:
+            generate_periodic_fees_screen(db, user_id, user_type);
+            break;
+        case 0:
+            return;
+        default:
+            printf("无效的选择，请重新输入\n");
+            printf("按任意键继续...");
+            getchar();
+            break;
+        }
     }
 }

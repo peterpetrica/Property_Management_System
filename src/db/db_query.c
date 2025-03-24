@@ -126,22 +126,26 @@ bool execute_query(Database *db, const char *sql, QueryResult *result)
 }
 
 /**
- * execute_update - 执行SQL更新操作
+ * 执行更新操作（无需返回结果的查询）
  *
- * 执行插入、更新或删除等修改数据库的SQL语句
- *
- * @param db 数据库连接指针
- * @param sql 要执行的SQL语句
- * @return true表示成功，false表示失败
+ * @param db 数据库连接
+ * @param query SQL查询语句
+ * @return 执行成功返回true，失败返回false
  */
-bool execute_update(Database *db, const char *sql)
+bool execute_update(Database *db, const char *query)
 {
+    if (!db || !db->db)
+    {
+        fprintf(stderr, "数据库连接无效\n");
+        return false;
+    }
+
     char *err_msg = NULL;
-    int rc = sqlite3_exec(db->db, sql, NULL, 0, &err_msg);
+    int rc = sqlite3_exec(db->db, query, NULL, NULL, &err_msg);
 
     if (rc != SQLITE_OK)
     {
-        fprintf(stderr, "SQL错误: %s\n", err_msg);
+        fprintf(stderr, "SQL执行错误: %s\n", err_msg);
         sqlite3_free(err_msg);
         return false;
     }

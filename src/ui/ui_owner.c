@@ -24,19 +24,22 @@
 #include "db/db_query.h"
 #include "utils/utils.h"
 #include "utils/console.h"
-#include "auth/auth.h" // 确保包含auth.h
+#include "auth/auth.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-// 函数声明
+
 bool query_username_by_user_id(Database *db, const char *user_id, char *username);
+void query_due_payments(Database *db, const char *user_id);
+bool update_overdue_transactions(Database *db);
 
 // 清除输入缓冲区
 void clear_input_buffer()
 {
     int c;
-    while ((c = getchar()) != '\n' && c != EOF);
+    while ((c = getchar()) != '\n' && c != EOF)
+        ;
 }
 
 // 显示缴费记录
@@ -380,42 +383,38 @@ void show_payment_management_screen(Database *db, const char *user_id, UserType 
     int choice;
     while (1)
     {
+        system("cls");
         printf("\n===== 缴费管理 =====\n");
-        printf("1--查看缴费记录\n");
-        printf("2--缴纳费用\n");
-        printf("3--查询应缴费用\n");
-        printf("4--查询剩余费用\n");
-        printf("0--返回上一级\n");
+        printf("1. 查看缴费记录\n");
+        printf("2. 缴纳费用\n");
+        printf("3. 查询应缴费用\n");
+        printf("4. 查询物业费标准\n");
+        printf("0. 返回上一级\n");
         printf("请输入您的选择: ");
-        if (scanf("%d", &choice) != 1)
+        scanf("%d", &choice);
+        getchar(); // 清除输入缓冲区中的换行符
+
+        switch (choice)
         {
-            clear_input_buffer(); // 缓冲区
-            continue;
-        }
-        if (choice == 1)
-        {
+        case 1:
             show_payment_history(db, user_id);
-        } // 显示缴费记录 }
-        else if (choice == 2)
-        {
-            process_payment_screen(db, user_id);
-        } // 进入缴费流程 }
-        else if (choice == 3)
-        {
-            query_due_amount(db, user_id);
-        } // 查询应缴费用
-        else if (choice == 4)
-        {
-            query_remaining_balance(db, user_id);
-        } // 查询剩余费用 }
-        else if (choice == 0)
-        {
-            printf("返回上一级菜单。\n");
             break;
-        }
-        else
-        {
-            printf("输入错误，请重新输入。\n");
+        case 2:
+            process_payment_screen(db, user_id);
+            break;
+        case 3:
+            query_due_payments(db, user_id);
+            break;
+        case 4:
+            query_fee_info(db, user_id);
+            break;
+        case 0:
+            return;
+        default:
+            printf("无效的选择，请重新输入\n");
+            printf("按任意键继续...");
+            getchar();
+            break;
         }
     }
 }
@@ -594,4 +593,119 @@ void show_owner_maintenance_screen(Database *db, const char *user_id, UserType u
 void show_owner_main_screen(Database *db, const char *user_id, UserType user_type)
 {
     main_screen_owner(db, user_id, user_type);
+}
+
+/**
+ * 查询应缴费用
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ */
+void query_due_payments(Database *db, const char *user_id)
+{
+    system("cls");
+
+    // 先更新所有交易的逾期状态
+    update_overdue_transactions(db);
+
+    // 查询用户所有未支付的费用总额
+    char query[512];
+    QueryResult result;
+
+    snprintf(query, sizeof(query),
+             "SELECT SUM(amount) FROM transactions "
+             "WHERE user_id = '%s' AND (status = %d OR status = %d)",
+             user_id, TRANS_UNPAID, TRANS_OVERDUE);
+
+    if (!execute_query(db, query, &result))
+    {
+        printf("查询应缴费用失败\n");
+        return;
+    }
+
+    float total_amount = 0;
+    if (result.row_count > 0 && result.rows[0].values[0] != NULL)
+    {
+        total_amount = atof(result.rows[0].values[0]);
+    }
+
+    printf("\n===== 应缴费用 =====\n");
+    printf("总应缴金额: %.2f 元\n", total_amount);
+
+    // 按费用类型统计
+    free_query_result(&result);
+
+    snprintf(query, sizeof(query),
+             "SELECT fee_type, SUM(amount) FROM transactions "
+             "WHERE user_id = '%s' AND (status = %d OR status = %d) "
+             "GROUP BY fee_type",
+             user_id, TRANS_UNPAID, TRANS_OVERDUE);
+
+    if (!execute_query(db, query, &result))
+    {
+        printf("查询费用类型统计失败\n");
+        return;
+    }
+
+    printf("\n费用类型明细:\n");
+
+    for (int i = 0; i < result.row_count; i++)
+    {
+        int fee_type = atoi(result.rows[i].values[0]);
+        float amount = atof(result.rows[i].values[1]);
+
+        char fee_type_str[20];
+        switch (fee_type)
+        {
+        case TRANS_PROPERTY_FEE:
+            strcpy(fee_type_str, "物业费");
+            break;
+        case TRANS_PARKING_FEE:
+            strcpy(fee_type_str, "停车费");
+            break;
+        case TRANS_WATER_FEE:
+            strcpy(fee_type_str, "水费");
+            break;
+        case TRANS_ELECTRICITY_FEE:
+            strcpy(fee_type_str, "电费");
+            break;
+        case TRANS_GAS_FEE:
+            strcpy(fee_type_str, "燃气费");
+            break;
+        default:
+            strcpy(fee_type_str, "其他费用");
+            break;
+        }
+
+        printf("%s: %.2f 元\n", fee_type_str, amount);
+    }
+
+    free_query_result(&result);
+
+    // 查询逾期费用
+    snprintf(query, sizeof(query),
+             "SELECT SUM(amount) FROM transactions "
+             "WHERE user_id = '%s' AND status = %d",
+             user_id, TRANS_OVERDUE);
+
+    if (!execute_query(db, query, &result))
+    {
+        printf("查询逾期费用失败\n");
+        return;
+    }
+
+    float overdue_amount = 0;
+    if (result.row_count > 0 && result.rows[0].values[0] != NULL)
+    {
+        overdue_amount = atof(result.rows[0].values[0]);
+    }
+
+    if (overdue_amount > 0)
+    {
+        printf("\n注意: 您有 %.2f 元的费用已逾期未付，请尽快缴纳！\n", overdue_amount);
+    }
+
+    free_query_result(&result);
+    printf("\n按任意键返回...");
+    getchar();
 }
