@@ -18,22 +18,17 @@
 #include <string.h>
 #include <time.h>
 #include <sqlite3.h>
+
 char* get_current_date() {
     time_t now = time(NULL);
-    if (now == -1) {
-        return NULL;
-    }
-    
+    if (now == -1) return NULL;
+
     struct tm *t = localtime(&now);
-    if (t == NULL) {
-        return NULL;
-    }
-    
-    char* date = malloc(11); // YYYY-MM-DD + null terminator
-    if (date == NULL) {
-        return NULL;
-    }
-    
+    if (!t) return NULL;
+
+    char* date = malloc(11);
+    if (!date) return NULL;
+
     strftime(date, 11, "%Y-%m-%d", t);
     return date;
 }
