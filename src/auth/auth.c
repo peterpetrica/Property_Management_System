@@ -79,11 +79,6 @@ static bool check_user_credentials(Database *db, const char *username, const cha
                 *user_type = USER_OWNER;
                 *permission_level = 3;
             }
-            else
-            {
-                *user_type = USER_OWNER;
-                *permission_level = 3;
-            }
             found = true;
         }
     }
