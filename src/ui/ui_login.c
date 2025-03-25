@@ -254,7 +254,13 @@ bool show_registration_screen(Database *db)
     do
     {
         printf("电话号码 (选填): ");
-        scanf("%19s", phone);
+        fgets(phone,sizeof(phone),stdin);
+        phone[strlen(phone)-1]='\0';
+        if(strlen(phone)==0)
+        {
+            break;
+        }
+
         bool valid = 1;
         if (strlen(phone) != 11)
         {
@@ -286,7 +292,12 @@ bool show_registration_screen(Database *db)
     do
     {
         printf("电子邮箱 (选填): ");
-        scanf("%63s", email);
+        fgets(email,sizeof(email),stdin);
+        email[strlen(email)-1]='\0';
+        if(strlen(email)==0)
+        {
+            break;
+        }
         if (strchr(email, '@') == NULL)
         {
             printf("不合法的邮箱地址，请重新输入\n");
