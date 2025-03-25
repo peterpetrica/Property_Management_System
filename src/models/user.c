@@ -217,7 +217,9 @@ bool update_staff(Database *db, const char *user_id, UserType user_type, Staff *
         return false;
     }
 
-    const char *query = "UPDATE users SET name = ?, phone_number = ? WHERE user_id = ? AND role_id = ?";
+    const char *query = "UPDATE staff"
+                        "SET staff_type_id= ?"
+                        "WHERE user_id=?";
     sqlite3_stmt *stmt;
     int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
     if (rc != SQLITE_OK)
@@ -226,10 +228,8 @@ bool update_staff(Database *db, const char *user_id, UserType user_type, Staff *
         return false;
     }
 
-    sqlite3_bind_text(stmt, 1, staff->name, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 2, staff->phone_number, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 3, user_id, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 4, "role_staff", -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 1, staff->staff_type_id, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, user_id, -1, SQLITE_STATIC);
 
     rc = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
