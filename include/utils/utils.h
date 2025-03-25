@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <time.h>
+#include<stdlib.h>
 
 // 生成UUID
 void generate_uuid(char *out);

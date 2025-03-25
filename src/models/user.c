@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "db/db_query.h"
 
 /**
  * @brief 创建业主账户
@@ -779,10 +780,63 @@ int compare_id_asc(const void *a, const void *b)
  * @param db 数据库连接
  * @param compare_func 用于排序的比较函数
  */
-void sort_owners(Database *db, int (*compare_func)(const void *, const void *))
-{
-    printf("排序业主操作执行中...\n");
+
+        void sort_owners(Database *db, int (*compare_func)(const void *, const void *))
+ {
+            // 确保数据库存在
+            if (db == NULL || db->db == NULL) {
+                printf("数据库连接无效，无法排序。\n");
+                return;
+            }
+        
+            // 查询业主数据
+            const char *query = "SELECT user_id, name FROM users WHERE role_id = "
+                                "(SELECT role_id FROM roles WHERE role_name = '业主')";
+        
+            QueryResult result;
+            if (!execute_query(db, query, &result)) { // 执行查询并获取结果
+                printf("查询失败。\n");
+                return;
+            }
+        
+            // 如果没有业主数据
+            if (result.row_count == 0) {
+                printf("没有业主数据。\n");
+                free_query_result(&result); // 释放查询结果
+                return;
+            }
+        
+            // 申请内存存储业主数据
+            Owner *owners = malloc(sizeof(Owner) * result.row_count);
+            if (!owners) {
+                printf("内存分配失败\n");
+                free_query_result(&result);
+                return;
+            }
+        
+            // 解析查询结果并填充 owners 数组
+            for (int i = 0; i < result.row_count; i++) {
+                strcpy(owners[i].user_id, result.rows[i].values[0]); // user_id
+                strcpy(owners[i].name, result.rows[i].values[1]);    // name
+            }
+        
+            // 使用 qsort 对业主数组进行排序
+            printf("正在对业主进行排序...\n");
+            qsort(owners, result.row_count, sizeof(Owner), compare_func);
+            printf("排序完成。\n");
+        
+            // 显示排序后的业主列表
+            for (int i = 0; i < result.row_count; i++) {
+                printf("ID: %s, Name: %s\n", owners[i].user_id, owners[i].name);
+            }
+        
+            // 释放内存
+            free(owners);
+            free_query_result(&result); // 释放查询结果
 }
+
+
+
 
 /**
  * @brief 显示业主列表
@@ -793,7 +847,7 @@ void display_owners(Database *db)
 {
     printf("显示业主列表...\n");
 
-    const char *query = "SELECT user_id, name, phone_number FROM users WHERE user_type = 1";
+    const char *query = "SELECT user_id, name, phone_number FROM users WHERE role_id = 1";
     sqlite3_stmt *stmt;
 
     if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) != SQLITE_OK)

@@ -18,7 +18,25 @@
 #include <string.h>
 #include <time.h>
 #include <sqlite3.h>
-
+char* get_current_date() {
+    time_t now = time(NULL);
+    if (now == -1) {
+        return NULL;
+    }
+    
+    struct tm *t = localtime(&now);
+    if (t == NULL) {
+        return NULL;
+    }
+    
+    char* date = malloc(11); // YYYY-MM-DD + null terminator
+    if (date == NULL) {
+        return NULL;
+    }
+    
+    strftime(date, 11, "%Y-%m-%d", t);
+    return date;
+}
 /**
  * 执行简单的SQL查询并返回结果数量
  *
@@ -31,6 +49,7 @@ int db_count_query(Database *db, const char *query, int *count)
 {
     // TODO
 }
+
 
 /**
  * 检查数据库表是否存在
