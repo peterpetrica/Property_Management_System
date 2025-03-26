@@ -232,7 +232,8 @@ bool show_registration_screen(Database *db)
     do
     {
         printf("真实姓名 (必填): ");
-        scanf("%63s", name);
+        fgets(name,sizeof(name),stdin);
+        name[strcspn(name,"\n")]='\0';
         bool valid = 1;
         if (strlen(name) > 20)
         {
@@ -255,7 +256,7 @@ bool show_registration_screen(Database *db)
     {
         printf("电话号码 (选填): ");
         fgets(phone,sizeof(phone),stdin);
-        phone[strlen(phone)-1]='\0';
+        phone[strcspn(phone,"\n")]='\0';
         if(strlen(phone)==0)
         {
             break;
@@ -293,19 +294,41 @@ bool show_registration_screen(Database *db)
     {
         printf("电子邮箱 (选填): ");
         fgets(email,sizeof(email),stdin);
-        email[strlen(email)-1]='\0';
+        email[strcspn(email,"\n")]='\0';
         if(strlen(email)==0)
         {
             break;
         }
+        bool valid = true;
+
+    // 检查邮箱长度
+    if (strlen(email) < 6)
+    {
+        printf("电子邮箱长度不能少于 6 个字符，请重新输入\n");
+        valid = false;
+    }
         if (strchr(email, '@') == NULL)
         {
             printf("不合法的邮箱地址，请重新输入\n");
         }
-        else
+        bool has_digit = false;
+    for (int i = 0; email[i] != '\0'; i++)
+    {
+        if (email[i] >= '0' && email[i] <= '9')
         {
+            has_digit = true;
             break;
         }
+    }
+    if (!has_digit)
+    {
+        printf("电子邮箱地址必须包含至少一个数字，请重新输入\n");
+        valid = false;
+    }
+    if (valid)
+    {
+        break;
+    }
     } while (1);
 
     // 生成唯一用户ID
