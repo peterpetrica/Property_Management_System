@@ -222,7 +222,6 @@ bool change_password(Database *db, const char *user_id, UserType user_type, cons
         return true;
     }
 }
-
 /**
  * @brief 重置用户密码为默认密码（仅管理员可操作）
  *
