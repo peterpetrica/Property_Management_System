@@ -402,7 +402,6 @@ int db_parameterized_query(Database *db, const char *query, void *params,
     }
 
     sqlite3_finalize(stmt);
-
     if (rc != SQLITE_DONE)
     {
         fprintf(stderr, "执行查询失败: %s\n", sqlite3_errmsg(db->db));
