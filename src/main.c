@@ -87,9 +87,10 @@ int main()
 
     LoginResult login_result = show_login_screen(&db);
 
+    // 移除以下逻辑，因为登录函数已经处理了跳转
+    /*
     if (login_result.success)
     {
-        // 主界面
         switch (login_result.user_type)
         {
         case USER_ADMIN:
@@ -109,6 +110,7 @@ int main()
             break;
         }
     }
+    */
 
     // 清理资源
     db_close(&db);
