@@ -24,27 +24,38 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "db/db_query.h"
 
-// 创建业主账户
+/**
+ * @brief 创建业主账户
+ *
+ * @param db 数据库连接
+ * @param owner 业主信息结构体
+ * @param password 业主密码（明文）
+ * @return bool 创建成功返回true，失败返回false
+ */
 bool create_owner(Database *db, Owner *owner, const char *password)
 {
-    if(!db||!owner||!password){
-        fprintf(stderr,"创建业主账户参数无效\n");
+    if (!db || !owner || !password)
+    {
+        fprintf(stderr, "创建业主账户参数无效\n");
         return false;
     }
     return false;
-    //加密密码
+
     char hashed_password[128];
-    if(!hash_password(password,hashed_password,sizeof(hashed_password))){
-        fprintf(stderr,"加密密码失败\n");
+    if (!hash_password(password, hashed_password, sizeof(hashed_password)))
+    {
+        fprintf(stderr, "加密密码失败\n");
         return false;
     }
-    //插入业主信息到数据库
+
     const char *query = "INSERT INTO users (user_id,username,password_hash,name,phone_number,email,role_id,registration_date) VALUES(?,?,?,?,?,?,?,?);";
     sqlite3_stmt *stmt;
-    int rc = sqlite3_prepare_v2(db->db,query,-1,&stmt,NULL);
-    if(rc!=SQLITE_OK){
-        fprintf(stderr,"无法准备插入语句: %s\n",sqlite3_errmsg(db->db));
+    int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "无法准备插入语句: %s\n", sqlite3_errmsg(db->db));
         return false;
     }
     sqlite3_bind_text(stmt, 1, owner->user_id, -1, SQLITE_STATIC);
@@ -52,72 +63,101 @@ bool create_owner(Database *db, Owner *owner, const char *password)
     sqlite3_bind_text(stmt, 3, hashed_password, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 4, owner->name, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 5, owner->phone_number, -1, SQLITE_STATIC);
-    rc=sqlite3_step(stmt);
+    rc = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
-    if(rc!=SQLITE_DONE){
-        fprintf(stderr,"无法插入业主信息: %s\n",sqlite3_errmsg(db->db));
+    if (rc != SQLITE_DONE)
+    {
+        fprintf(stderr, "无法插入业主信息: %s\n", sqlite3_errmsg(db->db));
         return false;
     }
     return true;
 }
 
-// 更新业主信息
+/**
+ * @brief 更新业主信息
+ *
+ * @param db 数据库连接
+ * @param user_id 业主ID
+ * @param user_type 用户类型
+ * @param owner 更新后的业主信息
+ * @return bool 更新成功返回true，失败返回false
+ */
 bool update_owner(Database *db, const char *user_id, UserType user_type, Owner *owner)
 {
-    if(!db||!user_id||!owner){
-        fprintf(stderr,"更新业主信息参数无效\n");
+    if (!db || !user_id || !owner)
+    {
+        fprintf(stderr, "更新业主信息参数无效\n");
         return false;
     }
     const char *query = "UPDATE users SET name=?,phone_number=?,email=? WHERE user_id=?;";
     sqlite3_stmt *stmt;
-    int rc = sqlite3_prepare_v2(db->db,query,-1,&stmt,NULL);
-    if(rc!=SQLITE_OK){
-        fprintf(stderr,"无法准备更新语句: %s\n",sqlite3_errmsg(db->db));
+    int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "无法准备更新语句: %s\n", sqlite3_errmsg(db->db));
         return false;
     }
     sqlite3_bind_text(stmt, 1, owner->name, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 2, owner->phone_number, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 3, owner->email, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 4, user_id, -1, SQLITE_STATIC);
-    rc=sqlite3_step(stmt);
+    rc = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
-    if(rc!=SQLITE_DONE){
-        fprintf(stderr,"无法更新业主信息: %s\n",sqlite3_errmsg(db->db));
+    if (rc != SQLITE_DONE)
+    {
+        fprintf(stderr, "无法更新业主信息: %s\n", sqlite3_errmsg(db->db));
         return false;
     }
 
     return true;
 }
 
-// 获取业主信息
+/**
+ * @brief 通过ID获取业主信息
+ *
+ * @param db 数据库连接
+ * @param owner_id 业主ID
+ * @param owner 用于存储查询结果的业主结构体
+ * @return bool 查询成功返回true，失败返回false
+ */
 bool get_owner_by_id(Database *db, const char *owner_id, Owner *owner)
 {
-    if(!db||!owner_id||!owner){
-        fprintf(stderr,"获取业主信息参数无效\n");
-        return false; 
+    if (!db || !owner_id || !owner)
+    {
+        fprintf(stderr, "获取业主信息参数无效\n");
+        return false;
     }
     const char *query = "SELECT name,phone_number,email FROM users WHERE user_id=?;";
     sqlite3_stmt *stmt;
-    int rc = sqlite3_prepare_v2(db->db,query,-1,&stmt,NULL);
-    if(rc!=SQLITE_OK){
-        fprintf(stderr,"无法准备查询语句: %s\n",sqlite3_errmsg(db->db));
-        return false; 
+    int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "无法准备查询语句: %s\n", sqlite3_errmsg(db->db));
+        return false;
     }
     sqlite3_bind_text(stmt, 1, owner_id, -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt, 2, SQLITE_STATIC);
-    rc=sqlite3_step(stmt);
-    if(rc==SQLITE_ROW){
-        strncpy(owner->name,(const char *)sqlite3_column_text(stmt,0),sizeof(owner->name)-1);
-        strncpy(owner->phone_number,(const char *)sqlite3_column_text(stmt,1),sizeof(owner->phone_number)-1);
+
+    rc = sqlite3_step(stmt);
+    if (rc == SQLITE_ROW)
+    {
+        strncpy(owner->name, (const char *)sqlite3_column_text(stmt, 0), sizeof(owner->name) - 1);
+        strncpy(owner->phone_number, (const char *)sqlite3_column_text(stmt, 1), sizeof(owner->phone_number) - 1);
         sqlite3_finalize(stmt);
-        return true; 
+        return true;
     }
     sqlite3_finalize(stmt);
-    fprintf(stderr,"无法获取业主信息: %s\n",sqlite3_errmsg(db->db));
+    fprintf(stderr, "无法获取业主信息: %s\n", sqlite3_errmsg(db->db));
     return true;
 }
 
-// 创建服务人员账户
+/**
+ * @brief 创建服务人员账户
+ *
+ * @param db 数据库连接
+ * @param staff 服务人员信息结构体
+ * @param password 服务人员密码（明文）
+ * @return bool 创建成功返回true，失败返回false
+ */
 bool create_staff(Database *db, Staff *staff, const char *password)
 {
     if (!db || !staff || !password)
@@ -126,7 +166,6 @@ bool create_staff(Database *db, Staff *staff, const char *password)
         return false;
     }
 
-    // 加密密码
     char hashed_password[256];
     if (!hash_password(password, hashed_password, sizeof(hashed_password)))
     {
@@ -134,7 +173,6 @@ bool create_staff(Database *db, Staff *staff, const char *password)
         return false;
     }
 
-    // 插入服务人员信息到数据库
     const char *query = "INSERT INTO users (user_id, name, phone_number, user_type, password) VALUES (?, ?, ?, ?, ?)";
     sqlite3_stmt *stmt;
     int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
@@ -162,7 +200,15 @@ bool create_staff(Database *db, Staff *staff, const char *password)
     return true;
 }
 
-// 更新服务人员信息
+/**
+ * @brief 更新服务人员信息
+ *
+ * @param db 数据库连接
+ * @param user_id 服务人员ID
+ * @param user_type 用户类型，必须为USER_STAFF
+ * @param staff 更新后的服务人员信息
+ * @return bool 更新成功返回true，失败返回false
+ */
 bool update_staff(Database *db, const char *user_id, UserType user_type, Staff *staff)
 {
     if (!db || !user_id || !staff || user_type != USER_STAFF)
@@ -171,7 +217,9 @@ bool update_staff(Database *db, const char *user_id, UserType user_type, Staff *
         return false;
     }
 
-    const char *query = "UPDATE users SET name = ?, phone_number = ? WHERE user_id = ? AND user_type = ?";
+    const char *query = "UPDATE staff"
+                        "SET staff_type_id= ?"
+                        "WHERE user_id=?";
     sqlite3_stmt *stmt;
     int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
     if (rc != SQLITE_OK)
@@ -180,10 +228,8 @@ bool update_staff(Database *db, const char *user_id, UserType user_type, Staff *
         return false;
     }
 
-    sqlite3_bind_text(stmt, 1, staff->name, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 2, staff->phone_number, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 3, user_id, -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt, 4, USER_STAFF);
+    sqlite3_bind_text(stmt, 1, staff->staff_type_id, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, user_id, -1, SQLITE_STATIC);
 
     rc = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
@@ -197,58 +243,115 @@ bool update_staff(Database *db, const char *user_id, UserType user_type, Staff *
     return true;
 }
 
-// 获取服务人员信息
+/**
+ * @brief 通过ID获取服务人员信息
+ *
+ * @param db 数据库连接
+ * @param staff_id 服务人员ID
+ * @param staff 用于存储查询结果的服务人员结构体
+ * @return bool 查询成功返回true，失败返回false
+ */
 bool get_staff_by_id(Database *db, const char *staff_id, Staff *staff)
 {
-    if (!db ||!staff_id ||!staff)
+    if (!db || !staff_id || !staff)
     {
         fprintf(stderr, "获取服务人员信息参数无效\n");
         return false;
     }
 
-    const char *query = "SELECT name, phone_number FROM users WHERE user_id =? AND user_type =?";
+    // 初始化staff结构体
+    memset(staff, 0, sizeof(Staff));
+
+    const char *query =
+        "SELECT u.name, u.phone_number, s.staff_type_id, s.staff_id "
+        "FROM users u JOIN staff s ON u.user_id = s.user_id "
+        "WHERE u.user_id = ? AND u.role_id = 'role_staff'";
+
     sqlite3_stmt *stmt;
     int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
-    if (rc!= SQLITE_OK)
+    if (rc != SQLITE_OK)
     {
         fprintf(stderr, "无法准备查询语句: %s\n", sqlite3_errmsg(db->db));
         return false;
     }
 
     sqlite3_bind_text(stmt, 1, staff_id, -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt, 2, USER_STAFF);
 
     rc = sqlite3_step(stmt);
-    if (rc== SQLITE_ROW)
+    if (rc == SQLITE_ROW)
     {
-        strncpy(staff->name, (const char *)sqlite3_column_text(stmt, 0), sizeof(staff->name) - 1);
-        strncpy(staff->phone_number, (const char *)sqlite3_column_text(stmt, 1), sizeof(staff->phone_number) - 1);
+        // ID
+        strncpy(staff->user_id, staff_id, sizeof(staff->user_id) - 1);
+        staff->user_id[sizeof(staff->user_id) - 1] = '\0';
+
+        // 姓名
+        const char *name = (const char *)sqlite3_column_text(stmt, 0);
+        if (name)
+        {
+            strncpy(staff->name, name, sizeof(staff->name) - 1);
+            staff->name[sizeof(staff->name) - 1] = '\0';
+        }
+
+        // 电话
+        const char *phone = (const char *)sqlite3_column_text(stmt, 1);
+        if (phone)
+        {
+            strncpy(staff->phone_number, phone, sizeof(staff->phone_number) - 1);
+            staff->phone_number[sizeof(staff->phone_number) - 1] = '\0';
+        }
+
+        // 服务类型ID
+        const char *staff_type = (const char *)sqlite3_column_text(stmt, 2);
+        if (staff_type)
+        {
+            strncpy(staff->staff_type_id, staff_type, sizeof(staff->staff_type_id) - 1);
+            staff->staff_type_id[sizeof(staff->staff_type_id) - 1] = '\0';
+        }
+
+        // 员工ID
+        const char *staff_id_val = (const char *)sqlite3_column_text(stmt, 3);
+        if (staff_id_val)
+        {
+            strncpy(staff->staff_id, staff_id_val, sizeof(staff->staff_id) - 1);
+            staff->staff_id[sizeof(staff->staff_id) - 1] = '\0';
+        }
+
         sqlite3_finalize(stmt);
-        return true; 
+        return true;
     }
+
     sqlite3_finalize(stmt);
-    fprintf(stderr, "无法获取服务人员信息: %s\n", sqlite3_errmsg(db->db));
-    return true;
+    fprintf(stderr, "未找到服务人员信息\n");
+    return false;
 }
-// 创建管理员账户
+
+/**
+ * @brief 创建管理员账户
+ *
+ * @param db 数据库连接
+ * @param admin 管理员信息结构体
+ * @param password 管理员密码（明文）
+ * @return bool 创建成功返回true，失败返回false
+ */
 bool create_admin(Database *db, Admin *admin, const char *password)
 {
-    if(!db||!admin||!password){
-        fprintf(stderr,"创建管理员账户参数无效\n");
+    if (!db || !admin || !password)
+    {
+        fprintf(stderr, "创建管理员账户参数无效\n");
         return false;
     }
-    // 加密密码
+
     char hashed_password[256];
     if (!hash_password(password, hashed_password, sizeof(hashed_password)))
     {
         fprintf(stderr, "密码加密失败\n");
         return false;
     }
-    // 插入管理员信息到数据库   
+
     const char *query = "INSERT INTO users (user_id, name, phone_number, user_type, password) VALUES (?,?,?,?,?)";
     sqlite3_stmt *stmt;
     int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
-    if (rc!= SQLITE_OK)
+    if (rc != SQLITE_OK)
     {
         fprintf(stderr, "无法准备插入语句: %s\n", sqlite3_errmsg(db->db));
         return false;
@@ -262,7 +365,7 @@ bool create_admin(Database *db, Admin *admin, const char *password)
     rc = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
 
-    if (rc!= SQLITE_DONE)
+    if (rc != SQLITE_DONE)
     {
         fprintf(stderr, "插入管理员信息失败: %s\n", sqlite3_errmsg(db->db));
         return false;
@@ -270,17 +373,26 @@ bool create_admin(Database *db, Admin *admin, const char *password)
     return true;
 }
 
-// 更新管理员信息
+/**
+ * @brief 更新管理员信息
+ *
+ * @param db 数据库连接
+ * @param user_id 管理员ID
+ * @param user_type 用户类型，必须为USER_ADMIN
+ * @param admin 更新后的管理员信息
+ * @return bool 更新成功返回true，失败返回false
+ */
 bool update_admin(Database *db, const char *user_id, UserType user_type, Admin *admin)
 {
-    if(!db||!user_id||!admin||user_type!= USER_ADMIN){
-        fprintf(stderr,"更新管理员信息参数无效\n");
+    if (!db || !user_id || !admin || user_type != USER_ADMIN)
+    {
+        fprintf(stderr, "更新管理员信息参数无效\n");
         return false;
     }
     const char *query = "UPDATE users SET name =?, phone_number =? WHERE user_id =? AND user_type =?";
     sqlite3_stmt *stmt;
     int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
-    if (rc!= SQLITE_OK)
+    if (rc != SQLITE_OK)
     {
         fprintf(stderr, "无法准备更新语句: %s\n", sqlite3_errmsg(db->db));
         return false;
@@ -294,7 +406,7 @@ bool update_admin(Database *db, const char *user_id, UserType user_type, Admin *
     rc = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
 
-    if (rc!= SQLITE_DONE)
+    if (rc != SQLITE_DONE)
     {
         fprintf(stderr, "更新管理员信息失败: %s\n", sqlite3_errmsg(db->db));
         return false;
@@ -302,26 +414,34 @@ bool update_admin(Database *db, const char *user_id, UserType user_type, Admin *
     return true;
 }
 
-// 获取管理员信息
+/**
+ * @brief 通过ID获取管理员信息
+ *
+ * @param db 数据库连接
+ * @param admin_id 管理员ID
+ * @param admin 用于存储查询结果的管理员结构体
+ * @return bool 查询成功返回true，失败返回false
+ */
 bool get_admin_by_id(Database *db, const char *admin_id, Admin *admin)
 {
-    if(!db||!admin_id||!admin){
-        fprintf(stderr,"获取管理员信息参数无效\n");
-        return false; 
+    if (!db || !admin_id || !admin)
+    {
+        fprintf(stderr, "获取管理员信息参数无效\n");
+        return false;
     }
     const char *query = "SELECT name, phone_number FROM users WHERE user_id =? AND user_type =?";
     sqlite3_stmt *stmt;
     int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
-    if (rc!= SQLITE_OK)
+    if (rc != SQLITE_OK)
     {
         fprintf(stderr, "无法准备查询语句: %s\n", sqlite3_errmsg(db->db));
-        return false;  
+        return false;
     }
     sqlite3_bind_text(stmt, 1, admin_id, -1, SQLITE_STATIC);
     sqlite3_bind_int(stmt, 2, USER_ADMIN);
 
     rc = sqlite3_step(stmt);
-    if (rc== SQLITE_ROW)
+    if (rc == SQLITE_ROW)
     {
         strncpy(admin->name, (const char *)sqlite3_column_text(stmt, 0), sizeof(admin->name) - 1);
         strncpy(admin->username, (const char *)sqlite3_column_text(stmt, 1), sizeof(admin->username) - 1);
@@ -333,21 +453,32 @@ bool get_admin_by_id(Database *db, const char *admin_id, Admin *admin)
     return true;
 }
 
-// 删除用户 (仅管理员可用)
+/**
+ * @brief 删除用户（仅限管理员使用）
+ *
+ * @param db 数据库连接
+ * @param admin_id 执行删除操作的管理员ID
+ * @param admin_type 执行删除操作的用户类型，必须为USER_ADMIN
+ * @param user_id 被删除的用户ID
+ * @param user_type 被删除的用户类型
+ * @return bool 删除成功返回true，失败返回false
+ */
 bool delete_user(Database *db, const char *admin_id, UserType admin_type, const char *user_id, UserType user_type)
 {
-    if(!db||!admin_id||!user_id){
-        fprintf(stderr,"删除用户参数无效\n");
+    if (!db || !admin_id || !user_id)
+    {
+        fprintf(stderr, "删除用户参数无效\n");
         return false;
     }
-    if(admin_type!=USER_ADMIN){
-        fprintf(stderr,"只有管理员可以删除用户\n");
+    if (admin_type != USER_ADMIN)
+    {
+        fprintf(stderr, "只有管理员可以删除用户\n");
         return false;
     }
     const char *query = "DELETE FROM users WHERE user_id =? AND user_type =?";
     sqlite3_stmt *stmt;
     int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
-    if (rc!= SQLITE_OK)
+    if (rc != SQLITE_OK)
     {
         fprintf(stderr, "无法准备删除语句: %s\n", sqlite3_errmsg(db->db));
         return false;
@@ -357,7 +488,7 @@ bool delete_user(Database *db, const char *admin_id, UserType admin_type, const 
     rc = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
 
-    if (rc!= SQLITE_DONE)
+    if (rc != SQLITE_DONE)
     {
         fprintf(stderr, "删除用户失败: %s\n", sqlite3_errmsg(db->db));
         return false;
@@ -365,19 +496,25 @@ bool delete_user(Database *db, const char *admin_id, UserType admin_type, const 
     return true;
 }
 
-// 根据用户ID查询用户名
+/**
+ * @brief 根据用户ID查询用户名
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param username 用于存储查询结果的用户名字符串
+ * @return bool 查询成功返回true，失败返回false
+ */
 bool query_username_by_user_id(Database *db, const char *user_id, char *username)
 {
-    if(!db||!user_id||!username){
-        fprintf(stderr,"查询用户名参数无效\n");
+    if (!db || !user_id || !username)
+    {
+        fprintf(stderr, "查询用户名参数无效\n");
         return false;
     }
 
-    // 准备SQL查询语句 - 从users表查询username字段
     const char *query = "SELECT username FROM users WHERE user_id = ?";
     sqlite3_stmt *stmt;
 
-    // 准备语句
     int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
     if (rc != SQLITE_OK)
     {
@@ -385,7 +522,6 @@ bool query_username_by_user_id(Database *db, const char *user_id, char *username
         return false;
     }
 
-    // 绑定参数
     rc = sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
     if (rc != SQLITE_OK)
     {
@@ -394,16 +530,14 @@ bool query_username_by_user_id(Database *db, const char *user_id, char *username
         return false;
     }
 
-    // 执行查询
     rc = sqlite3_step(stmt);
     if (rc == SQLITE_ROW)
     {
-        // 获取结果
         const unsigned char *result = sqlite3_column_text(stmt, 0);
         if (result)
         {
             strncpy(username, (const char *)result, 99);
-            username[99] = '\0'; // 确保字符串结束
+            username[99] = '\0';
             sqlite3_finalize(stmt);
             return true;
         }
@@ -413,13 +547,19 @@ bool query_username_by_user_id(Database *db, const char *user_id, char *username
         fprintf(stderr, "查询执行失败: %s\n", sqlite3_errmsg(db->db));
     }
 
-    // 没有找到
     strncpy(username, "未知用户", 99);
     sqlite3_finalize(stmt);
     return true;
 }
 
-// 通过用户姓名查询用户ID
+/**
+ * @brief 通过用户姓名查询用户ID
+ *
+ * @param db 数据库连接
+ * @param name 用户姓名
+ * @param user_id 用于存储查询结果的用户ID字符串
+ * @return bool 查询成功返回true，失败返回false
+ */
 bool query_user_id_by_name(Database *db, const char *name, char *user_id)
 {
     if (db == NULL || db->db == NULL || name == NULL || user_id == NULL)
@@ -428,12 +568,10 @@ bool query_user_id_by_name(Database *db, const char *name, char *user_id)
         return false;
     }
 
-    // 准备SQL查询语句 - 首先计算匹配的用户数量
     const char *count_query = "SELECT COUNT(*) FROM users WHERE name = ?";
     sqlite3_stmt *count_stmt;
     int total_users = 0;
 
-    // 准备计数语句
     int rc = sqlite3_prepare_v2(db->db, count_query, -1, &count_stmt, NULL);
     if (rc != SQLITE_OK)
     {
@@ -441,7 +579,6 @@ bool query_user_id_by_name(Database *db, const char *name, char *user_id)
         return false;
     }
 
-    // 绑定参数
     rc = sqlite3_bind_text(count_stmt, 1, name, -1, SQLITE_STATIC);
     if (rc != SQLITE_OK)
     {
@@ -450,7 +587,6 @@ bool query_user_id_by_name(Database *db, const char *name, char *user_id)
         return false;
     }
 
-    // 执行计数查询
     if (sqlite3_step(count_stmt) == SQLITE_ROW)
     {
         total_users = sqlite3_column_int(count_stmt, 0);
@@ -464,7 +600,6 @@ bool query_user_id_by_name(Database *db, const char *name, char *user_id)
     }
     else if (total_users == 1)
     {
-        // 只有一个匹配，直接查询并返回
         const char *query = "SELECT user_id FROM users WHERE name = ?";
         sqlite3_stmt *stmt;
 
@@ -500,7 +635,6 @@ bool query_user_id_by_name(Database *db, const char *name, char *user_id)
     }
     else
     {
-        // 有多个匹配，需要动态分配内存存储所有匹配的结果
         char **user_ids = (char **)malloc(total_users * sizeof(char *));
         char **phone_numbers = (char **)malloc(total_users * sizeof(char *));
 
@@ -514,16 +648,14 @@ bool query_user_id_by_name(Database *db, const char *name, char *user_id)
             return false;
         }
 
-        // 为每个用户ID和手机号分配内存
         for (int i = 0; i < total_users; i++)
         {
-            user_ids[i] = (char *)malloc(37 * sizeof(char));      // UUID长度最大36字符+结束符
-            phone_numbers[i] = (char *)malloc(20 * sizeof(char)); // 手机号最大19字符+结束符
+            user_ids[i] = (char *)malloc(37 * sizeof(char));
+            phone_numbers[i] = (char *)malloc(20 * sizeof(char));
 
             if (user_ids[i] == NULL || phone_numbers[i] == NULL)
             {
                 fprintf(stderr, "内存分配失败\n");
-                // 释放已分配的内存
                 for (int j = 0; j < i; j++)
                 {
                     free(user_ids[j]);
@@ -540,7 +672,6 @@ bool query_user_id_by_name(Database *db, const char *name, char *user_id)
             }
         }
 
-        // 准备SQL查询语句 - 获取匹配的用户及其手机号
         const char *query = "SELECT user_id, phone_number FROM users WHERE name = ?";
         sqlite3_stmt *stmt;
 
@@ -559,7 +690,6 @@ bool query_user_id_by_name(Database *db, const char *name, char *user_id)
             goto cleanup;
         }
 
-        // 获取所有匹配的记录
         int count = 0;
         while ((rc = sqlite3_step(stmt)) == SQLITE_ROW && count < total_users)
         {
@@ -571,7 +701,6 @@ bool query_user_id_by_name(Database *db, const char *name, char *user_id)
                 strncpy(user_ids[count], (const char *)id_result, 36);
                 user_ids[count][36] = '\0';
 
-                // 复制手机号或设置为空字符串
                 if (phone_result)
                 {
                     strncpy(phone_numbers[count], (const char *)phone_result, 19);
@@ -588,14 +717,12 @@ bool query_user_id_by_name(Database *db, const char *name, char *user_id)
 
         sqlite3_finalize(stmt);
 
-        // 有多个匹配，需要用户选择
         printf("找到多个姓名为 \"%s\" 的用户，请选择：\n", name);
         for (int i = 0; i < count; i++)
         {
             char phone_suffix[15] = "未知";
             int phone_len = strlen(phone_numbers[i]);
 
-            // 获取手机号后四位
             if (phone_len >= 4 && strcmp(phone_numbers[i], "未知手机号") != 0)
             {
                 strncpy(phone_suffix, phone_numbers[i] + (phone_len - 4), 4);
@@ -609,11 +736,9 @@ bool query_user_id_by_name(Database *db, const char *name, char *user_id)
         printf("请输入数字选择 (1-%d): ", count);
         scanf("%d", &choice);
 
-        // 验证选择的有效性
         bool success = false;
         if (choice >= 1 && choice <= count)
         {
-            // 返回选择的用户ID
             strcpy(user_id, user_ids[choice - 1]);
             success = true;
         }
@@ -623,7 +748,6 @@ bool query_user_id_by_name(Database *db, const char *name, char *user_id)
         }
 
     cleanup:
-        // 释放分配的内存
         for (int i = 0; i < total_users; i++)
         {
             free(user_ids[i]);
@@ -634,4 +758,182 @@ bool query_user_id_by_name(Database *db, const char *name, char *user_id)
 
         return success;
     }
+}
+
+/**
+ * @brief 比较函数 - 按ID升序排序
+ *
+ * @param a 第一个比较对象
+ * @param b 第二个比较对象
+ * @return int 比较结果：< 0表示a小于b，0表示相等，> 0表示a大于b
+ */
+int compare_id_asc(const void *a, const void *b)
+{
+    const Owner *owner_a = (const Owner *)a;
+    const Owner *owner_b = (const Owner *)b;
+    return strcmp(owner_a->user_id, owner_b->user_id);
+}
+
+/**
+ * @brief 排序业主列表
+ *
+ * @param db 数据库连接
+ * @param compare_func 用于排序的比较函数
+ */
+
+        void sort_owners(Database *db, int (*compare_func)(const void *, const void *))
+ {
+            // 确保数据库存在
+            if (db == NULL || db->db == NULL) {
+                printf("数据库连接无效，无法排序。\n");
+                return;
+            }
+        
+            // 查询业主数据
+            const char *query = "SELECT user_id, name FROM users WHERE role_id = "
+                                "(SELECT role_id FROM roles WHERE role_name = '业主')";
+        
+            QueryResult result;
+            if (!execute_query(db, query, &result)) { // 执行查询并获取结果
+                printf("查询失败。\n");
+                return;
+            }
+        
+            // 如果没有业主数据
+            if (result.row_count == 0) {
+                printf("没有业主数据。\n");
+                free_query_result(&result); // 释放查询结果
+                return;
+            }
+        
+            // 申请内存存储业主数据
+            Owner *owners = malloc(sizeof(Owner) * result.row_count);
+            if (!owners) {
+                printf("内存分配失败\n");
+                free_query_result(&result);
+                return;
+            }
+        
+            // 解析查询结果并填充 owners 数组
+            for (int i = 0; i < result.row_count; i++) {
+                strcpy(owners[i].user_id, result.rows[i].values[0]); // user_id
+                strcpy(owners[i].name, result.rows[i].values[1]);    // name
+            }
+        
+            // 使用 qsort 对业主数组进行排序
+            printf("正在对业主进行排序...\n");
+            qsort(owners, result.row_count, sizeof(Owner), compare_func);
+            printf("排序完成。\n");
+        
+            // 显示排序后的业主列表
+            for (int i = 0; i < result.row_count; i++) {
+                printf("ID: %s, Name: %s\n", owners[i].user_id, owners[i].name);
+            }
+        
+            // 释放内存
+            free(owners);
+            free_query_result(&result); // 释放查询结果
+}
+
+
+
+
+/**
+ * @brief 显示业主列表
+ *
+ * @param db 数据库连接
+ */
+void display_owners(Database *db)
+{
+    printf("显示业主列表...\n");
+
+    const char *query = "SELECT user_id, name, phone_number FROM users WHERE role_id = 1";
+    sqlite3_stmt *stmt;
+
+    if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) != SQLITE_OK)
+    {
+        printf("准备查询失败: %s\n", sqlite3_errmsg(db->db));
+        return;
+    }
+
+    printf("%-20s %-20s %-15s\n", "业主ID", "姓名", "联系电话");
+    printf("--------------------------------------------------\n");
+
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        const char *id = (const char *)sqlite3_column_text(stmt, 0);
+        const char *name = (const char *)sqlite3_column_text(stmt, 1);
+        const char *phone = (const char *)sqlite3_column_text(stmt, 2);
+
+        printf("%-20s %-20s %-15s\n", id, name, phone);
+    }
+
+    sqlite3_finalize(stmt);
+}
+
+/**
+ * @brief 查询所有服务人员
+ *
+ * @param db 数据库连接
+ * @param staff_list 用于存储查询结果的服务人员数组
+ * @param max_count 数组最大容量
+ * @return int 实际查询到的服务人员数量
+ */
+int query_all_staff(Database *db, Staff *staff_list, int max_count)
+{
+    if (!db || !staff_list || max_count <= 0)
+        return 0;
+
+    const char *query = "SELECT staff_id, user_id, name, phone_number, staff_type_id FROM staff";
+    sqlite3_stmt *stmt;
+    int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
+    {
+        printf("准备查询所有服务人员失败: %s\n", sqlite3_errmsg(db->db));
+        return 0;
+    }
+
+    int count = 0;
+    while (sqlite3_step(stmt) == SQLITE_ROW && count < max_count)
+    {
+        strcpy(staff_list[count].staff_id, (const char *)sqlite3_column_text(stmt, 0));
+        strcpy(staff_list[count].user_id, (const char *)sqlite3_column_text(stmt, 1));
+        strcpy(staff_list[count].name, (const char *)sqlite3_column_text(stmt, 2));
+        strcpy(staff_list[count].phone_number, (const char *)sqlite3_column_text(stmt, 3));
+        strcpy(staff_list[count].staff_type_id, (const char *)sqlite3_column_text(stmt, 4));
+        count++;
+    }
+
+    sqlite3_finalize(stmt);
+    return count;
+}
+
+/**
+ * @brief 统计服务人员总数
+ *
+ * @param db 数据库连接
+ * @return int 服务人员总数
+ */
+int count_all_staff(Database *db)
+{
+    if (!db)
+        return 0;
+
+    const char *query = "SELECT COUNT(*) FROM staff";
+    sqlite3_stmt *stmt;
+    int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
+    {
+        printf("准备统计服务人员总数失败: %s\n", sqlite3_errmsg(db->db));
+        return 0;
+    }
+
+    int count = 0;
+    if (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        count = sqlite3_column_int(stmt, 0);
+    }
+
+    sqlite3_finalize(stmt);
+    return count;
 }

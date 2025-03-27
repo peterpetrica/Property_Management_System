@@ -1,0 +1,56 @@
+\hypertarget{console_8c}{}\doxysection{src/utils/console.c 文件参考}
+\label{console_8c}\index{src/utils/console.c@{src/utils/console.c}}
+{\ttfamily \#include \char`\"{}utils/console.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$termios.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$fcntl.\+h$>$}\newline
+console.\+c 的引用(Include)关系图\+:
+% FIG 0
+\doxysubsection*{函数}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{console_8c_af5978fab9fa6dd4ced1c3a8ab1251f7b}{getch}} (void)
+\begin{DoxyCompactList}\small\item\em 在\+Linux系统下获取单个字符输入，无回显 \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{console_8c_aed241cb94aaa9c588492533b30686892}{read\+\_\+password}} (char $\ast$password, size\+\_\+t size)
+\begin{DoxyCompactList}\small\item\em 安全读取密码，输入时显示星号，支持退格键 \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{函数说明}
+\mbox{\Hypertarget{console_8c_af5978fab9fa6dd4ced1c3a8ab1251f7b}\label{console_8c_af5978fab9fa6dd4ced1c3a8ab1251f7b}} 
+\index{console.c@{console.c}!getch@{getch}}
+\index{getch@{getch}!console.c@{console.c}}
+\doxysubsubsection{\texorpdfstring{getch()}{getch()}}
+{\footnotesize\ttfamily int getch (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+在\+Linux系统下获取单个字符输入，无回显 
+
+\begin{DoxyReturn}{返回}
+int 返回读取的字符\+ASCII码 
+\end{DoxyReturn}
+这是这个函数的调用关系图\+:
+% FIG 1
+\mbox{\Hypertarget{console_8c_aed241cb94aaa9c588492533b30686892}\label{console_8c_aed241cb94aaa9c588492533b30686892}} 
+\index{console.c@{console.c}!read\_password@{read\_password}}
+\index{read\_password@{read\_password}!console.c@{console.c}}
+\doxysubsubsection{\texorpdfstring{read\_password()}{read\_password()}}
+{\footnotesize\ttfamily void read\+\_\+password (\begin{DoxyParamCaption}\item[{char $\ast$}]{password,  }\item[{size\+\_\+t}]{size }\end{DoxyParamCaption})}
+
+
+
+安全读取密码，输入时显示星号，支持退格键 
+
+
+\begin{DoxyParams}{参数}
+{\em password} & 存储密码的字符数组 \\
+\hline
+{\em size} & 密码数组的最大容量 \\
+\hline
+\end{DoxyParams}
+函数调用图\+:
+% FIG 2
+这是这个函数的调用关系图\+:
+% FIG 3

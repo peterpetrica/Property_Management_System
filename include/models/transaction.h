@@ -18,6 +18,25 @@ typedef enum
     TRANS_OTHER = 99           // 其他费用
 } FeeType;
 
+// 支付方式
+typedef enum
+{
+    PAYMENT_NONE = 0,   // 未支付
+    PAYMENT_CASH = 1,   // 现金
+    PAYMENT_CARD = 2,   // 银行卡
+    PAYMENT_WECHAT = 3, // 微信
+    PAYMENT_ALIPAY = 4, // 支付宝
+    PAYMENT_OTHER = 99  // 其他方式
+} PaymentMethod;
+
+// 交易状态
+typedef enum
+{
+    TRANS_UNPAID = 0, // 未付款
+    TRANS_PAID = 1,   // 已付款
+    TRANS_OVERDUE = 2 // 逾期未付
+} TransactionStatus;
+
 // 费用标准
 typedef struct
 {
@@ -63,5 +82,23 @@ bool get_room_transactions(Database *db, const char *user_id, UserType user_type
 
 // 获取停车位交易记录
 bool get_parking_transactions(Database *db, const char *user_id, UserType user_type, const char *parking_id, QueryResult *result);
+
+// 生成交易ID
+char *generate_transaction_id();
+
+// 检查并更新所有逾期未付的交易记录
+bool update_overdue_transactions(Database *db);
+
+// 查询用户未付费用
+bool get_unpaid_transactions(Database *db, const char *user_id, QueryResult *result);
+
+// 处理用户支付交易
+bool process_payment(Database *db, const char *transaction_id, const char *user_id, int payment_method);
+
+// 生成物业费记录
+bool generate_property_fees(Database *db, time_t period_start, time_t period_end, int due_days);
+
+// 生成停车费记录
+bool generate_parking_fees(Database *db, time_t period_start, time_t period_end, int due_days);
 
 #endif /* TRANSACTION_H */

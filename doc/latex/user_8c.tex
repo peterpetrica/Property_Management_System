@@ -1,0 +1,456 @@
+\hypertarget{user_8c}{}\doxysection{src/models/user.c 文件参考}
+\label{user_8c}\index{src/models/user.c@{src/models/user.c}}
+{\ttfamily \#include \char`\"{}models/user.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}utils/utils.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}auth/auth.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+user.\+c 的引用(Include)关系图\+:
+% FIG 0
+\doxysubsection*{函数}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{user_8c_a368176270b82bfc80691cd4969cc8f14}{create\+\_\+owner}} (Database $\ast$db, Owner $\ast$owner, const char $\ast$password)
+\begin{DoxyCompactList}\small\item\em 创建业主账户 \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{user_8c_a567859a17e3d2139f02d4d0e996de213}{update\+\_\+owner}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type, Owner $\ast$owner)
+\begin{DoxyCompactList}\small\item\em 更新业主信息 \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{user_8c_a7bad56fd926017718e56a14aad8e9843}{get\+\_\+owner\+\_\+by\+\_\+id}} (Database $\ast$db, const char $\ast$owner\+\_\+id, Owner $\ast$owner)
+\begin{DoxyCompactList}\small\item\em 通过\+ID获取业主信息 \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{user_8c_a7486a7b32c198fb34f2c2eac93180704}{create\+\_\+staff}} (Database $\ast$db, Staff $\ast$staff, const char $\ast$password)
+\begin{DoxyCompactList}\small\item\em 创建服务人员账户 \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{user_8c_a86ce46c46c3890427f89b171779c3525}{update\+\_\+staff}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type, Staff $\ast$staff)
+\begin{DoxyCompactList}\small\item\em 更新服务人员信息 \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{user_8c_a3ea99c3aa114cb22a6ec4339760a9701}{get\+\_\+staff\+\_\+by\+\_\+id}} (Database $\ast$db, const char $\ast$staff\+\_\+id, Staff $\ast$staff)
+\begin{DoxyCompactList}\small\item\em 通过\+ID获取服务人员信息 \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{user_8c_a1378b2f4d5ccc76846ad28e42f1e1b45}{create\+\_\+admin}} (Database $\ast$db, Admin $\ast$admin, const char $\ast$password)
+\begin{DoxyCompactList}\small\item\em 创建管理员账户 \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{user_8c_affb901f9dc279c720f63c333bac75243}{update\+\_\+admin}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type, Admin $\ast$admin)
+\begin{DoxyCompactList}\small\item\em 更新管理员信息 \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{user_8c_a0a374c233c120c298c1ad4e24154db3e}{get\+\_\+admin\+\_\+by\+\_\+id}} (Database $\ast$db, const char $\ast$admin\+\_\+id, Admin $\ast$admin)
+\begin{DoxyCompactList}\small\item\em 通过\+ID获取管理员信息 \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{user_8c_ad04ce1fa44ede593c18d70ccebf7dc13}{delete\+\_\+user}} (Database $\ast$db, const char $\ast$admin\+\_\+id, User\+Type admin\+\_\+type, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type)
+\begin{DoxyCompactList}\small\item\em 删除用户（仅限管理员使用） \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{user_8c_ae15af65350309ebdca05ea8a04036fbd}{query\+\_\+username\+\_\+by\+\_\+user\+\_\+id}} (Database $\ast$db, const char $\ast$user\+\_\+id, char $\ast$username)
+\begin{DoxyCompactList}\small\item\em 根据用户\+ID查询用户名 \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{user_8c_a1555f4d7d175c7c102585abf355ef691}{query\+\_\+user\+\_\+id\+\_\+by\+\_\+name}} (Database $\ast$db, const char $\ast$name, char $\ast$user\+\_\+id)
+\begin{DoxyCompactList}\small\item\em 通过用户姓名查询用户\+ID \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{user_8c_a1fbd5e15e6716d40eb368da695cc8589}{compare\+\_\+id\+\_\+asc}} (const void $\ast$a, const void $\ast$b)
+\begin{DoxyCompactList}\small\item\em 比较函数 -\/ 按\+ID升序排序 \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{user_8c_ac706a8a1976266645acf0e7682c55457}{sort\+\_\+owners}} (Database $\ast$db, int($\ast$compare\+\_\+func)(const void $\ast$, const void $\ast$))
+\begin{DoxyCompactList}\small\item\em 排序业主列表 \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{user_8c_a62366d2f423064f14203e2ca8efb4774}{display\+\_\+owners}} (Database $\ast$db)
+\begin{DoxyCompactList}\small\item\em 显示业主列表 \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{user_8c_a1b0bbade4033d5de2645b9eb45c37fb0}{query\+\_\+all\+\_\+staff}} (Database $\ast$db, Staff $\ast$staff\+\_\+list, int max\+\_\+count)
+\begin{DoxyCompactList}\small\item\em 查询所有服务人员 \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{user_8c_a87a052e09a6fdfb31114924758823e3d}{count\+\_\+all\+\_\+staff}} (Database $\ast$db)
+\begin{DoxyCompactList}\small\item\em 统计服务人员总数 \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{函数说明}
+\mbox{\Hypertarget{user_8c_a1fbd5e15e6716d40eb368da695cc8589}\label{user_8c_a1fbd5e15e6716d40eb368da695cc8589}} 
+\index{user.c@{user.c}!compare\_id\_asc@{compare\_id\_asc}}
+\index{compare\_id\_asc@{compare\_id\_asc}!user.c@{user.c}}
+\doxysubsubsection{\texorpdfstring{compare\_id\_asc()}{compare\_id\_asc()}}
+{\footnotesize\ttfamily int compare\+\_\+id\+\_\+asc (\begin{DoxyParamCaption}\item[{const void $\ast$}]{a,  }\item[{const void $\ast$}]{b }\end{DoxyParamCaption})}
+
+
+
+比较函数 -\/ 按\+ID升序排序 
+
+
+\begin{DoxyParams}{参数}
+{\em a} & 第一个比较对象 \\
+\hline
+{\em b} & 第二个比较对象 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+int 比较结果：$<$ 0表示a小于b，0表示相等，$>$ 0表示a大于b 
+\end{DoxyReturn}
+\mbox{\Hypertarget{user_8c_a87a052e09a6fdfb31114924758823e3d}\label{user_8c_a87a052e09a6fdfb31114924758823e3d}} 
+\index{user.c@{user.c}!count\_all\_staff@{count\_all\_staff}}
+\index{count\_all\_staff@{count\_all\_staff}!user.c@{user.c}}
+\doxysubsubsection{\texorpdfstring{count\_all\_staff()}{count\_all\_staff()}}
+{\footnotesize\ttfamily int count\+\_\+all\+\_\+staff (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db }\end{DoxyParamCaption})}
+
+
+
+统计服务人员总数 
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+int 服务人员总数 
+\end{DoxyReturn}
+这是这个函数的调用关系图\+:
+% FIG 1
+\mbox{\Hypertarget{user_8c_a1378b2f4d5ccc76846ad28e42f1e1b45}\label{user_8c_a1378b2f4d5ccc76846ad28e42f1e1b45}} 
+\index{user.c@{user.c}!create\_admin@{create\_admin}}
+\index{create\_admin@{create\_admin}!user.c@{user.c}}
+\doxysubsubsection{\texorpdfstring{create\_admin()}{create\_admin()}}
+{\footnotesize\ttfamily bool create\+\_\+admin (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{Admin $\ast$}]{admin,  }\item[{const char $\ast$}]{password }\end{DoxyParamCaption})}
+
+
+
+创建管理员账户 
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em admin} & 管理员信息结构体 \\
+\hline
+{\em password} & 管理员密码（明文） \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+bool 创建成功返回true，失败返回false 
+\end{DoxyReturn}
+函数调用图\+:
+% FIG 2
+\mbox{\Hypertarget{user_8c_a368176270b82bfc80691cd4969cc8f14}\label{user_8c_a368176270b82bfc80691cd4969cc8f14}} 
+\index{user.c@{user.c}!create\_owner@{create\_owner}}
+\index{create\_owner@{create\_owner}!user.c@{user.c}}
+\doxysubsubsection{\texorpdfstring{create\_owner()}{create\_owner()}}
+{\footnotesize\ttfamily bool create\+\_\+owner (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{Owner $\ast$}]{owner,  }\item[{const char $\ast$}]{password }\end{DoxyParamCaption})}
+
+
+
+创建业主账户 
+
+用户模型实现文件 (\mbox{\hyperlink{user_8c}{user.\+c}})
+
+功能： 本文件提供物业管理系统中用户相关操作的实现，包括业主、服务人员和管理员 三种用户类型的账户创建、信息更新、信息获取以及用户删除功能。
+
+主要功能：
+\begin{DoxyEnumerate}
+\item 业主(\+Owner)账户管理：创建、更新和获取业主信息
+\item 服务人员(\+Staff)账户管理：创建、更新和获取服务人员信息
+\item 管理员(\+Admin)账户管理：创建、更新和获取管理员信息
+\item 用户删除功能：仅限管理员使用
+\end{DoxyEnumerate}
+
+预期实现：
+\begin{DoxyItemize}
+\item 所有函数应与数据库交互，确保用户数据的持久化存储
+\item 用户操作应进行适当的权限验证
+\item 敏感信息如密码应进行加密处理
+\item 所有函数应有适当的错误处理和状态返回
+\end{DoxyItemize}
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em owner} & 业主信息结构体 \\
+\hline
+{\em password} & 业主密码（明文） \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+bool 创建成功返回true，失败返回false 
+\end{DoxyReturn}
+函数调用图\+:
+% FIG 3
+\mbox{\Hypertarget{user_8c_a7486a7b32c198fb34f2c2eac93180704}\label{user_8c_a7486a7b32c198fb34f2c2eac93180704}} 
+\index{user.c@{user.c}!create\_staff@{create\_staff}}
+\index{create\_staff@{create\_staff}!user.c@{user.c}}
+\doxysubsubsection{\texorpdfstring{create\_staff()}{create\_staff()}}
+{\footnotesize\ttfamily bool create\+\_\+staff (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{Staff $\ast$}]{staff,  }\item[{const char $\ast$}]{password }\end{DoxyParamCaption})}
+
+
+
+创建服务人员账户 
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em staff} & 服务人员信息结构体 \\
+\hline
+{\em password} & 服务人员密码（明文） \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+bool 创建成功返回true，失败返回false 
+\end{DoxyReturn}
+函数调用图\+:
+% FIG 4
+\mbox{\Hypertarget{user_8c_ad04ce1fa44ede593c18d70ccebf7dc13}\label{user_8c_ad04ce1fa44ede593c18d70ccebf7dc13}} 
+\index{user.c@{user.c}!delete\_user@{delete\_user}}
+\index{delete\_user@{delete\_user}!user.c@{user.c}}
+\doxysubsubsection{\texorpdfstring{delete\_user()}{delete\_user()}}
+{\footnotesize\ttfamily bool delete\+\_\+user (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{admin\+\_\+id,  }\item[{User\+Type}]{admin\+\_\+type,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type }\end{DoxyParamCaption})}
+
+
+
+删除用户（仅限管理员使用） 
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em admin\+\_\+id} & 执行删除操作的管理员\+ID \\
+\hline
+{\em admin\+\_\+type} & 执行删除操作的用户类型，必须为\+USER\+\_\+\+ADMIN \\
+\hline
+{\em user\+\_\+id} & 被删除的用户\+ID \\
+\hline
+{\em user\+\_\+type} & 被删除的用户类型 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+bool 删除成功返回true，失败返回false 
+\end{DoxyReturn}
+\mbox{\Hypertarget{user_8c_a62366d2f423064f14203e2ca8efb4774}\label{user_8c_a62366d2f423064f14203e2ca8efb4774}} 
+\index{user.c@{user.c}!display\_owners@{display\_owners}}
+\index{display\_owners@{display\_owners}!user.c@{user.c}}
+\doxysubsubsection{\texorpdfstring{display\_owners()}{display\_owners()}}
+{\footnotesize\ttfamily void display\+\_\+owners (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db }\end{DoxyParamCaption})}
+
+
+
+显示业主列表 
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+\end{DoxyParams}
+这是这个函数的调用关系图\+:
+% FIG 5
+\mbox{\Hypertarget{user_8c_a0a374c233c120c298c1ad4e24154db3e}\label{user_8c_a0a374c233c120c298c1ad4e24154db3e}} 
+\index{user.c@{user.c}!get\_admin\_by\_id@{get\_admin\_by\_id}}
+\index{get\_admin\_by\_id@{get\_admin\_by\_id}!user.c@{user.c}}
+\doxysubsubsection{\texorpdfstring{get\_admin\_by\_id()}{get\_admin\_by\_id()}}
+{\footnotesize\ttfamily bool get\+\_\+admin\+\_\+by\+\_\+id (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{admin\+\_\+id,  }\item[{Admin $\ast$}]{admin }\end{DoxyParamCaption})}
+
+
+
+通过\+ID获取管理员信息 
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em admin\+\_\+id} & 管理员\+ID \\
+\hline
+{\em admin} & 用于存储查询结果的管理员结构体 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+bool 查询成功返回true，失败返回false 
+\end{DoxyReturn}
+\mbox{\Hypertarget{user_8c_a7bad56fd926017718e56a14aad8e9843}\label{user_8c_a7bad56fd926017718e56a14aad8e9843}} 
+\index{user.c@{user.c}!get\_owner\_by\_id@{get\_owner\_by\_id}}
+\index{get\_owner\_by\_id@{get\_owner\_by\_id}!user.c@{user.c}}
+\doxysubsubsection{\texorpdfstring{get\_owner\_by\_id()}{get\_owner\_by\_id()}}
+{\footnotesize\ttfamily bool get\+\_\+owner\+\_\+by\+\_\+id (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{owner\+\_\+id,  }\item[{Owner $\ast$}]{owner }\end{DoxyParamCaption})}
+
+
+
+通过\+ID获取业主信息 
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em owner\+\_\+id} & 业主\+ID \\
+\hline
+{\em owner} & 用于存储查询结果的业主结构体 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+bool 查询成功返回true，失败返回false 
+\end{DoxyReturn}
+\mbox{\Hypertarget{user_8c_a3ea99c3aa114cb22a6ec4339760a9701}\label{user_8c_a3ea99c3aa114cb22a6ec4339760a9701}} 
+\index{user.c@{user.c}!get\_staff\_by\_id@{get\_staff\_by\_id}}
+\index{get\_staff\_by\_id@{get\_staff\_by\_id}!user.c@{user.c}}
+\doxysubsubsection{\texorpdfstring{get\_staff\_by\_id()}{get\_staff\_by\_id()}}
+{\footnotesize\ttfamily bool get\+\_\+staff\+\_\+by\+\_\+id (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{staff\+\_\+id,  }\item[{Staff $\ast$}]{staff }\end{DoxyParamCaption})}
+
+
+
+通过\+ID获取服务人员信息 
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em staff\+\_\+id} & 服务人员\+ID \\
+\hline
+{\em staff} & 用于存储查询结果的服务人员结构体 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+bool 查询成功返回true，失败返回false 
+\end{DoxyReturn}
+这是这个函数的调用关系图\+:
+% FIG 6
+\mbox{\Hypertarget{user_8c_a1b0bbade4033d5de2645b9eb45c37fb0}\label{user_8c_a1b0bbade4033d5de2645b9eb45c37fb0}} 
+\index{user.c@{user.c}!query\_all\_staff@{query\_all\_staff}}
+\index{query\_all\_staff@{query\_all\_staff}!user.c@{user.c}}
+\doxysubsubsection{\texorpdfstring{query\_all\_staff()}{query\_all\_staff()}}
+{\footnotesize\ttfamily int query\+\_\+all\+\_\+staff (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{Staff $\ast$}]{staff\+\_\+list,  }\item[{int}]{max\+\_\+count }\end{DoxyParamCaption})}
+
+
+
+查询所有服务人员 
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em staff\+\_\+list} & 用于存储查询结果的服务人员数组 \\
+\hline
+{\em max\+\_\+count} & 数组最大容量 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+int 实际查询到的服务人员数量 
+\end{DoxyReturn}
+这是这个函数的调用关系图\+:
+% FIG 7
+\mbox{\Hypertarget{user_8c_a1555f4d7d175c7c102585abf355ef691}\label{user_8c_a1555f4d7d175c7c102585abf355ef691}} 
+\index{user.c@{user.c}!query\_user\_id\_by\_name@{query\_user\_id\_by\_name}}
+\index{query\_user\_id\_by\_name@{query\_user\_id\_by\_name}!user.c@{user.c}}
+\doxysubsubsection{\texorpdfstring{query\_user\_id\_by\_name()}{query\_user\_id\_by\_name()}}
+{\footnotesize\ttfamily bool query\+\_\+user\+\_\+id\+\_\+by\+\_\+name (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{name,  }\item[{char $\ast$}]{user\+\_\+id }\end{DoxyParamCaption})}
+
+
+
+通过用户姓名查询用户\+ID 
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em name} & 用户姓名 \\
+\hline
+{\em user\+\_\+id} & 用于存储查询结果的用户\+ID字符串 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+bool 查询成功返回true，失败返回false 
+\end{DoxyReturn}
+\mbox{\Hypertarget{user_8c_ae15af65350309ebdca05ea8a04036fbd}\label{user_8c_ae15af65350309ebdca05ea8a04036fbd}} 
+\index{user.c@{user.c}!query\_username\_by\_user\_id@{query\_username\_by\_user\_id}}
+\index{query\_username\_by\_user\_id@{query\_username\_by\_user\_id}!user.c@{user.c}}
+\doxysubsubsection{\texorpdfstring{query\_username\_by\_user\_id()}{query\_username\_by\_user\_id()}}
+{\footnotesize\ttfamily bool query\+\_\+username\+\_\+by\+\_\+user\+\_\+id (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{char $\ast$}]{username }\end{DoxyParamCaption})}
+
+
+
+根据用户\+ID查询用户名 
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em user\+\_\+id} & 用户\+ID \\
+\hline
+{\em username} & 用于存储查询结果的用户名字符串 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+bool 查询成功返回true，失败返回false 
+\end{DoxyReturn}
+这是这个函数的调用关系图\+:
+% FIG 8
+\mbox{\Hypertarget{user_8c_ac706a8a1976266645acf0e7682c55457}\label{user_8c_ac706a8a1976266645acf0e7682c55457}} 
+\index{user.c@{user.c}!sort\_owners@{sort\_owners}}
+\index{sort\_owners@{sort\_owners}!user.c@{user.c}}
+\doxysubsubsection{\texorpdfstring{sort\_owners()}{sort\_owners()}}
+{\footnotesize\ttfamily void sort\+\_\+owners (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{int($\ast$)(const void $\ast$, const void $\ast$)}]{compare\+\_\+func }\end{DoxyParamCaption})}
+
+
+
+排序业主列表 
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em compare\+\_\+func} & 用于排序的比较函数 \\
+\hline
+\end{DoxyParams}
+这是这个函数的调用关系图\+:
+% FIG 9
+\mbox{\Hypertarget{user_8c_affb901f9dc279c720f63c333bac75243}\label{user_8c_affb901f9dc279c720f63c333bac75243}} 
+\index{user.c@{user.c}!update\_admin@{update\_admin}}
+\index{update\_admin@{update\_admin}!user.c@{user.c}}
+\doxysubsubsection{\texorpdfstring{update\_admin()}{update\_admin()}}
+{\footnotesize\ttfamily bool update\+\_\+admin (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type,  }\item[{Admin $\ast$}]{admin }\end{DoxyParamCaption})}
+
+
+
+更新管理员信息 
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em user\+\_\+id} & 管理员\+ID \\
+\hline
+{\em user\+\_\+type} & 用户类型，必须为\+USER\+\_\+\+ADMIN \\
+\hline
+{\em admin} & 更新后的管理员信息 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+bool 更新成功返回true，失败返回false 
+\end{DoxyReturn}
+\mbox{\Hypertarget{user_8c_a567859a17e3d2139f02d4d0e996de213}\label{user_8c_a567859a17e3d2139f02d4d0e996de213}} 
+\index{user.c@{user.c}!update\_owner@{update\_owner}}
+\index{update\_owner@{update\_owner}!user.c@{user.c}}
+\doxysubsubsection{\texorpdfstring{update\_owner()}{update\_owner()}}
+{\footnotesize\ttfamily bool update\+\_\+owner (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type,  }\item[{Owner $\ast$}]{owner }\end{DoxyParamCaption})}
+
+
+
+更新业主信息 
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em user\+\_\+id} & 业主\+ID \\
+\hline
+{\em user\+\_\+type} & 用户类型 \\
+\hline
+{\em owner} & 更新后的业主信息 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+bool 更新成功返回true，失败返回false 
+\end{DoxyReturn}
+\mbox{\Hypertarget{user_8c_a86ce46c46c3890427f89b171779c3525}\label{user_8c_a86ce46c46c3890427f89b171779c3525}} 
+\index{user.c@{user.c}!update\_staff@{update\_staff}}
+\index{update\_staff@{update\_staff}!user.c@{user.c}}
+\doxysubsubsection{\texorpdfstring{update\_staff()}{update\_staff()}}
+{\footnotesize\ttfamily bool update\+\_\+staff (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type,  }\item[{Staff $\ast$}]{staff }\end{DoxyParamCaption})}
+
+
+
+更新服务人员信息 
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em user\+\_\+id} & 服务人员\+ID \\
+\hline
+{\em user\+\_\+type} & 用户类型，必须为\+USER\+\_\+\+STAFF \\
+\hline
+{\em staff} & 更新后的服务人员信息 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+bool 更新成功返回true，失败返回false 
+\end{DoxyReturn}
+这是这个函数的调用关系图\+:
+% FIG 10

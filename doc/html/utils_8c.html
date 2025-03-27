@@ -1,0 +1,328 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Property_Management_System: src/utils/utils.c 文件参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">Property_Management_System
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.9.1 -->
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(function() {
+  initMenu('',false,false,'search.php','搜索');
+});
+/* @license-end */</script>
+<div id="main-nav"></div>
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_313caf1132e152dd9b58bea13a4052ca.html">utils</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#func-members">函数</a>  </div>
+  <div class="headertitle">
+<div class="title">utils.c 文件参考</div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><code>#include &quot;utils/utils.h&quot;</code><br />
+<code>#include &lt;stdio.h&gt;</code><br />
+<code>#include &lt;stdlib.h&gt;</code><br />
+<code>#include &lt;string.h&gt;</code><br />
+<code>#include &lt;time.h&gt;</code><br />
+<code>#include &lt;openssl/sha.h&gt;</code><br />
+<code>#include &lt;openssl/evp.h&gt;</code><br />
+<code>#include &lt;openssl/rand.h&gt;</code><br />
+</div><div class="textblock"><div class="dynheader">
+utils.c 的引用(Include)关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="utils_8c__incl.png" border="0" usemap="#asrc_2utils_2utils_8c" alt=""/></div>
+</div>
+</div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:af5263e9c5ed8b07e92367144201731b2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8c.html#af5263e9c5ed8b07e92367144201731b2">generate_uuid</a> (char *out)</td></tr>
+<tr class="memdesc:af5263e9c5ed8b07e92367144201731b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">生成UUID字符串  <a href="utils_8c.html#af5263e9c5ed8b07e92367144201731b2">更多...</a><br /></td></tr>
+<tr class="separator:af5263e9c5ed8b07e92367144201731b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab2d374a6232a32aad9981a4344353699"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8c.html#ab2d374a6232a32aad9981a4344353699">hash_password</a> (const char *password, char *hashed_output, size_t output_size)</td></tr>
+<tr class="memdesc:ab2d374a6232a32aad9981a4344353699"><td class="mdescLeft">&#160;</td><td class="mdescRight">存储密码（当前为明文存储）  <a href="utils_8c.html#ab2d374a6232a32aad9981a4344353699">更多...</a><br /></td></tr>
+<tr class="separator:ab2d374a6232a32aad9981a4344353699"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a223fd223ee25faf39a073768f3632475"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8c.html#a223fd223ee25faf39a073768f3632475">verify_password</a> (const char *password, const char *hash)</td></tr>
+<tr class="memdesc:a223fd223ee25faf39a073768f3632475"><td class="mdescLeft">&#160;</td><td class="mdescRight">验证密码  <a href="utils_8c.html#a223fd223ee25faf39a073768f3632475">更多...</a><br /></td></tr>
+<tr class="separator:a223fd223ee25faf39a073768f3632475"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ea7f5b7e4bffb256d36fb30baf842bf"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8c.html#a2ea7f5b7e4bffb256d36fb30baf842bf">format_time</a> (time_t time_val, char *buffer, int buffer_size)</td></tr>
+<tr class="memdesc:a2ea7f5b7e4bffb256d36fb30baf842bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">格式化时间为字符串  <a href="utils_8c.html#a2ea7f5b7e4bffb256d36fb30baf842bf">更多...</a><br /></td></tr>
+<tr class="separator:a2ea7f5b7e4bffb256d36fb30baf842bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3586704e4679491ee2a686e9cd77f63f"><td class="memItemLeft" align="right" valign="top">time_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8c.html#a3586704e4679491ee2a686e9cd77f63f">parse_time</a> (const char *time_str)</td></tr>
+<tr class="memdesc:a3586704e4679491ee2a686e9cd77f63f"><td class="mdescLeft">&#160;</td><td class="mdescRight">从字符串解析时间  <a href="utils_8c.html#a3586704e4679491ee2a686e9cd77f63f">更多...</a><br /></td></tr>
+<tr class="separator:a3586704e4679491ee2a686e9cd77f63f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10ee73a80b3e7b76c27b20a09769a801"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8c.html#a10ee73a80b3e7b76c27b20a09769a801">safe_strcpy</a> (char *dest, const char *src, size_t dest_size)</td></tr>
+<tr class="memdesc:a10ee73a80b3e7b76c27b20a09769a801"><td class="mdescLeft">&#160;</td><td class="mdescRight">安全字符串复制  <a href="utils_8c.html#a10ee73a80b3e7b76c27b20a09769a801">更多...</a><br /></td></tr>
+<tr class="separator:a10ee73a80b3e7b76c27b20a09769a801"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">函数说明</h2>
+<a id="a2ea7f5b7e4bffb256d36fb30baf842bf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2ea7f5b7e4bffb256d36fb30baf842bf">&#9670;&nbsp;</a></span>format_time()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char* format_time </td>
+          <td>(</td>
+          <td class="paramtype">time_t&#160;</td>
+          <td class="paramname"><em>time_val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>buffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>buffer_size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>格式化时间为字符串 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">time_val</td><td>时间值 </td></tr>
+    <tr><td class="paramname">buffer</td><td>输出缓冲区 </td></tr>
+    <tr><td class="paramname">buffer_size</td><td>缓冲区大小 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>char* 格式化后的时间字符串，失败返回NULL </dd></dl>
+
+</div>
+</div>
+<a id="af5263e9c5ed8b07e92367144201731b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af5263e9c5ed8b07e92367144201731b2">&#9670;&nbsp;</a></span>generate_uuid()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void generate_uuid </td>
+          <td>(</td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>out</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>生成UUID字符串 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">out</td><td>输出缓冲区，长度至少为37字节(36个字符+结束符) </td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="utils_8c_af5263e9c5ed8b07e92367144201731b2_icgraph.png" border="0" usemap="#autils_8c_af5263e9c5ed8b07e92367144201731b2_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="ab2d374a6232a32aad9981a4344353699"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab2d374a6232a32aad9981a4344353699">&#9670;&nbsp;</a></span>hash_password()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hash_password </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>password</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>hashed_output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>output_size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>存储密码（当前为明文存储） </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">password</td><td>原始密码 </td></tr>
+    <tr><td class="paramname">hashed_output</td><td>输出缓冲区 </td></tr>
+    <tr><td class="paramname">output_size</td><td>缓冲区大小 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 操作是否成功 </dd></dl>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="utils_8c_ab2d374a6232a32aad9981a4344353699_icgraph.png" border="0" usemap="#autils_8c_ab2d374a6232a32aad9981a4344353699_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a3586704e4679491ee2a686e9cd77f63f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3586704e4679491ee2a686e9cd77f63f">&#9670;&nbsp;</a></span>parse_time()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">time_t parse_time </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>time_str</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>从字符串解析时间 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">time_str</td><td>时间字符串，格式为"YYYY-MM-DD HH:MM:SS"或"YYYY-MM-DD" </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>time_t 解析后的时间，失败返回-1 </dd></dl>
+
+</div>
+</div>
+<a id="a10ee73a80b3e7b76c27b20a09769a801"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a10ee73a80b3e7b76c27b20a09769a801">&#9670;&nbsp;</a></span>safe_strcpy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void safe_strcpy </td>
+          <td>(</td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>dest</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>src</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>dest_size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>安全字符串复制 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dest</td><td>目标字符串 </td></tr>
+    <tr><td class="paramname">src</td><td>源字符串 </td></tr>
+    <tr><td class="paramname">dest_size</td><td>目标缓冲区大小 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a223fd223ee25faf39a073768f3632475"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a223fd223ee25faf39a073768f3632475">&#9670;&nbsp;</a></span>verify_password()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool verify_password </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>password</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>hash</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>验证密码 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">password</td><td>待验证的密码 </td></tr>
+    <tr><td class="paramname">hash</td><td>存储的密码（当前为明文） </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 密码是否匹配 </dd></dl>
+
+</div>
+</div>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+</small></address>
+</body>
+</html>

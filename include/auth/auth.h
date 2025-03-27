@@ -8,7 +8,7 @@
 typedef enum
 {
     USER_ADMIN = 1, // 管理员
-    USER_STAFF = 2, // 物业服务人员
+    USER_STAFF = 2, // 服务人员
     USER_OWNER = 3  // 业主
 } UserType;
 

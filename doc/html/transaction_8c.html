@@ -1,0 +1,485 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Property_Management_System: src/models/transaction.c 文件参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">Property_Management_System
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.9.1 -->
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(function() {
+  initMenu('',false,false,'search.php','搜索');
+});
+/* @license-end */</script>
+<div id="main-nav"></div>
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_bdeba5f06b852fec80257c0bf4c3c36e.html">models</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#func-members">函数</a>  </div>
+  <div class="headertitle">
+<div class="title">transaction.c 文件参考</div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><code>#include &quot;models/transaction.h&quot;</code><br />
+<code>#include &quot;auth/auth.h&quot;</code><br />
+<code>#include &quot;utils/utils.h&quot;</code><br />
+<code>#include &lt;stdio.h&gt;</code><br />
+<code>#include &lt;stdlib.h&gt;</code><br />
+<code>#include &lt;string.h&gt;</code><br />
+<code>#include &lt;time.h&gt;</code><br />
+</div><div class="textblock"><div class="dynheader">
+transaction.c 的引用(Include)关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="transaction_8c__incl.png" border="0" usemap="#asrc_2models_2transaction_8c" alt=""/></div>
+</div>
+</div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:adc8ec87ffc99084abadde5f985eabfa7"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="transaction_8c.html#adc8ec87ffc99084abadde5f985eabfa7">generate_transaction_id</a> ()</td></tr>
+<tr class="separator:adc8ec87ffc99084abadde5f985eabfa7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d17744da0eddfe6f758f935b79ed99e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="transaction_8c.html#a4d17744da0eddfe6f758f935b79ed99e">add_fee_standard</a> (Database *db, const char *user_id, UserType user_type, FeeStandard *standard)</td></tr>
+<tr class="separator:a4d17744da0eddfe6f758f935b79ed99e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af75f92e36a69175063fdf306b3a69534"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="transaction_8c.html#af75f92e36a69175063fdf306b3a69534">get_current_fee_standard</a> (Database *db, int fee_type, FeeStandard *standard)</td></tr>
+<tr class="separator:af75f92e36a69175063fdf306b3a69534"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac83e1833361d46781d99f292bc67c48e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="transaction_8c.html#ac83e1833361d46781d99f292bc67c48e">add_transaction</a> (Database *db, const char *user_id, UserType user_type, Transaction *transaction)</td></tr>
+<tr class="separator:ac83e1833361d46781d99f292bc67c48e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53cf9a26c545a88fd107e171830fbd1e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="transaction_8c.html#a53cf9a26c545a88fd107e171830fbd1e">get_owner_transactions</a> (Database *db, const char *user_id, UserType user_type, const char *owner_id, QueryResult *result)</td></tr>
+<tr class="separator:a53cf9a26c545a88fd107e171830fbd1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3723cd95f922f8ce31c8cea5fdc513d5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="transaction_8c.html#a3723cd95f922f8ce31c8cea5fdc513d5">get_room_transactions</a> (Database *db, const char *user_id, UserType user_type, const char *room_id, QueryResult *result)</td></tr>
+<tr class="separator:a3723cd95f922f8ce31c8cea5fdc513d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d2c47446eeedb6a3805bb46c98d023b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="transaction_8c.html#a5d2c47446eeedb6a3805bb46c98d023b">get_parking_transactions</a> (Database *db, const char *user_id, UserType user_type, const char *parking_id, QueryResult *result)</td></tr>
+<tr class="separator:a5d2c47446eeedb6a3805bb46c98d023b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">函数说明</h2>
+<a id="a4d17744da0eddfe6f758f935b79ed99e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d17744da0eddfe6f758f935b79ed99e">&#9670;&nbsp;</a></span>add_fee_standard()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool add_fee_standard </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">FeeStandard *&#160;</td>
+          <td class="paramname"><em>standard</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>添加费用标准</p>
+<p>向系统中添加新的费用标准，仅管理员可执行此操作</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接指针 </td></tr>
+    <tr><td class="paramname">user_id</td><td>执行操作的用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>用户类型，必须为管理员 </td></tr>
+    <tr><td class="paramname">standard</td><td>费用标准结构体指针，包含要添加的标准详情 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="transaction_8c_a4d17744da0eddfe6f758f935b79ed99e_cgraph.png" border="0" usemap="#atransaction_8c_a4d17744da0eddfe6f758f935b79ed99e_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="ac83e1833361d46781d99f292bc67c48e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac83e1833361d46781d99f292bc67c48e">&#9670;&nbsp;</a></span>add_transaction()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool add_transaction </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Transaction *&#160;</td>
+          <td class="paramname"><em>transaction</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>添加交易记录</p>
+<p>向系统中添加新的交易记录</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接指针 </td></tr>
+    <tr><td class="paramname">user_id</td><td>执行操作的用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>用户类型 </td></tr>
+    <tr><td class="paramname">transaction</td><td>交易记录结构体指针，包含要添加的交易详情 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="transaction_8c_ac83e1833361d46781d99f292bc67c48e_cgraph.png" border="0" usemap="#atransaction_8c_ac83e1833361d46781d99f292bc67c48e_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="adc8ec87ffc99084abadde5f985eabfa7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc8ec87ffc99084abadde5f985eabfa7">&#9670;&nbsp;</a></span>generate_transaction_id()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char* generate_transaction_id </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p><a class="el" href="transaction_8c.html">transaction.c</a> 交易记录和费用标准管理模块</p>
+<p>该模块实现物业管理系统中与财务交易相关的功能，包括：</p><ol type="1">
+<li>费用标准的添加和查询</li>
+<li>交易记录的添加和查询</li>
+<li>支持按业主查询交易历史</li>
+</ol>
+<p>预期实现：</p><ul>
+<li>添加费用标准：管理员可设置不同类型的费用标准</li>
+<li>获取当前费用标准：根据交易类型获取当前有效的费用标准</li>
+<li>添加交易记录：记录业主的缴费信息</li>
+<li>查询业主交易记录：获取特定业主的所有交易历史 生成交易ID</li>
+</ul>
+<p>创建一个唯一的UUID作为交易记录的标识符</p>
+<dl class="section return"><dt>返回</dt><dd>返回生成的交易ID字符串 </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="transaction_8c_adc8ec87ffc99084abadde5f985eabfa7_cgraph.png" border="0" usemap="#atransaction_8c_adc8ec87ffc99084abadde5f985eabfa7_cgraph" alt=""/></div>
+</div>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="transaction_8c_adc8ec87ffc99084abadde5f985eabfa7_icgraph.png" border="0" usemap="#atransaction_8c_adc8ec87ffc99084abadde5f985eabfa7_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="af75f92e36a69175063fdf306b3a69534"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af75f92e36a69175063fdf306b3a69534">&#9670;&nbsp;</a></span>get_current_fee_standard()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool get_current_fee_standard </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>fee_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">FeeStandard *&#160;</td>
+          <td class="paramname"><em>standard</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>获取当前费用标准</p>
+<p>根据费用类型获取当前生效的费用标准</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接指针 </td></tr>
+    <tr><td class="paramname">fee_type</td><td>要查询的费用类型 </td></tr>
+    <tr><td class="paramname">standard</td><td>输出参数，用于存储查询到的费用标准 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="transaction_8c_af75f92e36a69175063fdf306b3a69534_cgraph.png" border="0" usemap="#atransaction_8c_af75f92e36a69175063fdf306b3a69534_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a53cf9a26c545a88fd107e171830fbd1e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a53cf9a26c545a88fd107e171830fbd1e">&#9670;&nbsp;</a></span>get_owner_transactions()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool get_owner_transactions </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>owner_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QueryResult *&#160;</td>
+          <td class="paramname"><em>result</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>获取业主交易记录</p>
+<p>查询特定业主的所有交易历史记录</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接指针 </td></tr>
+    <tr><td class="paramname">user_id</td><td>执行查询的用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>用户类型 </td></tr>
+    <tr><td class="paramname">owner_id</td><td>要查询的业主ID </td></tr>
+    <tr><td class="paramname">result</td><td>输出参数，存储查询结果 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="transaction_8c_a53cf9a26c545a88fd107e171830fbd1e_cgraph.png" border="0" usemap="#atransaction_8c_a53cf9a26c545a88fd107e171830fbd1e_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a5d2c47446eeedb6a3805bb46c98d023b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5d2c47446eeedb6a3805bb46c98d023b">&#9670;&nbsp;</a></span>get_parking_transactions()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool get_parking_transactions </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>parking_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QueryResult *&#160;</td>
+          <td class="paramname"><em>result</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>获取停车位交易记录</p>
+<p>查询特定停车位的所有交易历史记录，包含权限验证</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接指针 </td></tr>
+    <tr><td class="paramname">user_id</td><td>执行查询的用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>用户类型 </td></tr>
+    <tr><td class="paramname">parking_id</td><td>要查询的停车位ID </td></tr>
+    <tr><td class="paramname">result</td><td>输出参数，存储查询结果 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="transaction_8c_a5d2c47446eeedb6a3805bb46c98d023b_cgraph.png" border="0" usemap="#atransaction_8c_a5d2c47446eeedb6a3805bb46c98d023b_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a3723cd95f922f8ce31c8cea5fdc513d5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3723cd95f922f8ce31c8cea5fdc513d5">&#9670;&nbsp;</a></span>get_room_transactions()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool get_room_transactions </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>room_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QueryResult *&#160;</td>
+          <td class="paramname"><em>result</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>获取房屋交易记录</p>
+<p>查询特定房屋的所有交易历史记录，包含权限验证</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接指针 </td></tr>
+    <tr><td class="paramname">user_id</td><td>执行查询的用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>用户类型 </td></tr>
+    <tr><td class="paramname">room_id</td><td>要查询的房屋ID </td></tr>
+    <tr><td class="paramname">result</td><td>输出参数，存储查询结果 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="transaction_8c_a3723cd95f922f8ce31c8cea5fdc513d5_cgraph.png" border="0" usemap="#atransaction_8c_a3723cd95f922f8ce31c8cea5fdc513d5_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+</small></address>
+</body>
+</html>

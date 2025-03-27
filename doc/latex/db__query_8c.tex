@@ -1,0 +1,221 @@
+\hypertarget{db__query_8c}{}\doxysection{src/db/db\+\_\+query.c 文件参考}
+\label{db__query_8c}\index{src/db/db\_query.c@{src/db/db\_query.c}}
+{\ttfamily \#include \char`\"{}db/db\+\_\+query.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}auth/auth.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$stdarg.\+h$>$}\newline
+db\+\_\+query.\+c 的引用(Include)关系图\+:
+% FIG 0
+\doxysubsection*{函数}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{db__query_8c_ad6a50f994e852c3e41ca39df52927b8a}{execute\+\_\+query}} (Database $\ast$db, const char $\ast$sql, Query\+Result $\ast$result)
+\item 
+bool \mbox{\hyperlink{db__query_8c_a8e8357f0e514181200d759cc87a3a088}{execute\+\_\+update}} (Database $\ast$db, const char $\ast$sql)
+\item 
+void \mbox{\hyperlink{db__query_8c_ad4c3a29daaeb7d4428edf4dbb111f1b5}{free\+\_\+query\+\_\+result}} (Query\+Result $\ast$result)
+\item 
+bool \mbox{\hyperlink{db__query_8c_aa4115e4bbd68ea1cb8b8c56b6a33488a}{get\+\_\+building\+\_\+id\+\_\+by\+\_\+name}} (Database $\ast$db, const char $\ast$building\+\_\+name, char $\ast$building\+\_\+id)
+\item 
+int \mbox{\hyperlink{db__query_8c_a80394962a697f8b8a250219d12eb2329}{db\+\_\+compound\+\_\+query}} (Database $\ast$db, const char $\ast$query, Query\+Result $\ast$result)
+\item 
+int \mbox{\hyperlink{db__query_8c_ad629e0cf10ea429757528e1bc3ffe58c}{db\+\_\+fuzzy\+\_\+query}} (Database $\ast$db, const char $\ast$table, const char $\ast$column, const char $\ast$pattern, Query\+Result $\ast$result)
+\item 
+int \mbox{\hyperlink{db__query_8c_ab5db06d4f3195a158091f32f5264a311}{db\+\_\+privileged\+\_\+query}} (Database $\ast$db, const char $\ast$query, int weight, Query\+Result $\ast$result)
+\item 
+int \mbox{\hyperlink{db__query_8c_aeabacd9008df0c7e4261e94ff23482db}{db\+\_\+parameterized\+\_\+query}} (Database $\ast$db, const char $\ast$query, void $\ast$params, void($\ast$bind\+\_\+params)(sqlite3\+\_\+stmt $\ast$, void $\ast$), Query\+Result $\ast$result)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{函数说明}
+\mbox{\Hypertarget{db__query_8c_a80394962a697f8b8a250219d12eb2329}\label{db__query_8c_a80394962a697f8b8a250219d12eb2329}} 
+\index{db\_query.c@{db\_query.c}!db\_compound\_query@{db\_compound\_query}}
+\index{db\_compound\_query@{db\_compound\_query}!db\_query.c@{db\_query.c}}
+\doxysubsubsection{\texorpdfstring{db\_compound\_query()}{db\_compound\_query()}}
+{\footnotesize\ttfamily int db\+\_\+compound\+\_\+query (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{query,  }\item[{Query\+Result $\ast$}]{result }\end{DoxyParamCaption})}
+
+db\+\_\+compound\+\_\+query -\/ 执行复合查询
+
+执行涉及多表联合的复杂\+SQL查询
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接指针 \\
+\hline
+{\em query} & 要执行的复合\+SQL查询 \\
+\hline
+{\em result} & 用于存储查询结果的结构指针 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+SQLITE\+\_\+\+OK表示成功，其他值表示失败 
+\end{DoxyReturn}
+\mbox{\Hypertarget{db__query_8c_ad629e0cf10ea429757528e1bc3ffe58c}\label{db__query_8c_ad629e0cf10ea429757528e1bc3ffe58c}} 
+\index{db\_query.c@{db\_query.c}!db\_fuzzy\_query@{db\_fuzzy\_query}}
+\index{db\_fuzzy\_query@{db\_fuzzy\_query}!db\_query.c@{db\_query.c}}
+\doxysubsubsection{\texorpdfstring{db\_fuzzy\_query()}{db\_fuzzy\_query()}}
+{\footnotesize\ttfamily int db\+\_\+fuzzy\+\_\+query (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{table,  }\item[{const char $\ast$}]{column,  }\item[{const char $\ast$}]{pattern,  }\item[{Query\+Result $\ast$}]{result }\end{DoxyParamCaption})}
+
+db\+\_\+fuzzy\+\_\+query -\/ 执行模糊查询
+
+使用模糊匹配条件执行\+SQL查询
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接指针 \\
+\hline
+{\em table} & 要查询的表名 \\
+\hline
+{\em column} & 要进行模糊匹配的列名 \\
+\hline
+{\em pattern} & 模糊匹配的模式 \\
+\hline
+{\em result} & 用于存储查询结果的结构指针 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+SQLITE\+\_\+\+OK表示成功，其他值表示失败 
+\end{DoxyReturn}
+\mbox{\Hypertarget{db__query_8c_aeabacd9008df0c7e4261e94ff23482db}\label{db__query_8c_aeabacd9008df0c7e4261e94ff23482db}} 
+\index{db\_query.c@{db\_query.c}!db\_parameterized\_query@{db\_parameterized\_query}}
+\index{db\_parameterized\_query@{db\_parameterized\_query}!db\_query.c@{db\_query.c}}
+\doxysubsubsection{\texorpdfstring{db\_parameterized\_query()}{db\_parameterized\_query()}}
+{\footnotesize\ttfamily int db\+\_\+parameterized\+\_\+query (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{query,  }\item[{void $\ast$}]{params,  }\item[{void($\ast$)(sqlite3\+\_\+stmt $\ast$, void $\ast$)}]{bind\+\_\+params,  }\item[{Query\+Result $\ast$}]{result }\end{DoxyParamCaption})}
+
+db\+\_\+parameterized\+\_\+query -\/ 执行参数化查询
+
+使用预编译语句和参数绑定执行\+SQL查询，防止\+SQL注入
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接指针 \\
+\hline
+{\em query} & 要执行的参数化\+SQL查询 \\
+\hline
+{\em params} & 参数数据结构指针 \\
+\hline
+{\em bind\+\_\+params} & 用于绑定参数的回调函数 \\
+\hline
+{\em result} & 用于存储查询结果的结构指针 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+SQLITE\+\_\+\+OK表示成功，其他值表示失败 
+\end{DoxyReturn}
+函数调用图\+:
+% FIG 1
+\mbox{\Hypertarget{db__query_8c_ab5db06d4f3195a158091f32f5264a311}\label{db__query_8c_ab5db06d4f3195a158091f32f5264a311}} 
+\index{db\_query.c@{db\_query.c}!db\_privileged\_query@{db\_privileged\_query}}
+\index{db\_privileged\_query@{db\_privileged\_query}!db\_query.c@{db\_query.c}}
+\doxysubsubsection{\texorpdfstring{db\_privileged\_query()}{db\_privileged\_query()}}
+{\footnotesize\ttfamily int db\+\_\+privileged\+\_\+query (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{query,  }\item[{int}]{weight,  }\item[{Query\+Result $\ast$}]{result }\end{DoxyParamCaption})}
+
+db\+\_\+privileged\+\_\+query -\/ 执行特权查询
+
+基于用户权重执行访问控制的查询
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接指针 \\
+\hline
+{\em query} & 要执行的\+SQL查询 \\
+\hline
+{\em weight} & 用户权重值 \\
+\hline
+{\em result} & 用于存储查询结果的结构指针 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+SQLITE\+\_\+\+OK表示成功，其他值表示失败 
+\end{DoxyReturn}
+\mbox{\Hypertarget{db__query_8c_ad6a50f994e852c3e41ca39df52927b8a}\label{db__query_8c_ad6a50f994e852c3e41ca39df52927b8a}} 
+\index{db\_query.c@{db\_query.c}!execute\_query@{execute\_query}}
+\index{execute\_query@{execute\_query}!db\_query.c@{db\_query.c}}
+\doxysubsubsection{\texorpdfstring{execute\_query()}{execute\_query()}}
+{\footnotesize\ttfamily bool execute\+\_\+query (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{sql,  }\item[{Query\+Result $\ast$}]{result }\end{DoxyParamCaption})}
+
+execute\+\_\+query -\/ 执行\+SQL查询
+
+执行指定的\+SQL查询语句并将结果存入\+Query\+Result结构
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接指针 \\
+\hline
+{\em sql} & 要执行的\+SQL查询语句 \\
+\hline
+{\em result} & 用于存储查询结果的结构指针 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+true表示成功，false表示失败 
+\end{DoxyReturn}
+这是这个函数的调用关系图\+:
+% FIG 2
+\mbox{\Hypertarget{db__query_8c_a8e8357f0e514181200d759cc87a3a088}\label{db__query_8c_a8e8357f0e514181200d759cc87a3a088}} 
+\index{db\_query.c@{db\_query.c}!execute\_update@{execute\_update}}
+\index{execute\_update@{execute\_update}!db\_query.c@{db\_query.c}}
+\doxysubsubsection{\texorpdfstring{execute\_update()}{execute\_update()}}
+{\footnotesize\ttfamily bool execute\+\_\+update (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{sql }\end{DoxyParamCaption})}
+
+execute\+\_\+update -\/ 执行\+SQL更新操作
+
+执行插入、更新或删除等修改数据库的\+SQL语句
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接指针 \\
+\hline
+{\em sql} & 要执行的\+SQL语句 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+true表示成功，false表示失败 
+\end{DoxyReturn}
+这是这个函数的调用关系图\+:
+% FIG 3
+\mbox{\Hypertarget{db__query_8c_ad4c3a29daaeb7d4428edf4dbb111f1b5}\label{db__query_8c_ad4c3a29daaeb7d4428edf4dbb111f1b5}} 
+\index{db\_query.c@{db\_query.c}!free\_query\_result@{free\_query\_result}}
+\index{free\_query\_result@{free\_query\_result}!db\_query.c@{db\_query.c}}
+\doxysubsubsection{\texorpdfstring{free\_query\_result()}{free\_query\_result()}}
+{\footnotesize\ttfamily void free\+\_\+query\+\_\+result (\begin{DoxyParamCaption}\item[{Query\+Result $\ast$}]{result }\end{DoxyParamCaption})}
+
+free\+\_\+query\+\_\+result -\/ 释放查询结果资源
+
+释放\+Query\+Result结构中分配的所有内存
+
+
+\begin{DoxyParams}{参数}
+{\em result} & 要释放的查询结果结构指针 \\
+\hline
+\end{DoxyParams}
+这是这个函数的调用关系图\+:
+% FIG 4
+\mbox{\Hypertarget{db__query_8c_aa4115e4bbd68ea1cb8b8c56b6a33488a}\label{db__query_8c_aa4115e4bbd68ea1cb8b8c56b6a33488a}} 
+\index{db\_query.c@{db\_query.c}!get\_building\_id\_by\_name@{get\_building\_id\_by\_name}}
+\index{get\_building\_id\_by\_name@{get\_building\_id\_by\_name}!db\_query.c@{db\_query.c}}
+\doxysubsubsection{\texorpdfstring{get\_building\_id\_by\_name()}{get\_building\_id\_by\_name()}}
+{\footnotesize\ttfamily bool get\+\_\+building\+\_\+id\+\_\+by\+\_\+name (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{building\+\_\+name,  }\item[{char $\ast$}]{building\+\_\+id }\end{DoxyParamCaption})}
+
+get\+\_\+building\+\_\+id\+\_\+by\+\_\+name -\/ 通过建筑名称获取建筑\+ID
+
+根据给定的建筑名称查询对应的建筑\+ID
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接指针 \\
+\hline
+{\em building\+\_\+name} & 建筑名称 \\
+\hline
+{\em building\+\_\+id} & 用于存储查询到的建筑\+ID的缓冲区 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+true表示成功找到，false表示未找到或查询失败 
+\end{DoxyReturn}
+函数调用图\+:
+% FIG 5
+这是这个函数的调用关系图\+:
+% FIG 6

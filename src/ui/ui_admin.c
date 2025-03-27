@@ -1,21 +1,17 @@
-//////////////////////////////////////////////////////////////
-// 文件名: ui_admin.c
-//
-// 功能: 实现物业管理系统的管理员界面相关功能
-//
-// 主要模块:
-// 1. 管理员主界面 - 显示管理员可以访问的所有功能入口
-// 2. 信息管理界面 - 提供对楼盘、住户、用户等基本信息的增删改查功能
-// 3. 服务分配界面 - 管理员分配物业服务请求给相应工作人员
-// 4. 信息查询界面 - 按照不同条件查询系统内的各类信息
-// 5. 信息排序界面 - 根据不同条件对查询结果进行排序展示
-// 6. 信息统计界面 - 对系统内数据进行统计分析并呈现
-// 7. 系统维护界面 - 系统备份、恢复和维护相关功能
-//
-// 预期实现: 为管理员提供友好的命令行交互界面，展示菜单选项，
-// 接收用户输入，调用相应的数据库操作函数，并展示操作结果。
-// 确保系统操作安全性并提供适当的错误处理和用户反馈。
-//////////////////////////////////////////////////////////////
+/**
+ * @file ui_admin.c
+ * @brief 物业管理系统管理员界面功能实现
+ *
+ * 本文件实现了物业管理系统中管理员界面的所有相关功能：
+ * - 管理员主界面
+ * - 信息管理界面
+ * - 服务分配界面
+ * - 信息查询界面
+ * - 信息排序界面
+ * - 信息统计界面
+ * - 系统维护界面
+ * - 测试功能界面
+ */
 
 #include "ui/ui_admin.h"
 #include "ui/ui_login.h"
@@ -25,6 +21,7 @@
 #include "models/transaction.h"
 #include "models/service.h"
 #include "db/db_query.h"
+#include "db/db_utils.h"
 #include "utils/utils.h"
 #include "utils/file_ops.h"
 #include "utils/console.h"
@@ -32,23 +29,26 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-void show_info_management_screen(Database *db, const char *user_id, UserType user_type);
-void show_service_assignment_screen(Database *db, const char *user_id, UserType user_type);
-void show_info_query_screen(Database *db, const char *user_id, UserType user_type);
-void show_info_sort_screen(Database *db, const char *user_id, UserType user_type);
-void show_info_statistics_screen(Database *db, const char *user_id, UserType user_type);
-void show_system_maintenance_screen(Database *db, const char *user_id, UserType user_type);
-void show_apartment_test_screen(Database *db, const char *user_id, UserType user_type);
-// 添加楼宇测试界面函数声明
-void show_building_test_screen(Database *db, const char *user_id, UserType user_type);
 
-// 在文件顶部添加这个函数声明
+/**
+ * @brief 清屏函数
+ *
+ * 清除控制台显示内容，适用于Windows和Unix/Linux系统
+ */
 void clear_screen()
 {
     system("clear||cls");
 }
 
-// 显示管理员主界面
+/**
+ * @brief 显示管理员主界面
+ *
+ * 显示管理员系统的主菜单，提供各功能模块的入口
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
 void show_admin_main_screen(Database *db, const char *user_id, UserType user_type)
 {
     printf("\n=== 物业服务管理系统主页面 ===\n");
@@ -101,40 +101,139 @@ void show_admin_main_screen(Database *db, const char *user_id, UserType user_typ
     }
 }
 
-// 信息管理界面
+/**
+ * @brief 显示信息管理界面
+ *
+ * 提供对系统基本信息（如楼盘、住户、用户等）的增删改查功能
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
 void show_info_management_screen(Database *db, const char *user_id, UserType user_type)
 {
     // TODO: 实现信息管理界面功能
 }
 
-// 服务分配界面
+/**
+ * @brief 显示服务分配界面
+ *
+ * 管理员将物业服务请求分配给相应工作人员的界面
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
 void show_service_assignment_screen(Database *db, const char *user_id, UserType user_type)
 {
     // TODO: 实现服务分配界面功能
 }
 
-// 信息查询界面
+/**
+ * @brief 显示信息查询界面
+ *
+ * 提供按不同条件查询系统内各类信息的功能
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
 void show_info_query_screen(Database *db, const char *user_id, UserType user_type)
 {
     // TODO: 实现信息查询界面功能
 }
 
-// 信息排序界面
+/**
+ * @brief 显示信息排序界面
+ *
+ * 根据不同条件对查询结果进行排序展示的功能
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
 void show_info_sort_screen(Database *db, const char *user_id, UserType user_type)
 {
     // TODO: 实现信息排序界面功能
 }
 
-// 信息统计界面
+/**
+ * @brief 显示信息统计界面
+ *
+ * 对系统内数据进行统计分析并呈现的功能
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
 void show_info_statistics_screen(Database *db, const char *user_id, UserType user_type)
 {
     // TODO: 实现信息统计界面功能
 }
 
-// 系统维护界面
+/**
+ * @brief 显示系统维护界面
+ *
+ * 提供系统备份、恢复、用户信息更新和费用标准管理等功能
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
 void show_system_maintenance_screen(Database *db, const char *user_id, UserType user_type)
 {
-    // TODO: 实现系统维护界面功能
+    int choice;
+
+    while (1)
+    {
+        system("cls");
+        printf("\n===== 系统维护 =====\n");
+        printf("1. 数据备份\n");
+        printf("2. 数据恢复\n");
+        printf("3. 更新用户信息\n");
+        printf("4. 更新费用标准\n");
+        printf("5. 用户权限设置\n");
+        printf("6. 费用标准管理\n");
+        printf("0. 返回上一级\n");
+        printf("请输入您的选择: ");
+        scanf("%d", &choice);
+        getchar(); // 清除输入缓冲区
+
+        switch (choice)
+        {
+        case 1:
+            backup_database(db);
+            printf("数据备份完成\n");
+            printf("按任意键继续...");
+            getchar();
+            break;
+        case 2:
+            restore_database(db);
+            printf("数据恢复完成\n");
+            printf("按任意键继续...");
+            getchar();
+            break;
+        case 3:
+            // 更新用户信息的实现
+            break;
+        case 4:
+            // 更新费用标准的实现
+            break;
+        case 5:
+            // 用户权限设置的实现
+            break;
+        case 6:
+            manage_fee_standards_screen(db, user_id, user_type);
+            break;
+        case 0:
+            return;
+        default:
+            printf("无效的选择\n");
+            printf("按任意键继续...");
+            getchar();
+            break;
+        }
+    }
 }
 
 ////////////////////////////////////////////////
@@ -145,6 +244,15 @@ void show_system_maintenance_screen(Database *db, const char *user_id, UserType 
 //                                            //
 ////////////////////////////////////////////////
 
+/**
+ * @brief 显示房屋管理测试界面
+ *
+ * 提供添加、更新、删除、查询房屋信息等功能，用于测试
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
 void show_apartment_test_screen(Database *db, const char *user_id, UserType user_type)
 {
     while (1)
@@ -429,7 +537,15 @@ void show_apartment_test_screen(Database *db, const char *user_id, UserType user
     }
 }
 
-// 实现楼宇管理测试界面
+/**
+ * @brief 显示楼宇管理测试界面
+ *
+ * 提供添加、修改、删除、查询楼宇信息等功能，用于测试
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
 void show_building_test_screen(Database *db, const char *user_id, UserType user_type)
 //实现信息查询页面
 void show_info_query_screen(Database* db, const char* user_id, UserType user_type)
@@ -757,3 +873,329 @@ void show_info_statistics_screen(Database* db, const char* user_id, UserType use
 
 
 
+
+
+/**
+ * @brief 生成周期性费用界面
+ *
+ * 按年月生成物业费、停车费等周期性费用的界面
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
+void generate_periodic_fees_screen(Database *db, const char *user_id, UserType user_type)
+{
+    if (user_type != USER_ADMIN)
+    {
+        printf("权限不足，无法访问此功能\n");
+        return;
+    }
+
+    int year, month, fee_type, due_days;
+
+    system("cls");
+    printf("\n===== 生成周期性费用 =====\n");
+    printf("请输入年份: ");
+    scanf("%d", &year);
+    getchar(); // 清除输入缓冲区
+
+    printf("请输入月份(1-12): ");
+    scanf("%d", &month);
+    getchar(); // 清除输入缓冲区
+
+    if (month < 1 || month > 12)
+    {
+        printf("无效的月份\n");
+        printf("按任意键返回...");
+        getchar();
+        return;
+    }
+
+    printf("请选择费用类型:\n");
+    printf("1. 物业费\n");
+    printf("2. 停车费\n");
+    printf("3. 全部\n");
+    printf("请输入(1-3): ");
+    scanf("%d", &fee_type);
+    getchar(); // 清除输入缓冲区
+
+    printf("请输入付款截止天数(从月底开始计算): ");
+    scanf("%d", &due_days);
+    getchar(); // 清除输入缓冲区
+
+    // 计算账单开始和结束日期
+    struct tm start_tm = {0}, end_tm = {0};
+    start_tm.tm_year = year - 1900;
+    start_tm.tm_mon = month - 1;
+    start_tm.tm_mday = 1;
+
+    end_tm.tm_year = year - 1900;
+    end_tm.tm_mon = month;
+    end_tm.tm_mday = 0; // 这会自动调整为上个月的最后一天
+
+    time_t period_start = mktime(&start_tm);
+    time_t period_end = mktime(&end_tm);
+
+    bool success = true;
+
+    if (fee_type == 1 || fee_type == 3)
+    {
+        success &= generate_property_fees(db, period_start, period_end, due_days);
+    }
+
+    if (fee_type == 2 || fee_type == 3)
+    {
+        success &= generate_parking_fees(db, period_start, period_end, due_days);
+    }
+
+    if (success)
+    {
+        printf("成功生成%d年%d月的费用账单\n", year, month);
+    }
+    else
+    {
+        printf("生成费用账单时发生错误\n");
+    }
+
+    printf("按任意键返回...");
+    getchar();
+}
+
+/**
+ * @brief 费用标准管理界面
+ *
+ * 提供查看、添加费用标准和生成周期性费用的功能
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
+void manage_fee_standards_screen(Database *db, const char *user_id, UserType user_type)
+{
+    if (user_type != USER_ADMIN)
+    {
+        printf("权限不足，无法访问此功能\n");
+        return;
+    }
+
+    int choice;
+    while (1)
+    {
+        system("cls");
+        printf("\n===== 费用标准管理 =====\n");
+        printf("1. 查看现有费用标准\n");
+        printf("2. 添加新费用标准\n");
+        printf("3. 生成周期性费用\n");
+        printf("0. 返回上一级\n");
+        printf("请输入您的选择: ");
+        scanf("%d", &choice);
+        getchar(); // 清除输入缓冲区
+
+        switch (choice)
+        {
+        case 1:
+            // 查看费用标准实现
+            {
+                system("cls");
+                printf("\n===== 现有费用标准 =====\n");
+
+                char query[512];
+                QueryResult result;
+
+                snprintf(query, sizeof(query),
+                         "SELECT standard_id, fee_type, price_per_unit, unit, effective_date, end_date "
+                         "FROM fee_standards "
+                         "ORDER BY fee_type, effective_date DESC");
+
+                if (!execute_query(db, query, &result))
+                {
+                    printf("查询费用标准失败\n");
+                    printf("按任意键返回...");
+                    getchar();
+                    break;
+                }
+
+                if (result.row_count == 0)
+                {
+                    printf("暂无费用标准记录\n");
+                    free_query_result(&result);
+                    printf("按任意键返回...");
+                    getchar();
+                    break;
+                }
+
+                printf("%-12s %-15s %-12s %-10s %-15s %-15s\n",
+                       "标准ID", "费用类型", "单价", "单位", "生效日期", "终止日期");
+
+                char fee_type_str[20];
+                struct tm tm_info;
+                char start_date_str[20], end_date_str[20];
+
+                for (int i = 0; i < result.row_count; i++)
+                {
+                    // 费用类型
+                    int fee_type = atoi(result.rows[i].values[1]);
+                    switch (fee_type)
+                    {
+                    case TRANS_PROPERTY_FEE:
+                        strcpy(fee_type_str, "物业费");
+                        break;
+                    case TRANS_PARKING_FEE:
+                        strcpy(fee_type_str, "停车费");
+                        break;
+                    case TRANS_WATER_FEE:
+                        strcpy(fee_type_str, "水费");
+                        break;
+                    case TRANS_ELECTRICITY_FEE:
+                        strcpy(fee_type_str, "电费");
+                        break;
+                    case TRANS_GAS_FEE:
+                        strcpy(fee_type_str, "燃气费");
+                        break;
+                    default:
+                        strcpy(fee_type_str, "其他费用");
+                        break;
+                    }
+
+                    // 生效日期
+                    time_t effective_date = (time_t)atol(result.rows[i].values[4]);
+                    localtime_r(&effective_date, &tm_info);
+                    strftime(start_date_str, sizeof(start_date_str), "%Y-%m-%d", &tm_info);
+
+                    // 终止日期
+                    time_t end_date = (time_t)atol(result.rows[i].values[5]);
+                    if (end_date == 0)
+                    {
+                        strcpy(end_date_str, "无限期");
+                    }
+                    else
+                    {
+                        localtime_r(&end_date, &tm_info);
+                        strftime(end_date_str, sizeof(end_date_str), "%Y-%m-%d", &tm_info);
+                    }
+
+                    printf("%-12s %-15s %-12.2f %-10s %-15s %-15s\n",
+                           result.rows[i].values[0], // 标准ID
+                           fee_type_str,
+                           atof(result.rows[i].values[2]), // 单价
+                           result.rows[i].values[3],       // 单位
+                           start_date_str,
+                           end_date_str);
+                }
+
+                free_query_result(&result);
+                printf("\n按任意键返回...");
+                getchar();
+            }
+            break;
+        case 2:
+            // 添加费用标准实现
+            {
+                system("cls");
+                printf("\n===== 添加新费用标准 =====\n");
+
+                FeeStandard standard;
+                memset(&standard, 0, sizeof(FeeStandard));
+
+                generate_uuid(standard.standard_id);
+
+                printf("请选择费用类型:\n");
+                printf("1. 物业费\n");
+                printf("2. 停车费\n");
+                printf("3. 水费\n");
+                printf("4. 电费\n");
+                printf("5. 燃气费\n");
+                printf("99. 其他费用\n");
+                printf("请输入: ");
+                scanf("%d", &standard.fee_type);
+                getchar(); // 清除输入缓冲区
+
+                printf("请输入单价: ");
+                scanf("%f", &standard.price_per_unit);
+                getchar(); // 清除输入缓冲区
+
+                printf("请输入计费单位(如元/平方米/月、元/个/月): ");
+                scanf("%15s", standard.unit);
+                getchar(); // 清除输入缓冲区
+
+                printf("请输入生效日期(格式: YYYY-MM-DD): ");
+                char date_str[20];
+                scanf("%19s", date_str);
+                getchar(); // 清除输入缓冲区
+
+                // 解析日期
+                struct tm tm_info = {0};
+                if (sscanf(date_str, "%d-%d-%d", &tm_info.tm_year, &tm_info.tm_mon, &tm_info.tm_mday) == 3)
+                {
+                    tm_info.tm_year -= 1900; // 年份需要减去1900
+                    tm_info.tm_mon -= 1;     // 月份是从0开始的
+                    standard.effective_date = mktime(&tm_info);
+                }
+                else
+                {
+                    printf("日期格式错误\n");
+                    printf("按任意键返回...");
+                    getchar();
+                    break;
+                }
+
+                printf("是否设置终止日期? (1-是, 0-无限期): ");
+                int has_end_date;
+                scanf("%d", &has_end_date);
+                getchar(); // 清除输入缓冲区
+
+                if (has_end_date)
+                {
+                    printf("请输入终止日期(格式: YYYY-MM-DD): ");
+                    scanf("%19s", date_str);
+                    getchar(); // 清除输入缓冲区
+
+                    // 解析日期
+                    struct tm end_tm = {0};
+                    if (sscanf(date_str, "%d-%d-%d", &end_tm.tm_year, &end_tm.tm_mon, &end_tm.tm_mday) == 3)
+                    {
+                        end_tm.tm_year -= 1900; // 年份需要减去1900
+                        end_tm.tm_mon -= 1;     // 月份是从0开始的
+                        standard.end_date = mktime(&end_tm);
+                    }
+                    else
+                    {
+                        printf("日期格式错误\n");
+                        printf("按任意键返回...");
+                        getchar();
+                        break;
+                    }
+                }
+                else
+                {
+                    standard.end_date = 0; // 无限期
+                }
+
+                // 添加费用标准
+                if (add_fee_standard(db, user_id, user_type, &standard))
+                {
+                    printf("成功添加费用标准\n");
+                }
+                else
+                {
+                    printf("添加费用标准失败\n");
+                }
+
+                printf("按任意键返回...");
+                getchar();
+            }
+            break;
+        case 3:
+            generate_periodic_fees_screen(db, user_id, user_type);
+            break;
+        case 0:
+            return;
+        default:
+            printf("无效的选择，请重新输入\n");
+            printf("按任意键继续...");
+            getchar();
+            break;
+        }
+    }
+}

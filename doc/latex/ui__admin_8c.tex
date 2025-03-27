@@ -1,0 +1,131 @@
+\hypertarget{ui__admin_8c}{}\doxysection{src/ui/ui\+\_\+admin.c 文件参考}
+\label{ui__admin_8c}\index{src/ui/ui\_admin.c@{src/ui/ui\_admin.c}}
+{\ttfamily \#include \char`\"{}ui/ui\+\_\+admin.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}ui/ui\+\_\+login.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}models/building.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}models/apartment.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}models/user.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}models/transaction.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}models/service.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}db/db\+\_\+query.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}utils/utils.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}utils/file\+\_\+ops.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}utils/console.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$time.\+h$>$}\newline
+ui\+\_\+admin.\+c 的引用(Include)关系图\+:
+% FIG 0
+\doxysubsection*{函数}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{ui__admin_8c_aa0525a5c85dfd96708a51d62b7c30f4c}{show\+\_\+info\+\_\+management\+\_\+screen}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type)
+\item 
+void \mbox{\hyperlink{ui__admin_8c_a75f2aae2a32316b61dbe06d34e736457}{show\+\_\+service\+\_\+assignment\+\_\+screen}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type)
+\item 
+void \mbox{\hyperlink{ui__admin_8c_a3fcf8622a29a96d10af73d7739aa5a4f}{show\+\_\+info\+\_\+query\+\_\+screen}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type)
+\item 
+void \mbox{\hyperlink{ui__admin_8c_a66676641c925f4ca29871bb326b8464e}{show\+\_\+info\+\_\+sort\+\_\+screen}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type)
+\item 
+void \mbox{\hyperlink{ui__admin_8c_af06cf458605a75f367562e8a7bde280e}{show\+\_\+info\+\_\+statistics\+\_\+screen}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type)
+\item 
+void \mbox{\hyperlink{ui__admin_8c_a61e9828b6d3a25995a8212a070c3ca52}{show\+\_\+system\+\_\+maintenance\+\_\+screen}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type)
+\item 
+void \mbox{\hyperlink{ui__admin_8c_afb1825a611f2a3637dd802beeb235f60}{show\+\_\+apartment\+\_\+test\+\_\+screen}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type)
+\item 
+void \mbox{\hyperlink{ui__admin_8c_a9867a3e3ca13d713114fb0e364e0aabb}{show\+\_\+building\+\_\+test\+\_\+screen}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type)
+\item 
+void \mbox{\hyperlink{ui__admin_8c_a4953d1edcbbfc7e420c423ded1d5621a}{clear\+\_\+screen}} ()
+\item 
+void \mbox{\hyperlink{ui__admin_8c_adc4f1afd300f7fedcbfd7fe7497147d8}{show\+\_\+admin\+\_\+main\+\_\+screen}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{函数说明}
+\mbox{\Hypertarget{ui__admin_8c_a4953d1edcbbfc7e420c423ded1d5621a}\label{ui__admin_8c_a4953d1edcbbfc7e420c423ded1d5621a}} 
+\index{ui\_admin.c@{ui\_admin.c}!clear\_screen@{clear\_screen}}
+\index{clear\_screen@{clear\_screen}!ui\_admin.c@{ui\_admin.c}}
+\doxysubsubsection{\texorpdfstring{clear\_screen()}{clear\_screen()}}
+{\footnotesize\ttfamily void clear\+\_\+screen (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+这是这个函数的调用关系图\+:
+% FIG 1
+\mbox{\Hypertarget{ui__admin_8c_adc4f1afd300f7fedcbfd7fe7497147d8}\label{ui__admin_8c_adc4f1afd300f7fedcbfd7fe7497147d8}} 
+\index{ui\_admin.c@{ui\_admin.c}!show\_admin\_main\_screen@{show\_admin\_main\_screen}}
+\index{show\_admin\_main\_screen@{show\_admin\_main\_screen}!ui\_admin.c@{ui\_admin.c}}
+\doxysubsubsection{\texorpdfstring{show\_admin\_main\_screen()}{show\_admin\_main\_screen()}}
+{\footnotesize\ttfamily void show\+\_\+admin\+\_\+main\+\_\+screen (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type }\end{DoxyParamCaption})}
+
+函数调用图\+:
+% FIG 2
+这是这个函数的调用关系图\+:
+% FIG 3
+\mbox{\Hypertarget{ui__admin_8c_afb1825a611f2a3637dd802beeb235f60}\label{ui__admin_8c_afb1825a611f2a3637dd802beeb235f60}} 
+\index{ui\_admin.c@{ui\_admin.c}!show\_apartment\_test\_screen@{show\_apartment\_test\_screen}}
+\index{show\_apartment\_test\_screen@{show\_apartment\_test\_screen}!ui\_admin.c@{ui\_admin.c}}
+\doxysubsubsection{\texorpdfstring{show\_apartment\_test\_screen()}{show\_apartment\_test\_screen()}}
+{\footnotesize\ttfamily void show\+\_\+apartment\+\_\+test\+\_\+screen (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type }\end{DoxyParamCaption})}
+
+函数调用图\+:
+% FIG 4
+这是这个函数的调用关系图\+:
+% FIG 5
+\mbox{\Hypertarget{ui__admin_8c_a9867a3e3ca13d713114fb0e364e0aabb}\label{ui__admin_8c_a9867a3e3ca13d713114fb0e364e0aabb}} 
+\index{ui\_admin.c@{ui\_admin.c}!show\_building\_test\_screen@{show\_building\_test\_screen}}
+\index{show\_building\_test\_screen@{show\_building\_test\_screen}!ui\_admin.c@{ui\_admin.c}}
+\doxysubsubsection{\texorpdfstring{show\_building\_test\_screen()}{show\_building\_test\_screen()}}
+{\footnotesize\ttfamily void show\+\_\+building\+\_\+test\+\_\+screen (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type }\end{DoxyParamCaption})}
+
+函数调用图\+:
+% FIG 6
+这是这个函数的调用关系图\+:
+% FIG 7
+\mbox{\Hypertarget{ui__admin_8c_aa0525a5c85dfd96708a51d62b7c30f4c}\label{ui__admin_8c_aa0525a5c85dfd96708a51d62b7c30f4c}} 
+\index{ui\_admin.c@{ui\_admin.c}!show\_info\_management\_screen@{show\_info\_management\_screen}}
+\index{show\_info\_management\_screen@{show\_info\_management\_screen}!ui\_admin.c@{ui\_admin.c}}
+\doxysubsubsection{\texorpdfstring{show\_info\_management\_screen()}{show\_info\_management\_screen()}}
+{\footnotesize\ttfamily void show\+\_\+info\+\_\+management\+\_\+screen (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type }\end{DoxyParamCaption})}
+
+这是这个函数的调用关系图\+:
+% FIG 8
+\mbox{\Hypertarget{ui__admin_8c_a3fcf8622a29a96d10af73d7739aa5a4f}\label{ui__admin_8c_a3fcf8622a29a96d10af73d7739aa5a4f}} 
+\index{ui\_admin.c@{ui\_admin.c}!show\_info\_query\_screen@{show\_info\_query\_screen}}
+\index{show\_info\_query\_screen@{show\_info\_query\_screen}!ui\_admin.c@{ui\_admin.c}}
+\doxysubsubsection{\texorpdfstring{show\_info\_query\_screen()}{show\_info\_query\_screen()}}
+{\footnotesize\ttfamily void show\+\_\+info\+\_\+query\+\_\+screen (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type }\end{DoxyParamCaption})}
+
+这是这个函数的调用关系图\+:
+% FIG 9
+\mbox{\Hypertarget{ui__admin_8c_a66676641c925f4ca29871bb326b8464e}\label{ui__admin_8c_a66676641c925f4ca29871bb326b8464e}} 
+\index{ui\_admin.c@{ui\_admin.c}!show\_info\_sort\_screen@{show\_info\_sort\_screen}}
+\index{show\_info\_sort\_screen@{show\_info\_sort\_screen}!ui\_admin.c@{ui\_admin.c}}
+\doxysubsubsection{\texorpdfstring{show\_info\_sort\_screen()}{show\_info\_sort\_screen()}}
+{\footnotesize\ttfamily void show\+\_\+info\+\_\+sort\+\_\+screen (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type }\end{DoxyParamCaption})}
+
+这是这个函数的调用关系图\+:
+% FIG 10
+\mbox{\Hypertarget{ui__admin_8c_af06cf458605a75f367562e8a7bde280e}\label{ui__admin_8c_af06cf458605a75f367562e8a7bde280e}} 
+\index{ui\_admin.c@{ui\_admin.c}!show\_info\_statistics\_screen@{show\_info\_statistics\_screen}}
+\index{show\_info\_statistics\_screen@{show\_info\_statistics\_screen}!ui\_admin.c@{ui\_admin.c}}
+\doxysubsubsection{\texorpdfstring{show\_info\_statistics\_screen()}{show\_info\_statistics\_screen()}}
+{\footnotesize\ttfamily void show\+\_\+info\+\_\+statistics\+\_\+screen (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type }\end{DoxyParamCaption})}
+
+这是这个函数的调用关系图\+:
+% FIG 11
+\mbox{\Hypertarget{ui__admin_8c_a75f2aae2a32316b61dbe06d34e736457}\label{ui__admin_8c_a75f2aae2a32316b61dbe06d34e736457}} 
+\index{ui\_admin.c@{ui\_admin.c}!show\_service\_assignment\_screen@{show\_service\_assignment\_screen}}
+\index{show\_service\_assignment\_screen@{show\_service\_assignment\_screen}!ui\_admin.c@{ui\_admin.c}}
+\doxysubsubsection{\texorpdfstring{show\_service\_assignment\_screen()}{show\_service\_assignment\_screen()}}
+{\footnotesize\ttfamily void show\+\_\+service\+\_\+assignment\+\_\+screen (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type }\end{DoxyParamCaption})}
+
+这是这个函数的调用关系图\+:
+% FIG 12
+\mbox{\Hypertarget{ui__admin_8c_a61e9828b6d3a25995a8212a070c3ca52}\label{ui__admin_8c_a61e9828b6d3a25995a8212a070c3ca52}} 
+\index{ui\_admin.c@{ui\_admin.c}!show\_system\_maintenance\_screen@{show\_system\_maintenance\_screen}}
+\index{show\_system\_maintenance\_screen@{show\_system\_maintenance\_screen}!ui\_admin.c@{ui\_admin.c}}
+\doxysubsubsection{\texorpdfstring{show\_system\_maintenance\_screen()}{show\_system\_maintenance\_screen()}}
+{\footnotesize\ttfamily void show\+\_\+system\+\_\+maintenance\+\_\+screen (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type }\end{DoxyParamCaption})}
+
+这是这个函数的调用关系图\+:
+% FIG 13

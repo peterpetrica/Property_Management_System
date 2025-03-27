@@ -1,0 +1,12 @@
+digraph "show_staff_sort_screen"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="show_staff_sort_screen",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid"];
+  Node2 [label="compare_staff_by_name",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$ui__staff_8c.html#a19ca2526727be0927c9fb68691614f5b",tooltip=" "];
+  Node1 -> Node3 [color="midnightblue",fontsize="10",style="solid"];
+  Node3 [label="query_all_staff",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$user_8c.html#a1b0bbade4033d5de2645b9eb45c37fb0",tooltip="查询所有服务人员"];
+}

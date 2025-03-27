@@ -1,0 +1,438 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Property_Management_System: src/models/parking.c 文件参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">Property_Management_System
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.9.1 -->
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(function() {
+  initMenu('',false,false,'search.php','搜索');
+});
+/* @license-end */</script>
+<div id="main-nav"></div>
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_bdeba5f06b852fec80257c0bf4c3c36e.html">models</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#func-members">函数</a>  </div>
+  <div class="headertitle">
+<div class="title">parking.c 文件参考</div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><code>#include &quot;models/parking.h&quot;</code><br />
+<code>#include &quot;utils/utils.h&quot;</code><br />
+<code>#include &lt;stdio.h&gt;</code><br />
+<code>#include &lt;string.h&gt;</code><br />
+<code>#include &lt;stdlib.h&gt;</code><br />
+<code>#include &lt;time.h&gt;</code><br />
+</div><div class="textblock"><div class="dynheader">
+parking.c 的引用(Include)关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="parking_8c__incl.png" border="0" usemap="#asrc_2models_2parking_8c" alt=""/></div>
+</div>
+</div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:a83809b0515417c15b87a4a4c34f89949"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parking_8c.html#a83809b0515417c15b87a4a4c34f89949">add_parking_space</a> (Database *db, const char *user_id, UserType user_type, ParkingSpace *space)</td></tr>
+<tr class="memdesc:a83809b0515417c15b87a4a4c34f89949"><td class="mdescLeft">&#160;</td><td class="mdescRight">添加新的停车位  <a href="parking_8c.html#a83809b0515417c15b87a4a4c34f89949">更多...</a><br /></td></tr>
+<tr class="separator:a83809b0515417c15b87a4a4c34f89949"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a791241fc79fd1e9db73f9e925a037398"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parking_8c.html#a791241fc79fd1e9db73f9e925a037398">update_parking_space</a> (Database *db, const char *user_id, UserType user_type, ParkingSpace *space)</td></tr>
+<tr class="memdesc:a791241fc79fd1e9db73f9e925a037398"><td class="mdescLeft">&#160;</td><td class="mdescRight">修改停车位信息  <a href="parking_8c.html#a791241fc79fd1e9db73f9e925a037398">更多...</a><br /></td></tr>
+<tr class="separator:a791241fc79fd1e9db73f9e925a037398"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a5c16f79795b4b8f5cc669c81490071"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parking_8c.html#a2a5c16f79795b4b8f5cc669c81490071">delete_parking_space</a> (Database *db, const char *user_id, UserType user_type, const char *parking_id)</td></tr>
+<tr class="memdesc:a2a5c16f79795b4b8f5cc669c81490071"><td class="mdescLeft">&#160;</td><td class="mdescRight">删除停车位  <a href="parking_8c.html#a2a5c16f79795b4b8f5cc669c81490071">更多...</a><br /></td></tr>
+<tr class="separator:a2a5c16f79795b4b8f5cc669c81490071"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeb62b73c3b924b89a273d8e90ad22d59"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parking_8c.html#aeb62b73c3b924b89a273d8e90ad22d59">get_parking_space</a> (Database *db, const char *parking_id, ParkingSpace *space)</td></tr>
+<tr class="memdesc:aeb62b73c3b924b89a273d8e90ad22d59"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取停车位信息  <a href="parking_8c.html#aeb62b73c3b924b89a273d8e90ad22d59">更多...</a><br /></td></tr>
+<tr class="separator:aeb62b73c3b924b89a273d8e90ad22d59"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c2db453a73ac3a004cd61f47355cca2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parking_8c.html#a0c2db453a73ac3a004cd61f47355cca2">list_parking_spaces</a> (Database *db, const char *user_id, UserType user_type, QueryResult *result)</td></tr>
+<tr class="memdesc:a0c2db453a73ac3a004cd61f47355cca2"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取所有停车位列表  <a href="parking_8c.html#a0c2db453a73ac3a004cd61f47355cca2">更多...</a><br /></td></tr>
+<tr class="separator:a0c2db453a73ac3a004cd61f47355cca2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa40fab4876623b63e4f3dab47e911464"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parking_8c.html#aa40fab4876623b63e4f3dab47e911464">get_owner_parking_spaces</a> (Database *db, const char *user_id, UserType user_type, const char *owner_id, QueryResult *result)</td></tr>
+<tr class="memdesc:aa40fab4876623b63e4f3dab47e911464"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取特定业主的停车位列表  <a href="parking_8c.html#aa40fab4876623b63e4f3dab47e911464">更多...</a><br /></td></tr>
+<tr class="separator:aa40fab4876623b63e4f3dab47e911464"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">函数说明</h2>
+<a id="a83809b0515417c15b87a4a4c34f89949"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a83809b0515417c15b87a4a4c34f89949">&#9670;&nbsp;</a></span>add_parking_space()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool add_parking_space </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ParkingSpace *&#160;</td>
+          <td class="paramname"><em>space</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>添加新的停车位 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>操作用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>操作用户类型 </td></tr>
+    <tr><td class="paramname">space</td><td>停车位信息结构体 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 添加成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="parking_8c_a83809b0515417c15b87a4a4c34f89949_cgraph.png" border="0" usemap="#aparking_8c_a83809b0515417c15b87a4a4c34f89949_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a2a5c16f79795b4b8f5cc669c81490071"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2a5c16f79795b4b8f5cc669c81490071">&#9670;&nbsp;</a></span>delete_parking_space()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool delete_parking_space </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>parking_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>删除停车位 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>操作用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>操作用户类型 </td></tr>
+    <tr><td class="paramname">parking_id</td><td>要删除的停车位ID </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 删除成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="parking_8c_a2a5c16f79795b4b8f5cc669c81490071_cgraph.png" border="0" usemap="#aparking_8c_a2a5c16f79795b4b8f5cc669c81490071_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="aa40fab4876623b63e4f3dab47e911464"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa40fab4876623b63e4f3dab47e911464">&#9670;&nbsp;</a></span>get_owner_parking_spaces()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool get_owner_parking_spaces </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>owner_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QueryResult *&#160;</td>
+          <td class="paramname"><em>result</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>获取特定业主的停车位列表 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>操作用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>操作用户类型 </td></tr>
+    <tr><td class="paramname">owner_id</td><td>业主ID </td></tr>
+    <tr><td class="paramname">result</td><td>用于存储查询结果的结构体指针 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 查询成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="parking_8c_aa40fab4876623b63e4f3dab47e911464_cgraph.png" border="0" usemap="#aparking_8c_aa40fab4876623b63e4f3dab47e911464_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="aeb62b73c3b924b89a273d8e90ad22d59"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeb62b73c3b924b89a273d8e90ad22d59">&#9670;&nbsp;</a></span>get_parking_space()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool get_parking_space </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>parking_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ParkingSpace *&#160;</td>
+          <td class="paramname"><em>space</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>获取停车位信息 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">parking_id</td><td>停车位ID </td></tr>
+    <tr><td class="paramname">space</td><td>用于存储停车位信息的结构体指针 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 获取成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="parking_8c_aeb62b73c3b924b89a273d8e90ad22d59_cgraph.png" border="0" usemap="#aparking_8c_aeb62b73c3b924b89a273d8e90ad22d59_cgraph" alt=""/></div>
+</div>
+<div class="dynheader">
+这是这个函数的调用关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="parking_8c_aeb62b73c3b924b89a273d8e90ad22d59_icgraph.png" border="0" usemap="#aparking_8c_aeb62b73c3b924b89a273d8e90ad22d59_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a0c2db453a73ac3a004cd61f47355cca2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0c2db453a73ac3a004cd61f47355cca2">&#9670;&nbsp;</a></span>list_parking_spaces()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool list_parking_spaces </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QueryResult *&#160;</td>
+          <td class="paramname"><em>result</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>获取所有停车位列表 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>操作用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>操作用户类型 </td></tr>
+    <tr><td class="paramname">result</td><td>用于存储查询结果的结构体指针 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 查询成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="parking_8c_a0c2db453a73ac3a004cd61f47355cca2_cgraph.png" border="0" usemap="#aparking_8c_a0c2db453a73ac3a004cd61f47355cca2_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a791241fc79fd1e9db73f9e925a037398"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a791241fc79fd1e9db73f9e925a037398">&#9670;&nbsp;</a></span>update_parking_space()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool update_parking_space </td>
+          <td>(</td>
+          <td class="paramtype">Database *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>user_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UserType&#160;</td>
+          <td class="paramname"><em>user_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ParkingSpace *&#160;</td>
+          <td class="paramname"><em>space</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>修改停车位信息 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>数据库连接 </td></tr>
+    <tr><td class="paramname">user_id</td><td>操作用户ID </td></tr>
+    <tr><td class="paramname">user_type</td><td>操作用户类型 </td></tr>
+    <tr><td class="paramname">space</td><td>更新后的停车位信息 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool 修改成功返回true，失败返回false </dd></dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><img src="parking_8c_a791241fc79fd1e9db73f9e925a037398_cgraph.png" border="0" usemap="#aparking_8c_a791241fc79fd1e9db73f9e925a037398_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+</small></address>
+</body>
+</html>

@@ -17,29 +17,33 @@
 #include <string.h>
 #include <time.h>
 
-// 添加服务类型
+/**
+ * @brief 添加服务类型
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ * @param type 服务类型结构体指针
+ * @return bool 操作成功返回true，失败返回false
+ */
 bool add_service_type(Database *db, const char *user_id, UserType user_type, ServiceType *type)
 {
-    // 权限检查 - 只有管理员和物业服务人员可以添加服务类型
     if (user_type != USER_ADMIN && user_type != USER_STAFF)
     {
         printf("权限不足，无法添加服务类型");
         return false;
     }
 
-    // 如果没有提供ID，生成一个新的UUID
     if (strlen(type->id) == 0)
     {
         generate_uuid(type->id);
     }
 
-    // 准备SQL语句
     char query[512];
     snprintf(query, sizeof(query),
              "INSERT INTO service_types (id, name, description) VALUES ('%s', '%s', '%s')",
              type->id, type->name, type->description);
 
-    // 执行插入操作
     if (!execute_update(db, query))
     {
         printf("添加服务类型失败");
@@ -49,17 +53,23 @@ bool add_service_type(Database *db, const char *user_id, UserType user_type, Ser
     return true;
 }
 
-// 修改服务类型
+/**
+ * @brief 修改服务类型
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ * @param type 更新后的服务类型结构体指针
+ * @return bool 操作成功返回true，失败返回false
+ */
 bool update_service_type(Database *db, const char *user_id, UserType user_type, ServiceType *type)
 {
-    // 权限检查
     if (user_type != USER_ADMIN && user_type != USER_STAFF)
     {
         printf("权限不足，无法修改服务类型");
         return false;
     }
 
-    // 检查服务类型是否存在
     char check_query[256];
     snprintf(check_query, sizeof(check_query),
              "SELECT id FROM service_types WHERE id = '%s'", type->id);
@@ -76,7 +86,6 @@ bool update_service_type(Database *db, const char *user_id, UserType user_type, 
     }
     free_query_result(&check_result);
 
-    // 执行更新操作
     char query[512];
     snprintf(query, sizeof(query),
              "UPDATE service_types SET name = '%s', description = '%s' WHERE id = '%s'",
@@ -91,17 +100,23 @@ bool update_service_type(Database *db, const char *user_id, UserType user_type, 
     return true;
 }
 
-// 删除服务类型
+/**
+ * @brief 删除服务类型
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ * @param type_id 要删除的服务类型ID
+ * @return bool 操作成功返回true，失败返回false
+ */
 bool delete_service_type(Database *db, const char *user_id, UserType user_type, const char *type_id)
 {
-    // 权限检查 - 只有管理员可以删除服务类型
     if (user_type != USER_ADMIN)
     {
         printf("权限不足，只有管理员可以删除服务类型");
         return false;
     }
 
-    // 检查服务类型是否存在
     char check_query[256];
     snprintf(check_query, sizeof(check_query),
              "SELECT id FROM service_types WHERE id = '%s'", type_id);
@@ -118,7 +133,6 @@ bool delete_service_type(Database *db, const char *user_id, UserType user_type, 
     }
     free_query_result(&check_result);
 
-    // 检查是否有服务记录引用此服务类型
     char ref_query[256];
     snprintf(ref_query, sizeof(ref_query),
              "SELECT COUNT(*) FROM service_records WHERE service_type = '%s'", type_id);
@@ -145,7 +159,6 @@ bool delete_service_type(Database *db, const char *user_id, UserType user_type, 
         return false;
     }
 
-    // 执行删除操作
     char query[256];
     snprintf(query, sizeof(query), "DELETE FROM service_types WHERE id = '%s'", type_id);
 
@@ -158,7 +171,13 @@ bool delete_service_type(Database *db, const char *user_id, UserType user_type, 
     return true;
 }
 
-// 获取所有服务类型
+/**
+ * @brief 获取所有服务类型列表
+ *
+ * @param db 数据库连接
+ * @param result 查询结果
+ * @return bool 操作成功返回true，失败返回false
+ */
 bool list_service_types(Database *db, QueryResult *result)
 {
     const char *query = "SELECT id, name, description FROM service_types ORDER BY name";
@@ -172,29 +191,33 @@ bool list_service_types(Database *db, QueryResult *result)
     return true;
 }
 
-// 添加服务人员类型
+/**
+ * @brief 添加服务人员类型
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ * @param type 服务人员类型结构体指针
+ * @return bool 操作成功返回true，失败返回false
+ */
 bool add_staff_type(Database *db, const char *user_id, UserType user_type, StaffType *type)
 {
-    // 权限检查 - 只有管理员可以添加服务人员类型
     if (user_type != USER_ADMIN)
     {
         printf("权限不足，无法添加服务人员类型");
         return false;
     }
 
-    // 如果没有提供ID，生成一个新的UUID
     if (strlen(type->staff_type_id) == 0)
     {
         generate_uuid(type->staff_type_id);
     }
 
-    // 准备SQL语句
     char query[512];
     snprintf(query, sizeof(query),
              "INSERT INTO staff_types (staff_type_id, type_name, description) VALUES ('%s', '%s', '%s')",
              type->staff_type_id, type->type_name, type->description);
 
-    // 执行插入操作
     if (!execute_update(db, query))
     {
         printf("添加服务人员类型失败");
@@ -204,17 +227,23 @@ bool add_staff_type(Database *db, const char *user_id, UserType user_type, Staff
     return true;
 }
 
-// 修改服务人员类型
+/**
+ * @brief 修改服务人员类型
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ * @param type 更新后的服务人员类型结构体指针
+ * @return bool 操作成功返回true，失败返回false
+ */
 bool update_staff_type(Database *db, const char *user_id, UserType user_type, StaffType *type)
 {
-    // 权限检查
     if (user_type != USER_ADMIN)
     {
         printf("权限不足，无法修改服务人员类型");
         return false;
     }
 
-    // 检查服务人员类型是否存在
     char check_query[256];
     snprintf(check_query, sizeof(check_query),
              "SELECT staff_type_id FROM staff_types WHERE staff_type_id = '%s'", type->staff_type_id);
@@ -231,7 +260,6 @@ bool update_staff_type(Database *db, const char *user_id, UserType user_type, St
     }
     free_query_result(&check_result);
 
-    // 执行更新操作
     char query[512];
     snprintf(query, sizeof(query),
              "UPDATE staff_types SET type_name = '%s', description = '%s' WHERE staff_type_id = '%s'",
@@ -246,17 +274,23 @@ bool update_staff_type(Database *db, const char *user_id, UserType user_type, St
     return true;
 }
 
-// 删除服务人员类型
+/**
+ * @brief 删除服务人员类型
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ * @param staff_type_id 要删除的服务人员类型ID
+ * @return bool 操作成功返回true，失败返回false
+ */
 bool delete_staff_type(Database *db, const char *user_id, UserType user_type, const char *staff_type_id)
 {
-    // 权限检查 - 只有管理员可以删除服务人员类型
     if (user_type != USER_ADMIN)
     {
         printf("权限不足，无法删除服务人员类型");
         return false;
     }
 
-    // 检查服务人员类型是否存在
     char check_query[256];
     snprintf(check_query, sizeof(check_query),
              "SELECT staff_type_id FROM staff_types WHERE staff_type_id = '%s'", staff_type_id);
@@ -273,7 +307,6 @@ bool delete_staff_type(Database *db, const char *user_id, UserType user_type, co
     }
     free_query_result(&check_result);
 
-    // 检查是否有服务人员引用此类型
     char ref_query[256];
     snprintf(ref_query, sizeof(ref_query),
              "SELECT COUNT(*) FROM staff WHERE staff_type_id = '%s'", staff_type_id);
@@ -300,7 +333,6 @@ bool delete_staff_type(Database *db, const char *user_id, UserType user_type, co
         return false;
     }
 
-    // 执行删除操作
     char query[256];
     snprintf(query, sizeof(query), "DELETE FROM staff_types WHERE staff_type_id = '%s'", staff_type_id);
 
@@ -313,7 +345,13 @@ bool delete_staff_type(Database *db, const char *user_id, UserType user_type, co
     return true;
 }
 
-// 获取所有服务人员类型
+/**
+ * @brief 获取所有服务人员类型列表
+ *
+ * @param db 数据库连接
+ * @param result 查询结果
+ * @return bool 操作成功返回true，失败返回false
+ */
 bool list_staff_types(Database *db, QueryResult *result)
 {
     const char *query = "SELECT staff_type_id, type_name, description FROM staff_types ORDER BY type_name";
@@ -327,23 +365,28 @@ bool list_staff_types(Database *db, QueryResult *result)
     return true;
 }
 
-// 分配服务区域
+/**
+ * @brief 分配服务区域
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ * @param area 服务区域结构体指针
+ * @return bool 操作成功返回true，失败返回false
+ */
 bool assign_service_area(Database *db, const char *user_id, UserType user_type, ServiceArea *area)
 {
-    // 权限检查 - 只有管理员可以分配服务区域
     if (user_type != USER_ADMIN)
     {
         printf("权限不足，无法分配服务区域");
         return false;
     }
 
-    // 如果没有提供ID，生成一个新的UUID
     if (strlen(area->area_id) == 0)
     {
         generate_uuid(area->area_id);
     }
 
-    // 检查服务人员是否存在
     char check_staff_query[256];
     snprintf(check_staff_query, sizeof(check_staff_query),
              "SELECT staff_id FROM staff WHERE staff_id = '%s'", area->staff_id);
@@ -360,7 +403,6 @@ bool assign_service_area(Database *db, const char *user_id, UserType user_type, 
     }
     free_query_result(&check_staff_result);
 
-    // 检查楼宇是否存在
     char check_building_query[256];
     snprintf(check_building_query, sizeof(check_building_query),
              "SELECT building_id FROM buildings WHERE building_id = '%s'", area->building_id);
@@ -377,7 +419,6 @@ bool assign_service_area(Database *db, const char *user_id, UserType user_type, 
     }
     free_query_result(&check_building_result);
 
-    // 检查是否已存在相同的分配
     char check_assign_query[256];
     snprintf(check_assign_query, sizeof(check_assign_query),
              "SELECT area_id FROM service_areas WHERE staff_id = '%s' AND building_id = '%s'",
@@ -395,7 +436,6 @@ bool assign_service_area(Database *db, const char *user_id, UserType user_type, 
     }
     free_query_result(&check_assign_result);
 
-    // 准备SQL语句
     char query[512];
     char date_str[20];
     snprintf(date_str, sizeof(date_str), "%ld", (long)area->assignment_date);
@@ -404,7 +444,6 @@ bool assign_service_area(Database *db, const char *user_id, UserType user_type, 
              "INSERT INTO service_areas (area_id, staff_id, building_id, assignment_date) VALUES ('%s', '%s', '%s', '%s')",
              area->area_id, area->staff_id, area->building_id, date_str);
 
-    // 执行插入操作
     if (!execute_update(db, query))
     {
         printf("分配服务区域失败");
@@ -414,17 +453,23 @@ bool assign_service_area(Database *db, const char *user_id, UserType user_type, 
     return true;
 }
 
-// 取消服务区域分配
+/**
+ * @brief 取消服务区域分配
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ * @param area_id 要取消的服务区域ID
+ * @return bool 操作成功返回true，失败返回false
+ */
 bool unassign_service_area(Database *db, const char *user_id, UserType user_type, const char *area_id)
 {
-    // 权限检查 - 只有管理员可以取消服务区域分配
     if (user_type != USER_ADMIN)
     {
         printf("权限不足，无法取消服务区域分配");
         return false;
     }
 
-    // 检查服务区域是否存在
     char check_query[256];
     snprintf(check_query, sizeof(check_query),
              "SELECT area_id FROM service_areas WHERE area_id = '%s'", area_id);
@@ -441,7 +486,6 @@ bool unassign_service_area(Database *db, const char *user_id, UserType user_type
     }
     free_query_result(&check_result);
 
-    // 执行删除操作
     char query[256];
     snprintf(query, sizeof(query), "DELETE FROM service_areas WHERE area_id = '%s'", area_id);
 
@@ -454,10 +498,18 @@ bool unassign_service_area(Database *db, const char *user_id, UserType user_type
     return true;
 }
 
-// 获取服务人员的服务区域
+/**
+ * @brief 获取服务人员的服务区域列表
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ * @param staff_id 服务人员ID
+ * @param result 查询结果
+ * @return bool 操作成功返回true，失败返回false
+ */
 bool get_staff_service_areas(Database *db, const char *user_id, UserType user_type, const char *staff_id, QueryResult *result)
 {
-    // 准备SQL查询语句
     char query[512];
     snprintf(query, sizeof(query),
              "SELECT sa.area_id, sa.staff_id, sa.building_id, b.building_name, sa.assignment_date "
@@ -467,7 +519,6 @@ bool get_staff_service_areas(Database *db, const char *user_id, UserType user_ty
              "ORDER BY b.building_name",
              staff_id);
 
-    // 执行查询
     if (!execute_query(db, query, result))
     {
         printf("获取服务人员服务区域失败");
@@ -477,23 +528,28 @@ bool get_staff_service_areas(Database *db, const char *user_id, UserType user_ty
     return true;
 }
 
-// 记录服务
+/**
+ * @brief 记录服务
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ * @param record 服务记录结构体指针
+ * @return bool 操作成功返回true，失败返回false
+ */
 bool record_service(Database *db, const char *user_id, UserType user_type, ServiceRecord *record)
 {
-    // 权限检查 - 只有管理员和物业服务人员可以记录服务
     if (user_type != USER_ADMIN && user_type != USER_STAFF)
     {
         printf("权限不足，无法记录服务");
         return false;
     }
 
-    // 如果没有提供ID，生成一个新的UUID
     if (strlen(record->record_id) == 0)
     {
         generate_uuid(record->record_id);
     }
 
-    // 检查服务人员是否存在
     char check_staff_query[256];
     snprintf(check_staff_query, sizeof(check_staff_query),
              "SELECT staff_id FROM staff WHERE staff_id = '%s'", record->staff_id);
@@ -510,10 +566,8 @@ bool record_service(Database *db, const char *user_id, UserType user_type, Servi
     }
     free_query_result(&check_staff_result);
 
-    // 准备SQL语句
     char query[1024];
     char date_str[20];
-    // 使用正确的时间格式化函数或直接转换时间戳
     snprintf(date_str, sizeof(date_str), "%ld", (long)record->service_date);
 
     snprintf(query, sizeof(query),
@@ -522,7 +576,6 @@ bool record_service(Database *db, const char *user_id, UserType user_type, Servi
              record->record_id, record->staff_id, record->service_type, date_str,
              record->description, record->status, record->target_id);
 
-    // 执行插入操作
     if (!execute_update(db, query))
     {
         printf("记录服务失败");
@@ -532,10 +585,18 @@ bool record_service(Database *db, const char *user_id, UserType user_type, Servi
     return true;
 }
 
-// 获取服务人员的服务记录
+/**
+ * @brief 获取服务人员的服务记录
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ * @param staff_id 服务人员ID
+ * @param result 查询结果
+ * @return bool 操作成功返回true，失败返回false
+ */
 bool get_service_records_by_staff(Database *db, const char *user_id, UserType user_type, const char *staff_id, QueryResult *result)
 {
-    // 检查服务人员是否存在
     char check_query[256];
     snprintf(check_query, sizeof(check_query),
              "SELECT staff_id FROM staff WHERE staff_id = '%s'", staff_id);
@@ -552,7 +613,6 @@ bool get_service_records_by_staff(Database *db, const char *user_id, UserType us
     }
     free_query_result(&check_result);
 
-    // 准备SQL查询语句
     char query[512];
     snprintf(query, sizeof(query),
              "SELECT sr.record_id, sr.staff_id, u.name as staff_name, sr.service_type, "
@@ -564,7 +624,6 @@ bool get_service_records_by_staff(Database *db, const char *user_id, UserType us
              "ORDER BY sr.service_date DESC",
              staff_id);
 
-    // 执行查询
     if (!execute_query(db, query, result))
     {
         printf("获取服务人员服务记录失败");
@@ -574,10 +633,18 @@ bool get_service_records_by_staff(Database *db, const char *user_id, UserType us
     return true;
 }
 
-// 获取房屋的服务记录
+/**
+ * @brief 获取房屋的服务记录
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ * @param room_id 房屋ID
+ * @param result 查询结果
+ * @return bool 操作成功返回true，失败返回false
+ */
 bool get_service_records_by_room(Database *db, const char *user_id, UserType user_type, const char *room_id, QueryResult *result)
 {
-    // 检查房屋是否存在
     char check_query[256];
     snprintf(check_query, sizeof(check_query),
              "SELECT room_id FROM rooms WHERE room_id = '%s'", room_id);
@@ -594,7 +661,6 @@ bool get_service_records_by_room(Database *db, const char *user_id, UserType use
     }
     free_query_result(&check_result);
 
-    // 验证权限：业主只能查看自己的房屋
     if (user_type == USER_OWNER)
     {
         char owner_check[256];
@@ -615,7 +681,6 @@ bool get_service_records_by_room(Database *db, const char *user_id, UserType use
         free_query_result(&owner_result);
     }
 
-    // 准备SQL查询语句
     char query[512];
     snprintf(query, sizeof(query),
              "SELECT sr.record_id, sr.staff_id, u.name as staff_name, sr.service_type, "
@@ -627,7 +692,6 @@ bool get_service_records_by_room(Database *db, const char *user_id, UserType use
              "ORDER BY sr.service_date DESC",
              room_id);
 
-    // 执行查询
     if (!execute_query(db, query, result))
     {
         printf("获取房屋服务记录失败");
@@ -637,10 +701,18 @@ bool get_service_records_by_room(Database *db, const char *user_id, UserType use
     return true;
 }
 
-// 获取楼宇的服务记录
+/**
+ * @brief 获取楼宇的服务记录
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ * @param building_id 楼宇ID
+ * @param result 查询结果
+ * @return bool 操作成功返回true，失败返回false
+ */
 bool get_service_records_by_building(Database *db, const char *user_id, UserType user_type, const char *building_id, QueryResult *result)
 {
-    // 检查楼宇是否存在
     char check_query[256];
     snprintf(check_query, sizeof(check_query),
              "SELECT building_id FROM buildings WHERE building_id = '%s'", building_id);
@@ -657,7 +729,6 @@ bool get_service_records_by_building(Database *db, const char *user_id, UserType
     }
     free_query_result(&check_result);
 
-    // 准备SQL查询语句
     char query[512];
     snprintf(query, sizeof(query),
              "SELECT sr.record_id, sr.staff_id, u.name as staff_name, sr.service_type, "
@@ -669,7 +740,6 @@ bool get_service_records_by_building(Database *db, const char *user_id, UserType
              "ORDER BY sr.service_date DESC",
              building_id);
 
-    // 执行查询
     if (!execute_query(db, query, result))
     {
         printf("获取楼宇服务记录失败");

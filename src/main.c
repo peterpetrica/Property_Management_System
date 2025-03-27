@@ -62,13 +62,35 @@ int main()
         return 1;
     }
 
+    // 初始化数据库表
+    if (db_init_tables(&db) != SQLITE_OK)
+    {
+        fprintf(stderr, "无法初始化数据库表\n");
+        return 1;
+    }
+
+    // 初始化默认管理员账户
+    if (db_init_admin(&db) != SQLITE_OK)
+    {
+        fprintf(stderr, "无法初始化默认管理员账户\n");
+        return 1;
+    }
+
+    // 初始化默认物业服务人员账户
+    if (db_init_staff(&db) != SQLITE_OK)
+    {
+        fprintf(stderr, "无法初始化默认物业服务人员账户\n");
+        return 1;
+    }
+
     system("clear||cls");
 
     LoginResult login_result = show_login_screen(&db);
 
+    // 移除以下逻辑，因为登录函数已经处理了跳转
+    /*
     if (login_result.success)
     {
-        // 主界面
         switch (login_result.user_type)
         {
         case USER_ADMIN:
@@ -88,6 +110,7 @@ int main()
             break;
         }
     }
+    */
 
     // 清理资源
     db_close(&db);

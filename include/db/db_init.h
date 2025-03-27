@@ -3,13 +3,34 @@
 
 #include "db/database.h"
 
-// 初始化数据库并创建必要的表和默认数据
+/**
+ * db_init_tables
+ *
+ * 创建物业管理系统所需的所有数据库表
+ *
+ * @param db 数据库连接指针
+ * @return SQLITE_OK 表示成功，其他值表示失败
+ */
 int db_init_tables(Database *db);
 
-// 初始化默认管理员账户
+/**
+ * db_init_admin
+ *
+ * 初始化系统默认管理员账户
+ *
+ * @param db 数据库连接指针
+ * @return SQLITE_OK 表示成功，其他值表示失败
+ */
 int db_init_admin(Database *db);
 
-// 关闭数据库连接
-void db_close(Database *db);
+/**
+ * db_init_staff
+ *
+ * 初始化系统默认物业服务人员账户
+ *
+ * @param db 数据库连接指针
+ * @return SQLITE_OK 表示成功，其他值表示失败
+ */
+int db_init_staff(Database *db);
 
 #endif /* DB_INIT_H */

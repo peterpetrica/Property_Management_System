@@ -1,0 +1,131 @@
+\hypertarget{auth_8c}{}\doxysection{src/auth/auth.c 文件参考}
+\label{auth_8c}\index{src/auth/auth.c@{src/auth/auth.c}}
+{\ttfamily \#include \char`\"{}auth/auth.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}utils/utils.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$time.\+h$>$}\newline
+{\ttfamily \#include $<$openssl/sha.\+h$>$}\newline
+auth.\+c 的引用(Include)关系图\+:
+% FIG 0
+\doxysubsection*{函数}
+\begin{DoxyCompactItemize}
+\item 
+Login\+Result \mbox{\hyperlink{auth_8c_af8ec5b8912ae6023809fc9aa3a0c75cb}{authenticate\+\_\+user}} (Database $\ast$db, const char $\ast$username, const char $\ast$password)
+\begin{DoxyCompactList}\small\item\em 验证用户登录信息并返回登录结果 \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{auth_8c_a4147a77cb3537ed3be427279c07b8f38}{validate\+\_\+permission}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type, int min\+\_\+permission\+\_\+level)
+\begin{DoxyCompactList}\small\item\em 验证用户是否具有执行特定操作的权限 \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{auth_8c_a5dec1261f68e6ad3d0c56db959f49dca}{change\+\_\+password}} (Database $\ast$db, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type, const char $\ast$old\+\_\+password, const char $\ast$new\+\_\+password)
+\begin{DoxyCompactList}\small\item\em 修改用户密码 \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{auth_8c_aa3c7c22f3ab8daab77a43d5e47c22e9d}{reset\+\_\+password}} (Database $\ast$db, const char $\ast$admin\+\_\+id, User\+Type admin\+\_\+type, const char $\ast$user\+\_\+id, User\+Type user\+\_\+type)
+\begin{DoxyCompactList}\small\item\em 重置用户密码为默认密码（仅管理员可操作） \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{函数说明}
+\mbox{\Hypertarget{auth_8c_af8ec5b8912ae6023809fc9aa3a0c75cb}\label{auth_8c_af8ec5b8912ae6023809fc9aa3a0c75cb}} 
+\index{auth.c@{auth.c}!authenticate\_user@{authenticate\_user}}
+\index{authenticate\_user@{authenticate\_user}!auth.c@{auth.c}}
+\doxysubsubsection{\texorpdfstring{authenticate\_user()}{authenticate\_user()}}
+{\footnotesize\ttfamily Login\+Result authenticate\+\_\+user (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{username,  }\item[{const char $\ast$}]{password }\end{DoxyParamCaption})}
+
+
+
+验证用户登录信息并返回登录结果 
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em username} & 用户名 \\
+\hline
+{\em password} & 密码 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+Login\+Result 包含登录结果的结构体，成功时包含用户信息 
+\end{DoxyReturn}
+这是这个函数的调用关系图\+:
+% FIG 1
+\mbox{\Hypertarget{auth_8c_a5dec1261f68e6ad3d0c56db959f49dca}\label{auth_8c_a5dec1261f68e6ad3d0c56db959f49dca}} 
+\index{auth.c@{auth.c}!change\_password@{change\_password}}
+\index{change\_password@{change\_password}!auth.c@{auth.c}}
+\doxysubsubsection{\texorpdfstring{change\_password()}{change\_password()}}
+{\footnotesize\ttfamily bool change\+\_\+password (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type,  }\item[{const char $\ast$}]{old\+\_\+password,  }\item[{const char $\ast$}]{new\+\_\+password }\end{DoxyParamCaption})}
+
+
+
+修改用户密码 
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em user\+\_\+id} & 用户\+ID \\
+\hline
+{\em user\+\_\+type} & 用户类型 \\
+\hline
+{\em old\+\_\+password} & 旧密码 \\
+\hline
+{\em new\+\_\+password} & 新密码 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+bool 密码修改成功返回true，失败返回false 
+\end{DoxyReturn}
+这是这个函数的调用关系图\+:
+% FIG 2
+\mbox{\Hypertarget{auth_8c_aa3c7c22f3ab8daab77a43d5e47c22e9d}\label{auth_8c_aa3c7c22f3ab8daab77a43d5e47c22e9d}} 
+\index{auth.c@{auth.c}!reset\_password@{reset\_password}}
+\index{reset\_password@{reset\_password}!auth.c@{auth.c}}
+\doxysubsubsection{\texorpdfstring{reset\_password()}{reset\_password()}}
+{\footnotesize\ttfamily bool reset\+\_\+password (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{admin\+\_\+id,  }\item[{User\+Type}]{admin\+\_\+type,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type }\end{DoxyParamCaption})}
+
+
+
+重置用户密码为默认密码（仅管理员可操作） 
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em admin\+\_\+id} & 管理员\+ID \\
+\hline
+{\em admin\+\_\+type} & 管理员类型 \\
+\hline
+{\em user\+\_\+id} & 要重置密码的用户\+ID \\
+\hline
+{\em user\+\_\+type} & 要重置密码的用户类型 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+bool 重置成功返回true，失败返回false 
+\end{DoxyReturn}
+函数调用图\+:
+% FIG 3
+\mbox{\Hypertarget{auth_8c_a4147a77cb3537ed3be427279c07b8f38}\label{auth_8c_a4147a77cb3537ed3be427279c07b8f38}} 
+\index{auth.c@{auth.c}!validate\_permission@{validate\_permission}}
+\index{validate\_permission@{validate\_permission}!auth.c@{auth.c}}
+\doxysubsubsection{\texorpdfstring{validate\_permission()}{validate\_permission()}}
+{\footnotesize\ttfamily bool validate\+\_\+permission (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{user\+\_\+id,  }\item[{User\+Type}]{user\+\_\+type,  }\item[{int}]{min\+\_\+permission\+\_\+level }\end{DoxyParamCaption})}
+
+
+
+验证用户是否具有执行特定操作的权限 
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库连接 \\
+\hline
+{\em user\+\_\+id} & 用户\+ID \\
+\hline
+{\em user\+\_\+type} & 用户类型 \\
+\hline
+{\em min\+\_\+permission\+\_\+level} & 需要的最低权限级别 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+bool 用户具有足够权限返回true，否则返回false 
+\end{DoxyReturn}
+这是这个函数的调用关系图\+:
+% FIG 4

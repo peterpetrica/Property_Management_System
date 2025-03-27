@@ -1,0 +1,18 @@
+digraph "update_room"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="update_room",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid"];
+  Node2 [label="execute_query",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$db__query_8c.html#ad6a50f994e852c3e41ca39df52927b8a",tooltip=" "];
+  Node1 -> Node3 [color="midnightblue",fontsize="10",style="solid"];
+  Node3 [label="execute_update",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$db__query_8c.html#a8e8357f0e514181200d759cc87a3a088",tooltip=" "];
+  Node1 -> Node4 [color="midnightblue",fontsize="10",style="solid"];
+  Node4 [label="free_query_result",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$db__query_8c.html#ad4c3a29daaeb7d4428edf4dbb111f1b5",tooltip=" "];
+  Node1 -> Node5 [color="midnightblue",fontsize="10",style="solid"];
+  Node5 [label="log_error",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$apartment_8c.html#a01de98826735d07d7d41604a2ced9a64",tooltip=" "];
+  Node1 -> Node6 [color="midnightblue",fontsize="10",style="solid"];
+  Node6 [label="log_info",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$apartment_8c.html#ade762acc676da9bb7e589a8a1ac43424",tooltip=" "];
+}

@@ -1,0 +1,169 @@
+\hypertarget{database_8c}{}\doxysection{src/db/database.c 文件参考}
+\label{database_8c}\index{src/db/database.c@{src/db/database.c}}
+{\ttfamily \#include \char`\"{}db/database.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}db/db\+\_\+init.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+database.\+c 的引用(Include)关系图\+:
+% FIG 0
+\doxysubsection*{函数}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{database_8c_a52fdd9fcc6e0644bd418dca950c1f0de}{db\+\_\+init}} (Database $\ast$db, const char $\ast$db\+\_\+path)
+\begin{DoxyCompactList}\small\item\em 初始化数据库 \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{database_8c_a4eb6282b34dc0ef2afe1153fc3baa79c}{db\+\_\+close}} (Database $\ast$db)
+\begin{DoxyCompactList}\small\item\em 关闭数据库连接 \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{database_8c_a272c71b015b2a321e080226a2169a360}{db\+\_\+execute}} (Database $\ast$db, const char $\ast$sql)
+\begin{DoxyCompactList}\small\item\em 执行\+SQL语句 \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{database_8c_a5d547268f39d4da2eed27e533dff1ba4}{db\+\_\+prepare}} (Database $\ast$db, const char $\ast$sql, sqlite3\+\_\+stmt $\ast$$\ast$stmt)
+\begin{DoxyCompactList}\small\item\em 准备\+SQL语句 \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{database_8c_ad2d334436c88b33ac87de9e39a934fca}{db\+\_\+backup}} (Database $\ast$db, const char $\ast$backup\+\_\+path)
+\begin{DoxyCompactList}\small\item\em 数据库备份 \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{database_8c_a996f8531ef8649b3dad353338cdefd91}{db\+\_\+restore}} (Database $\ast$db, const char $\ast$backup\+\_\+path)
+\begin{DoxyCompactList}\small\item\em 从备份文件恢复数据库 \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{函数说明}
+\mbox{\Hypertarget{database_8c_ad2d334436c88b33ac87de9e39a934fca}\label{database_8c_ad2d334436c88b33ac87de9e39a934fca}} 
+\index{database.c@{database.c}!db\_backup@{db\_backup}}
+\index{db\_backup@{db\_backup}!database.c@{database.c}}
+\doxysubsubsection{\texorpdfstring{db\_backup()}{db\_backup()}}
+{\footnotesize\ttfamily int db\+\_\+backup (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{backup\+\_\+path }\end{DoxyParamCaption})}
+
+
+
+数据库备份 
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库结构体指针 \\
+\hline
+{\em backup\+\_\+path} & 备份文件路径 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+int SQLITE\+\_\+\+OK表示成功，其他值表示错误码 
+\end{DoxyReturn}
+\mbox{\Hypertarget{database_8c_a4eb6282b34dc0ef2afe1153fc3baa79c}\label{database_8c_a4eb6282b34dc0ef2afe1153fc3baa79c}} 
+\index{database.c@{database.c}!db\_close@{db\_close}}
+\index{db\_close@{db\_close}!database.c@{database.c}}
+\doxysubsubsection{\texorpdfstring{db\_close()}{db\_close()}}
+{\footnotesize\ttfamily void db\+\_\+close (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db }\end{DoxyParamCaption})}
+
+
+
+关闭数据库连接 
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库结构体指针 \\
+\hline
+\end{DoxyParams}
+这是这个函数的调用关系图\+:
+% FIG 1
+\mbox{\Hypertarget{database_8c_a272c71b015b2a321e080226a2169a360}\label{database_8c_a272c71b015b2a321e080226a2169a360}} 
+\index{database.c@{database.c}!db\_execute@{db\_execute}}
+\index{db\_execute@{db\_execute}!database.c@{database.c}}
+\doxysubsubsection{\texorpdfstring{db\_execute()}{db\_execute()}}
+{\footnotesize\ttfamily int db\+\_\+execute (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{sql }\end{DoxyParamCaption})}
+
+
+
+执行\+SQL语句 
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库结构体指针 \\
+\hline
+{\em sql} & 要执行的\+SQL语句 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+int SQLITE\+\_\+\+OK表示成功，其他值表示错误码 
+\end{DoxyReturn}
+这是这个函数的调用关系图\+:
+% FIG 2
+\mbox{\Hypertarget{database_8c_a52fdd9fcc6e0644bd418dca950c1f0de}\label{database_8c_a52fdd9fcc6e0644bd418dca950c1f0de}} 
+\index{database.c@{database.c}!db\_init@{db\_init}}
+\index{db\_init@{db\_init}!database.c@{database.c}}
+\doxysubsubsection{\texorpdfstring{db\_init()}{db\_init()}}
+{\footnotesize\ttfamily int db\+\_\+init (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{db\+\_\+path }\end{DoxyParamCaption})}
+
+
+
+初始化数据库 
+
+\mbox{\hyperlink{database_8c}{database.\+c}} 数据库操作模块的实现
+
+本模块提供物业管理系统所需的数据库访问接口，实现了数据库的基本操作功能：
+\begin{DoxyItemize}
+\item 数据库的初始化和连接
+\item 关闭数据库连接
+\item SQL语句的执行
+\item 数据库的备份功能
+\item 数据库的恢复功能
+\end{DoxyItemize}
+
+该模块是系统与数据存储层之间的桥梁，为上层业务逻辑提供数据持久化支持。
+
+所有函数需要进行适当的错误处理和资源管理
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库结构体指针 \\
+\hline
+{\em db\+\_\+path} & 数据库文件路径 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+int SQLITE\+\_\+\+OK表示成功，其他值表示错误码 
+\end{DoxyReturn}
+函数调用图\+:
+% FIG 3
+这是这个函数的调用关系图\+:
+% FIG 4
+\mbox{\Hypertarget{database_8c_a5d547268f39d4da2eed27e533dff1ba4}\label{database_8c_a5d547268f39d4da2eed27e533dff1ba4}} 
+\index{database.c@{database.c}!db\_prepare@{db\_prepare}}
+\index{db\_prepare@{db\_prepare}!database.c@{database.c}}
+\doxysubsubsection{\texorpdfstring{db\_prepare()}{db\_prepare()}}
+{\footnotesize\ttfamily int db\+\_\+prepare (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{sql,  }\item[{sqlite3\+\_\+stmt $\ast$$\ast$}]{stmt }\end{DoxyParamCaption})}
+
+
+
+准备\+SQL语句 
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库结构体指针 \\
+\hline
+{\em sql} & 要准备的\+SQL语句 \\
+\hline
+{\em stmt} & 准备好的语句句柄 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+int SQLITE\+\_\+\+OK表示成功，其他值表示错误码 
+\end{DoxyReturn}
+这是这个函数的调用关系图\+:
+% FIG 5
+\mbox{\Hypertarget{database_8c_a996f8531ef8649b3dad353338cdefd91}\label{database_8c_a996f8531ef8649b3dad353338cdefd91}} 
+\index{database.c@{database.c}!db\_restore@{db\_restore}}
+\index{db\_restore@{db\_restore}!database.c@{database.c}}
+\doxysubsubsection{\texorpdfstring{db\_restore()}{db\_restore()}}
+{\footnotesize\ttfamily int db\+\_\+restore (\begin{DoxyParamCaption}\item[{Database $\ast$}]{db,  }\item[{const char $\ast$}]{backup\+\_\+path }\end{DoxyParamCaption})}
+
+
+
+从备份文件恢复数据库 
+
+
+\begin{DoxyParams}{参数}
+{\em db} & 数据库结构体指针 \\
+\hline
+{\em backup\+\_\+path} & 备份文件路径 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{返回}
+int SQLITE\+\_\+\+OK表示成功，其他值表示错误码 
+\end{DoxyReturn}
