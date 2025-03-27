@@ -3,9 +3,9 @@
 
 #include <stdbool.h>
 #include <time.h>
-#include<stdlib.h>
-char* generate_transaction_id(void);
-char* get_current_date(void);
+#include <stdlib.h>
+char *generate_transaction_id(void);
+char *get_current_date(void);
 // 生成UUID
 void generate_uuid(char *out);
 
@@ -23,5 +23,12 @@ time_t parse_time(const char *time_str);
 
 // 安全字符串复制
 void safe_strcpy(char *dest, const char *src, size_t dest_size);
+
+/**
+ * @brief 去除字符串末尾的换行符
+ *
+ * @param str 要处理的字符串
+ */
+void trim_newline(char *str);
 
 #endif /* UTILS_H */

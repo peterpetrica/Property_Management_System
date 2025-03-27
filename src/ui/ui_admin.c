@@ -30,6 +30,14 @@
 #include <string.h>
 #include <time.h>
 
+// 添加缺少的函数声明
+bool query_buildings(Database *db, QueryResult *result);
+bool fuzzy_query_owner(Database *db, const char *pattern, QueryResult *result);
+void pause_console();
+void trim_newline(char *str);
+void wait_for_key(); // 修改函数名，替换之前的pause
+void print_query_result(QueryResult *result);
+
 /**
  * @brief 清屏函数
  *
@@ -127,48 +135,6 @@ void show_info_management_screen(Database *db, const char *user_id, UserType use
 void show_service_assignment_screen(Database *db, const char *user_id, UserType user_type)
 {
     // TODO: 实现服务分配界面功能
-}
-
-/**
- * @brief 显示信息查询界面
- *
- * 提供按不同条件查询系统内各类信息的功能
- *
- * @param db 数据库连接指针
- * @param user_id 当前登录用户的ID
- * @param user_type 当前登录用户的类型
- */
-void show_info_query_screen(Database *db, const char *user_id, UserType user_type)
-{
-    // TODO: 实现信息查询界面功能
-}
-
-/**
- * @brief 显示信息排序界面
- *
- * 根据不同条件对查询结果进行排序展示的功能
- *
- * @param db 数据库连接指针
- * @param user_id 当前登录用户的ID
- * @param user_type 当前登录用户的类型
- */
-void show_info_sort_screen(Database *db, const char *user_id, UserType user_type)
-{
-    // TODO: 实现信息排序界面功能
-}
-
-/**
- * @brief 显示信息统计界面
- *
- * 对系统内数据进行统计分析并呈现的功能
- *
- * @param db 数据库连接指针
- * @param user_id 当前登录用户的ID
- * @param user_type 当前登录用户的类型
- */
-void show_info_statistics_screen(Database *db, const char *user_id, UserType user_type)
-{
-    // TODO: 实现信息统计界面功能
 }
 
 /**
@@ -547,8 +513,26 @@ void show_apartment_test_screen(Database *db, const char *user_id, UserType user
  * @param user_type 当前登录用户的类型
  */
 void show_building_test_screen(Database *db, const char *user_id, UserType user_type)
-//实现信息查询页面
-void show_info_query_screen(Database* db, const char* user_id, UserType user_type)
+{
+    // 楼宇管理测试界面实现
+    clear_screen();
+    printf("\n=== 楼宇管理功能测试 ===\n");
+    printf("该功能正在开发中...\n");
+    printf("按Enter键返回主菜单...");
+    getchar();
+    show_admin_main_screen(db, user_id, user_type);
+}
+
+/**
+ * @brief 显示信息查询界面
+ *
+ * 提供按不同条件查询系统内各类信息的功能
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
+void show_info_query_screen(Database *db, const char *user_id, UserType user_type)
 {
     int choice;
     while (1)
@@ -577,7 +561,8 @@ void show_info_query_screen(Database* db, const char* user_id, UserType user_typ
                 for (int i = 0; i < result.row_count; i++)
                 {
                     printf("ID: %s | 名称: %s | 地址: %s | 管理员ID: %s\n",
-                        result.rows[i][0], result.rows[i][1], result.rows[i][2], result.rows[i][3]);
+                           result.rows[i].values[0], result.rows[i].values[1],
+                           result.rows[i].values[2], result.rows[i].values[3]);
                 }
             }
             else
@@ -598,7 +583,8 @@ void show_info_query_screen(Database* db, const char* user_id, UserType user_typ
                 for (int i = 0; i < result.row_count; i++)
                 {
                     printf("ID: %s | 姓名: %s | 联系方式: %s\n",
-                        result.rows[i][0], result.rows[i][1], result.rows[i][2]);
+                           result.rows[i].values[0], result.rows[i].values[1],
+                           result.rows[i].values[2]);
                 }
             }
             else
@@ -614,8 +600,17 @@ void show_info_query_screen(Database* db, const char* user_id, UserType user_typ
         }
     }
 }
-//实现信息排序页面
-void show_info_sort_screen(Database* db, const char* user_id, UserType user_type)
+
+/**
+ * @brief 显示信息排序界面
+ *
+ * 根据不同条件对查询结果进行排序展示的功能
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
+void show_info_sort_screen(Database *db, const char *user_id, UserType user_type)
 {
     clear_screen();
     printf("\n=== 信息排序界面 ===\n");
@@ -646,7 +641,7 @@ void show_info_sort_screen(Database* db, const char* user_id, UserType user_type
         scanf("%d", &attr);
         getchar();
 
-        char* order_by = NULL;
+        char *order_by = NULL;
         if (attr == 1)
             order_by = "payment.payment_date";
         else if (attr == 2)
@@ -661,14 +656,14 @@ void show_info_sort_screen(Database* db, const char* user_id, UserType user_type
         }
 
         snprintf(sql, sizeof(sql),
-            "SELECT owner.name AS 业主姓名, payment.amount AS 缴费金额, payment.payment_date AS 缴费时间 "
-            "FROM payment "
-            "JOIN apartment ON payment.apartment_id = apartment.id "
-            "JOIN owner ON apartment.owner_id = owner.id "
-            "JOIN building ON apartment.building_id = building.id "
-            "WHERE building.manager_id = '%s' "
-            "ORDER BY %s ASC;",
-            user_id, order_by);
+                 "SELECT owner.name AS 业主姓名, payment.amount AS 缴费金额, payment.payment_date AS 缴费时间 "
+                 "FROM payment "
+                 "JOIN apartment ON payment.apartment_id = apartment.id "
+                 "JOIN owner ON apartment.owner_id = owner.id "
+                 "JOIN building ON apartment.building_id = building.id "
+                 "WHERE building.manager_id = '%s' "
+                 "ORDER BY %s ASC;",
+                 user_id, order_by);
 
         if (execute_query(db, sql, &result))
         {
@@ -686,14 +681,14 @@ void show_info_sort_screen(Database* db, const char* user_id, UserType user_type
         printf("多属性排序：先按缴费金额降序，再按缴费时间升序。\n");
 
         snprintf(sql, sizeof(sql),
-            "SELECT owner.name AS 业主姓名, payment.amount AS 缴费金额, payment.payment_date AS 缴费时间 "
-            "FROM payment "
-            "JOIN apartment ON payment.apartment_id = apartment.id "
-            "JOIN owner ON apartment.owner_id = owner.id "
-            "JOIN building ON apartment.building_id = building.id "
-            "WHERE building.manager_id = '%s' "
-            "ORDER BY payment.amount DESC, payment.payment_date ASC;",
-            user_id);
+                 "SELECT owner.name AS 业主姓名, payment.amount AS 缴费金额, payment.payment_date AS 缴费时间 "
+                 "FROM payment "
+                 "JOIN apartment ON payment.apartment_id = apartment.id "
+                 "JOIN owner ON apartment.owner_id = owner.id "
+                 "JOIN building ON apartment.building_id = building.id "
+                 "WHERE building.manager_id = '%s' "
+                 "ORDER BY payment.amount DESC, payment.payment_date ASC;",
+                 user_id);
 
         if (execute_query(db, sql, &result))
         {
@@ -709,14 +704,14 @@ void show_info_sort_screen(Database* db, const char* user_id, UserType user_type
     {
         // 按姓名升序
         snprintf(sql, sizeof(sql),
-            "SELECT owner.name AS 业主姓名, owner.phone AS 电话 "
-            "FROM owner "
-            "JOIN apartment ON owner.id = apartment.owner_id "
-            "JOIN building ON apartment.building_id = building.id "
-            "WHERE building.manager_id = '%s' "
-            "GROUP BY owner.id "
-            "ORDER BY owner.name ASC;",
-            user_id);
+                 "SELECT owner.name AS 业主姓名, owner.phone AS 电话 "
+                 "FROM owner "
+                 "JOIN apartment ON owner.id = apartment.owner_id "
+                 "JOIN building ON apartment.building_id = building.id "
+                 "WHERE building.manager_id = '%s' "
+                 "GROUP BY owner.id "
+                 "ORDER BY owner.name ASC;",
+                 user_id);
 
         if (execute_query(db, sql, &result))
         {
@@ -737,7 +732,17 @@ void show_info_sort_screen(Database* db, const char* user_id, UserType user_type
     pause();
     show_info_sort_screen(db, user_id, user_type);
 }
-void show_info_statistics_screen(Database* db, const char* user_id, UserType user_type)
+
+/**
+ * @brief 显示信息统计界面
+ *
+ * 对系统内数据进行统计分析并呈现的功能
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
+void show_info_statistics_screen(Database *db, const char *user_id, UserType user_type)
 {
     int choice;
     clear_screen();
@@ -761,12 +766,12 @@ void show_info_statistics_screen(Database* db, const char* user_id, UserType use
     {
         // 统计未缴费业主数量
         snprintf(sql, sizeof(sql),
-            "SELECT COUNT(*) AS 未缴费业主数量 FROM owner "
-            "JOIN apartment ON owner.id = apartment.owner_id "
-            "JOIN payment ON apartment.id = payment.apartment_id "
-            "JOIN building ON apartment.building_id = building.id "
-            "WHERE building.manager_id = '%s' AND payment.status = '未缴费';",
-            user_id);
+                 "SELECT COUNT(*) AS 未缴费业主数量 FROM owner "
+                 "JOIN apartment ON owner.id = apartment.owner_id "
+                 "JOIN payment ON apartment.id = payment.apartment_id "
+                 "JOIN building ON apartment.building_id = building.id "
+                 "WHERE building.manager_id = '%s' AND payment.status = '未缴费';",
+                 user_id);
 
         if (execute_query(db, sql, &result))
         {
@@ -789,14 +794,14 @@ void show_info_statistics_screen(Database* db, const char* user_id, UserType use
         scanf("%d", &status_choice);
         getchar();
 
-        char* status = (status_choice == 1) ? "已缴费" : "未缴费";
+        char *status = (status_choice == 1) ? "已缴费" : "未缴费";
         snprintf(sql, sizeof(sql),
-            "SELECT COUNT(*) AS 业主数量 FROM owner "
-            "JOIN apartment ON owner.id = apartment.owner_id "
-            "JOIN payment ON apartment.id = payment.apartment_id "
-            "JOIN building ON apartment.building_id = building.id "
-            "WHERE building.manager_id = '%s' AND payment.status = '%s';",
-            user_id, status);
+                 "SELECT COUNT(*) AS 业主数量 FROM owner "
+                 "JOIN apartment ON owner.id = apartment.owner_id "
+                 "JOIN payment ON apartment.id = payment.apartment_id "
+                 "JOIN building ON apartment.building_id = building.id "
+                 "WHERE building.manager_id = '%s' AND payment.status = '%s';",
+                 user_id, status);
 
         if (execute_query(db, sql, &result))
         {
@@ -817,13 +822,13 @@ void show_info_statistics_screen(Database* db, const char* user_id, UserType use
         getchar();
 
         snprintf(sql, sizeof(sql),
-            "SELECT COUNT(*) AS 未缴费业主数量 FROM owner "
-            "JOIN apartment ON owner.id = apartment.owner_id "
-            "JOIN payment ON apartment.id = payment.apartment_id "
-            "JOIN building ON apartment.building_id = building.id "
-            "WHERE building.manager_id = '%s' AND payment.status = '未缴费' "
-            "AND strftime('%Y', payment.payment_date) = '%d';",
-            user_id, year);
+                 "SELECT COUNT(*) AS 未缴费业主数量 FROM owner "
+                 "JOIN apartment ON owner.id = apartment.owner_id "
+                 "JOIN payment ON apartment.id = payment.apartment_id "
+                 "JOIN building ON apartment.building_id = building.id "
+                 "WHERE building.manager_id = '%s' AND payment.status = '未缴费' "
+                 "AND strftime('%%Y', payment.payment_date) = '%d';",
+                 user_id, year);
 
         if (execute_query(db, sql, &result))
         {
@@ -840,16 +845,17 @@ void show_info_statistics_screen(Database* db, const char* user_id, UserType use
         // 统计截至某时间已缴费业主数量
         char date[20];
         printf("请输入截止日期（格式: YYYY-MM-DD）：");
-        fgets(date, sizeof(date), stdin); trim_newline(date);
+        fgets(date, sizeof(date), stdin);
+        trim_newline(date);
 
         snprintf(sql, sizeof(sql),
-            "SELECT COUNT(*) AS 已缴费业主数量 FROM owner "
-            "JOIN apartment ON owner.id = apartment.owner_id "
-            "JOIN payment ON apartment.id = payment.apartment_id "
-            "JOIN building ON apartment.building_id = building.id "
-            "WHERE building.manager_id = '%s' AND payment.status = '已缴费' "
-            "AND payment.payment_date <= '%s';",
-            user_id, date);
+                 "SELECT COUNT(*) AS 已缴费业主数量 FROM owner "
+                 "JOIN apartment ON owner.id = apartment.owner_id "
+                 "JOIN payment ON apartment.id = payment.apartment_id "
+                 "JOIN building ON apartment.building_id = building.id "
+                 "WHERE building.manager_id = '%s' AND payment.status = '已缴费' "
+                 "AND payment.payment_date <= '%s';",
+                 user_id, date);
 
         if (execute_query(db, sql, &result))
         {
@@ -870,10 +876,6 @@ void show_info_statistics_screen(Database* db, const char* user_id, UserType use
     pause();
     show_info_statistics_screen(db, user_id, user_type);
 }
-
-
-
-
 
 /**
  * @brief 生成周期性费用界面

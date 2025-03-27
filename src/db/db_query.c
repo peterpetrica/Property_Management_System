@@ -411,3 +411,33 @@ int db_parameterized_query(Database *db, const char *query, void *params,
 
     return SQLITE_OK;
 }
+
+/**
+ * @brief 查询所有楼盘信息
+ *
+ * @param db 数据库连接指针
+ * @param result 查询结果指针
+ * @return bool 成功返回true，失败返回false
+ */
+bool query_buildings(Database *db, QueryResult *result)
+{
+    const char *sql = "SELECT id, name, address, manager_id FROM building ORDER BY name";
+    return execute_query(db, sql, result);
+}
+
+/**
+ * @brief 模糊查询业主姓名
+ *
+ * @param db 数据库连接指针
+ * @param pattern 查询的姓名模式
+ * @param result 查询结果指针
+ * @return bool 成功返回true，失败返回false
+ */
+bool fuzzy_query_owner(Database *db, const char *pattern, QueryResult *result)
+{
+    char sql[512];
+    snprintf(sql, sizeof(sql),
+             "SELECT id, name, phone FROM owner WHERE name LIKE '%%%s%%' ORDER BY name",
+             pattern);
+    return execute_query(db, sql, result);
+}
