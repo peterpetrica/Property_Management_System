@@ -660,3 +660,63 @@ bool generate_parking_fees(Database *db, time_t period_start, time_t period_end,
     free_query_result(&parking_spaces);
     return true;
 }
+
+/**
+ * 生成水电气等公用事业费用
+ *
+ * @param db 数据库连接
+ * @param period_start 账单开始日期
+ * @param period_end 账单结束日期
+ * @param due_days 付款截止天数(从period_end开始计算)
+ * @return 生成成功返回true，失败返回false
+ */
+bool generate_utility_fees(Database *db, time_t period_start, time_t period_end, int due_days)
+{
+    time_t due_date = period_end + (due_days * 24 * 60 * 60);
+    char transaction_id[40];
+    bool success = true;
+
+    // 水费生成
+    const char *water_query = 
+        "INSERT INTO transactions (transaction_id, user_id, room_id, fee_type, amount, "
+        "payment_date, due_date, status, period_start, period_end) "
+        "SELECT LOWER(HEX(RANDOMBLOB(16))), r.owner_id, r.room_id, "
+        "3, r.area_sqm * fs.price_per_unit, "
+        "?, ?, 0, ?, ? "
+        "FROM rooms r "
+        "JOIN fee_standards fs ON fs.fee_type = 3 "
+        "WHERE r.owner_id IS NOT NULL "
+        "AND (fs.end_date = 0 OR fs.end_date > ?)";
+
+    success &= execute_parameterized_update(db, water_query, period_start, period_end, due_date);
+
+    // 电费生成
+    const char *electricity_query = 
+        "INSERT INTO transactions (transaction_id, user_id, room_id, fee_type, amount, "
+        "payment_date, due_date, status, period_start, period_end) "
+        "SELECT LOWER(HEX(RANDOMBLOB(16))), r.owner_id, r.room_id, "
+        "4, r.area_sqm * fs.price_per_unit, "
+        "?, ?, 0, ?, ? "
+        "FROM rooms r "
+        "JOIN fee_standards fs ON fs.fee_type = 4 "
+        "WHERE r.owner_id IS NOT NULL "
+        "AND (fs.end_date = 0 OR fs.end_date > ?)";
+
+    success &= execute_parameterized_update(db, electricity_query, period_start, period_end, due_date);
+
+    // 燃气费生成
+    const char *gas_query = 
+        "INSERT INTO transactions (transaction_id, user_id, room_id, fee_type, amount, "
+        "payment_date, due_date, status, period_start, period_end) "
+        "SELECT LOWER(HEX(RANDOMBLOB(16))), r.owner_id, r.room_id, "
+        "5, r.area_sqm * fs.price_per_unit, "
+        "?, ?, 0, ?, ? "
+        "FROM rooms r "
+        "JOIN fee_standards fs ON fs.fee_type = 5 "
+        "WHERE r.owner_id IS NOT NULL "
+        "AND (fs.end_date = 0 OR fs.end_date > ?)";
+
+    success &= execute_parameterized_update(db, gas_query, period_start, period_end, due_date);
+
+    return success;
+}

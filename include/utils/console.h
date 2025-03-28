@@ -6,6 +6,9 @@
 #define CONSOLE_H
 
 #include <stddef.h>
+#include <time.h>  // 添加time.h头文件
+#include "db/database.h"
+#include "auth/auth.h"
 #include "db/db_query.h"
 
 // 读取密码（不回显）
