@@ -40,7 +40,7 @@ void clear_staff_input_buffer()
 void clear_staff_screen()
 {
 #ifdef _WIN32
-    system("clear||cls");
+    // system("clear||cls");
 #else
     system("clear");
 #endif

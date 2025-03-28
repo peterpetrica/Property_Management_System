@@ -45,7 +45,7 @@ void print_query_result(QueryResult *result);
  */
 void clear_screen()
 {
-    system("clear||cls");
+    // system("clear||cls");
 }
 
 /**
@@ -889,7 +889,7 @@ void generate_periodic_fees_screen(Database *db, const char *user_id, UserType u
 
     int year, month, fee_type, due_days;
 
-    system("clear||cls");
+    // system("clear||cls");
     printf("\n===== 生成周期性费用 =====\n");
     printf("请输入年份: ");
     scanf("%d", &year);
@@ -977,7 +977,7 @@ void manage_fee_standards_screen(Database *db, const char *user_id, UserType use
     int choice;
     while (1)
     {
-        system("clear||cls");
+        // system("clear||cls");
         printf("\n===== 费用标准管理 =====\n");
         printf("1. 查看现有费用标准\n");
         printf("2. 添加新费用标准\n");
@@ -992,7 +992,7 @@ void manage_fee_standards_screen(Database *db, const char *user_id, UserType use
         case 1:
             // 查看费用标准实现
             {
-                system("clear||cls");
+                // system("clear||cls");
                 printf("\n===== 现有费用标准 =====\n");
 
                 char query[512];
@@ -1087,7 +1087,7 @@ void manage_fee_standards_screen(Database *db, const char *user_id, UserType use
         case 2:
             // 添加费用标准实现
             {
-                system("clear||cls");
+                // system("clear||cls");
                 printf("\n===== 添加新费用标准 =====\n");
 
                 FeeStandard standard;
