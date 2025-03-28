@@ -95,10 +95,9 @@ bool get_unpaid_transactions(Database *db, const char *user_id, QueryResult *res
 // 处理用户支付交易
 bool process_payment(Database *db, const char *transaction_id, const char *user_id, int payment_method);
 
-// 生成物业费记录
+// 生成各类费用的函数声明
 bool generate_property_fees(Database *db, time_t period_start, time_t period_end, int due_days);
-
-// 生成停车费记录
 bool generate_parking_fees(Database *db, time_t period_start, time_t period_end, int due_days);
+bool generate_utility_fees(Database *db, time_t period_start, time_t period_end, int due_days);
 
 #endif /* TRANSACTION_H */
