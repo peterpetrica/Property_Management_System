@@ -140,4 +140,27 @@ int compare_owner_name_asc(const void *a, const void *b);
  */
 int compare_owner_name_desc(const void *a, const void *b);
 
+/**
+ * @brief 查询特定业主的缴费信息
+ *
+ * @param db 数据库指针
+ * @param user_id 业主ID
+ */
+void query_owner_payment_info(Database *db, const char *user_id);
+
+/**
+ * @brief 查询所有业主的缴费情况
+ * 
+ * @param db 数据库指针
+ */
+void query_all_owners_payment_info(Database *db);
+
+/**
+ * @brief 查询所有用户的缴费信息，包括已缴费人数、未缴费人数和用户名
+ *
+ * @param db 数据库指针
+ * @param user_id 当前用户ID
+ */
+void query_service_staff_info(Database *db, const char *user_id);
+
 #endif /* UI_OWNER_H */
