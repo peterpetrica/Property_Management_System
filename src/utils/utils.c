@@ -205,3 +205,20 @@ void safe_strcpy(char *dest, const char *src, size_t dest_size)
     }
     dest[i] = '\0';
 }
+
+/**
+ * @brief 去除字符串末尾的换行符
+ *
+ * @param str 要处理的字符串
+ */
+void trim_newline(char *str)
+{
+    if (!str)
+        return;
+
+    int len = strlen(str);
+    if (len > 0 && str[len - 1] == '\n')
+    {
+        str[len - 1] = '\0';
+    }
+}

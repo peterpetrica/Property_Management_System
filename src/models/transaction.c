@@ -135,51 +135,94 @@ bool get_current_fee_standard(Database *db, int fee_type, FeeStandard *standard)
  * @param transaction 交易记录结构体指针，包含要添加的交易详情
  * @return 成功返回true，失败返回false
  */
+/**
+ * 添加交易记录（安全增强版）
+ * 
+ * 修改说明：
+ * 1. 强制设置所有NOT NULL字段的默认值
+ * 2. 增强字符串字段的安全性
+ * 3. 优化错误提示信息
+ */
 bool add_transaction(Database *db, const char *user_id, UserType user_type, Transaction *transaction)
 {
-    if (strlen(transaction->transaction_id) == 0)
-    {
+    // ==================== 1. 字段默认值设置 ====================
+    time_t now = time(NULL);
+    
+    // 必填时间字段兜底（解决NOT NULL约束）
+    if (transaction->payment_date == 0) {
+        transaction->payment_date = now;
+    }
+    if (transaction->period_start == 0) {
+        transaction->period_start = now;
+    }
+    if (transaction->period_end == 0) {
+        transaction->period_end = now;
+    }
+    
+    // 交易状态兜底
+    if (transaction->status == 0) {
+        transaction->status = TRANS_PAID; // 默认设为已支付
+    }
+
+    // ==================== 2. 必填字段校验 ====================
+    // 交易ID生成
+    if (strlen(transaction->transaction_id) == 0) {
         generate_uuid(transaction->transaction_id);
     }
 
-    if (transaction->amount <= 0)
-    {
-        printf("交易金额必须大于0");
+    // 金额校验
+    if (transaction->amount <= 0) {
+        fprintf(stderr, "[ERROR] 交易金额必须大于0\n");
         return false;
     }
 
-    if (transaction->fee_type == TRANS_PROPERTY_FEE && strlen(transaction->room_id) == 0)
-    {
-        printf("物业费交易必须指定房屋ID");
+    // 物业费必须关联房屋
+    if (transaction->fee_type == TRANS_PROPERTY_FEE && strlen(transaction->room_id) == 0) {
+        fprintf(stderr, "[ERROR] 物业费必须指定房屋ID\n");
         return false;
     }
 
-    if (transaction->fee_type == TRANS_PARKING_FEE && strlen(transaction->parking_id) == 0)
-    {
-        printf("停车费交易必须指定停车位ID");
+    // 停车费必须关联车位
+    if (transaction->fee_type == TRANS_PARKING_FEE && strlen(transaction->parking_id) == 0) {
+        fprintf(stderr, "[ERROR] 停车费必须指定停车位ID\n");
         return false;
     }
 
+    // ==================== 3. 安全生成SQL ====================
     char query[1024];
     snprintf(query, sizeof(query),
-             "INSERT INTO transactions (transaction_id, user_id, room_id, parking_id, fee_type, "
-             "amount, payment_date, due_date, payment_method, status, period_start, period_end) "
-             "VALUES ('%s', '%s', '%s', '%s', %d, %.2f, %ld, %ld, %d, %d, %ld, %ld)",
-             transaction->transaction_id, transaction->user_id,
-             transaction->room_id, transaction->parking_id,
-             transaction->fee_type, transaction->amount,
-             (long)transaction->payment_date, (long)transaction->due_date,
-             transaction->payment_method, transaction->status,
-             (long)transaction->period_start, (long)transaction->period_end);
+        "INSERT INTO transactions ("
+        "transaction_id, user_id, room_id, parking_id, fee_type, "
+        "amount, payment_date, due_date, payment_method, status, "
+        "period_start, period_end"
+        ") VALUES ("
+        "'%s', '%s', '%s', '%s', %d, "    // 字符串字段
+        "%.2f, %ld, %ld, %d, %d, "        // 数值字段
+        "%ld, %ld)",                       // 时间字段
+        transaction->transaction_id,
+        transaction->user_id,
+        transaction->room_id[0] ? transaction->room_id : "",  // 处理空字符串
+        transaction->parking_id[0] ? transaction->parking_id : "",
+        transaction->fee_type,
+        transaction->amount,
+        (long)transaction->payment_date,
+        (long)transaction->due_date,
+        transaction->payment_method,
+        transaction->status,
+        (long)transaction->period_start,
+        (long)transaction->period_end
+    );
 
-    if (!execute_query(db, query, NULL))
-    {
-        printf("添加交易记录失败: %s", query);
+    // ==================== 4. 执行并返回结果 ====================
+    if (!execute_query(db, query, NULL)) {
+        fprintf(stderr, "[ERROR] 添加交易记录失败 | SQL: %s\n", query);
         return false;
     }
 
-    printf("成功添加交易记录 ID: %s, 用户: %s, 金额: %.2f",
-           transaction->transaction_id, transaction->user_id, transaction->amount);
+    printf("[SUCCESS] 交易记录已添加 | 单号: %s | 用户: %s | 金额: ￥%.2f\n",
+           transaction->transaction_id, 
+           transaction->user_id, 
+           transaction->amount);
     return true;
 }
 

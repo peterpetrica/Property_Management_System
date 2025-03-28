@@ -30,6 +30,14 @@
 #include <string.h>
 #include <time.h>
 
+// 添加缺少的函数声明
+bool query_buildings(Database *db, QueryResult *result);
+bool fuzzy_query_owner(Database *db, const char *pattern, QueryResult *result);
+void pause_console();
+void trim_newline(char *str);
+void wait_for_key(); // 修改函数名，替换之前的pause
+void print_query_result(QueryResult *result);
+
 /**
  * @brief 清屏函数
  *
@@ -127,48 +135,6 @@ void show_info_management_screen(Database *db, const char *user_id, UserType use
 void show_service_assignment_screen(Database *db, const char *user_id, UserType user_type)
 {
     // TODO: 实现服务分配界面功能
-}
-
-/**
- * @brief 显示信息查询界面
- *
- * 提供按不同条件查询系统内各类信息的功能
- *
- * @param db 数据库连接指针
- * @param user_id 当前登录用户的ID
- * @param user_type 当前登录用户的类型
- */
-void show_info_query_screen(Database *db, const char *user_id, UserType user_type)
-{
-    // TODO: 实现信息查询界面功能
-}
-
-/**
- * @brief 显示信息排序界面
- *
- * 根据不同条件对查询结果进行排序展示的功能
- *
- * @param db 数据库连接指针
- * @param user_id 当前登录用户的ID
- * @param user_type 当前登录用户的类型
- */
-void show_info_sort_screen(Database *db, const char *user_id, UserType user_type)
-{
-    // TODO: 实现信息排序界面功能
-}
-
-/**
- * @brief 显示信息统计界面
- *
- * 对系统内数据进行统计分析并呈现的功能
- *
- * @param db 数据库连接指针
- * @param user_id 当前登录用户的ID
- * @param user_type 当前登录用户的类型
- */
-void show_info_statistics_screen(Database *db, const char *user_id, UserType user_type)
-{
-    // TODO: 实现信息统计界面功能
 }
 
 /**
@@ -548,286 +514,367 @@ void show_apartment_test_screen(Database *db, const char *user_id, UserType user
  */
 void show_building_test_screen(Database *db, const char *user_id, UserType user_type)
 {
+    // 楼宇管理测试界面实现
+    clear_screen();
+    printf("\n=== 楼宇管理功能测试 ===\n");
+    printf("该功能正在开发中...\n");
+    printf("按Enter键返回主菜单...");
+    getchar();
+    show_admin_main_screen(db, user_id, user_type);
+}
+
+/**
+ * @brief 显示信息查询界面
+ *
+ * 提供按不同条件查询系统内各类信息的功能
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
+void show_info_query_screen(Database *db, const char *user_id, UserType user_type)
+{
+    int choice;
     while (1)
     {
         clear_screen();
-        printf("\n=== 楼宇管理功能测试 ===\n");
-        printf("1. 添加楼宇\n");
-        printf("2. 修改楼宇信息\n");
-        printf("3. 删除楼宇\n");
-        printf("4. 获取楼宇信息\n");
-        printf("5. 获取所有楼宇列表\n");
-        printf("6. 分配服务人员到楼宇\n");
-        printf("7. 取消服务人员的楼宇分配\n");
-        printf("0. 返回主菜单\n");
+        printf("\n=== 信息查询界面 ===\n");
+        printf("1. 查询所有楼盘信息\n");
+        printf("2. 模糊查询业主姓名\n");
+        printf("3. 返回主界面\n");
         printf("请输入选项: ");
-
-        int choice;
         scanf("%d", &choice);
         getchar();
 
-        if (choice == 0)
-        {
-            show_admin_main_screen(db, user_id, user_type);
-            return;
-        }
+        QueryResult result;
+        char pattern[100];
+
+        if (choice == 3)
+            break;
 
         switch (choice)
         {
-        case 1: // 添加楼宇
-        {
-            Building building;
-            memset(&building, 0, sizeof(Building));
-
-            printf("请输入楼宇名称: ");
-            fgets(building.building_name, sizeof(building.building_name), stdin);
-            building.building_name[strcspn(building.building_name, "\n")] = 0;
-
-            printf("请输入楼宇地址: ");
-            fgets(building.address, sizeof(building.address), stdin);
-            building.address[strcspn(building.address, "\n")] = 0;
-
-            printf("请输入楼层数: ");
-            scanf("%d", &building.floors_count);
-            getchar();
-
-            if (add_building(db, user_id, user_type, &building))
+        case 1:
+            if (query_buildings(db, &result))
             {
-                printf("添加楼宇成功！楼宇ID: %s\n", building.building_id);
-            }
-            else
-            {
-                printf("添加楼宇失败！\n");
-            }
-        }
-        break;
-
-        case 2: // 修改楼宇信息
-        {
-            Building building;
-            memset(&building, 0, sizeof(Building));
-
-            char building_name[64];
-            printf("请输入要修改的楼宇名: ");
-            scanf("%s", building_name);
-            if (!get_building_id_by_name(db, building_name, building.building_id))
-            {
-                printf("未找到此楼宇名！\n");
-                break;
-            }
-            getchar();
-
-            // 获取原楼宇信息
-            if (!get_building(db, building.building_id, &building))
-            {
-                printf("未找到此楼宇ID！\n");
-                break;
-            }
-
-            printf("当前楼宇信息：\n");
-            printf("名称: %s\n", building.building_name);
-            printf("地址: %s\n", building.address);
-            printf("楼层数: %d\n", building.floors_count);
-
-            printf("\n请输入新的楼宇信息（直接回车保持不变）：\n");
-
-            char buffer[256];
-            printf("名称 [%s]: ", building.building_name);
-            fgets(buffer, sizeof(buffer), stdin);
-            buffer[strcspn(buffer, "\n")] = 0;
-            if (buffer[0] != '\0')
-                strncpy(building.building_name, buffer, sizeof(building.building_name) - 1);
-
-            printf("地址 [%s]: ", building.address);
-            fgets(buffer, sizeof(buffer), stdin);
-            buffer[strcspn(buffer, "\n")] = 0;
-            if (buffer[0] != '\0')
-                strncpy(building.address, buffer, sizeof(building.address) - 1);
-
-            printf("楼层数 [%d]: ", building.floors_count);
-            fgets(buffer, sizeof(buffer), stdin);
-            buffer[strcspn(buffer, "\n")] = 0;
-            if (buffer[0] != '\0')
-                building.floors_count = atoi(buffer);
-
-            if (update_building(db, user_id, user_type, &building))
-            {
-                printf("更新楼宇信息成功！\n");
-            }
-            else
-            {
-                printf("更新楼宇信息失败！\n");
-            }
-        }
-        break;
-
-        case 3: // 删除楼宇
-        {
-            char building_name[64];
-            printf("请输入楼宇名: ");
-            scanf("%s", building_name);
-            // 根据楼宇名查询楼宇ID
-            char building_id[40];
-            if (!get_building_id_by_name(db, building_name, building_id))
-            {
-                printf("未找到此楼宇名！\n");
-                break;
-            }
-            getchar();
-
-            printf("警告：删除楼宇将同时删除与该楼宇相关的所有信息！\n");
-            printf("确定要删除吗？(y/n): ");
-            char confirm;
-            scanf("%c", &confirm);
-            getchar();
-
-            if (confirm == 'y' || confirm == 'Y')
-            {
-                if (delete_building(db, user_id, user_type, building_id))
-                {
-                    printf("删除楼宇成功！\n");
-                }
-                else
-                {
-                    printf("删除楼宇失败！\n");
-                }
-            }
-            else
-            {
-                printf("取消删除操作。\n");
-            }
-        }
-        break;
-
-        case 4: // 获取楼宇信息
-        {
-            char building_name[64];
-            printf("请输入楼宇名: ");
-            scanf("%s", building_name);
-            // 根据楼宇名查询楼宇ID
-            char building_id[40];
-            if (!get_building_id_by_name(db, building_name, building_id))
-            {
-                printf("未找到此楼宇名！\n");
-                break;
-            }
-            getchar();
-
-            Building building;
-            if (get_building(db, building_id, &building))
-            {
-                printf("\n楼宇信息：\n");
-                printf("---------------------------------------\n");
-                printf("楼宇ID: %s\n", building.building_id);
-                printf("名称: %s\n", building.building_name);
-                printf("地址: %s\n", building.address);
-                printf("楼层数: %d\n", building.floors_count);
-                printf("---------------------------------------\n");
-            }
-            else
-            {
-                printf("获取楼宇信息失败！\n");
-            }
-        }
-        break;
-
-        case 5: // 获取所有楼宇列表
-        {
-            QueryResult result;
-            if (list_buildings(db, user_id, user_type, &result))
-            {
-                printf("\n系统中的所有楼宇：\n");
-                printf("---------------------------------------\n");
-                printf("%-10s %-20s %-30s %-5s\n",
-                       "楼宇ID", "名称", "地址", "楼层");
-
+                printf("\n--- 所有楼盘信息 ---\n");
                 for (int i = 0; i < result.row_count; i++)
                 {
-                    printf("%-10s %-20s %-30s %-5s\n",
-                           result.rows[i].values[0],  // building_id
-                           result.rows[i].values[1],  // building_name
-                           result.rows[i].values[2],  // address
-                           result.rows[i].values[3]); // floors_count
+                    printf("ID: %s | 名称: %s | 地址: %s | 管理员ID: %s\n",
+                           result.rows[i].values[0], result.rows[i].values[1],
+                           result.rows[i].values[2], result.rows[i].values[3]);
                 }
-                printf("---------------------------------------\n");
-                printf("共 %d 条记录\n", result.row_count);
-                free_query_result(&result);
             }
             else
             {
-                printf("查询楼宇列表失败！\n");
+                printf("查询失败！\n");
             }
-        }
-        break;
+            free_query_result(&result);
+            pause_console();
+            break;
+        case 2:
+            printf("请输入业主姓名关键字: ");
+            fgets(pattern, sizeof(pattern), stdin);
+            trim_newline(pattern);
 
-        case 6: // 分配服务人员到楼宇
-        {
-            char staff_id[64];
-            char building_id[64];
-            char building_name[64];
-
-            printf("请输入服务人员ID: ");
-            scanf("%s", staff_id);
-            getchar();
-
-            printf("请输入楼宇名: ");
-            scanf("%s", building_name);
-            // 根据楼宇名查询楼宇ID
-            if (!get_building_id_by_name(db, building_name, building_id))
+            if (fuzzy_query_owner(db, pattern, &result))
             {
-                printf("未找到此楼宇名！\n");
-                break;
-            }
-            getchar();
-
-            if (assign_staff_to_building(db, user_id, user_type, staff_id, building_id))
-            {
-                printf("分配服务人员到楼宇成功！\n");
+                printf("\n--- 查询结果 ---\n");
+                for (int i = 0; i < result.row_count; i++)
+                {
+                    printf("ID: %s | 姓名: %s | 联系方式: %s\n",
+                           result.rows[i].values[0], result.rows[i].values[1],
+                           result.rows[i].values[2]);
+                }
             }
             else
             {
-                printf("分配服务人员到楼宇失败！\n");
+                printf("查询失败！\n");
             }
-        }
-        break;
-
-        case 7: // 取消服务人员的楼宇分配
-        {
-            char staff_id[64];
-            char building_id[64];
-            char building_name[64];
-
-            printf("请输入服务人员ID: ");
-            scanf("%s", staff_id);
-            getchar();
-
-            printf("请输入楼宇名: ");
-            scanf("%s", building_name);
-            if (!get_building_id_by_name(db, building_name, building_id))
-            {
-                printf("未找到此楼宇名！\n");
-                break;
-            }
-            getchar();
-
-            if (unassign_staff_from_building(db, user_id, user_type, staff_id, building_id))
-            {
-                printf("取消服务人员的楼宇分配成功！\n");
-            }
-            else
-            {
-                printf("取消服务人员的楼宇分配失败！\n");
-            }
-        }
-        break;
-
+            free_query_result(&result);
+            pause_console();
+            break;
         default:
-            printf("无效选项，请重新输入。\n");
+            printf("无效选项。\n");
+            pause_console();
+        }
+    }
+}
+
+/**
+ * @brief 显示信息排序界面
+ *
+ * 根据不同条件对查询结果进行排序展示的功能
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
+void show_info_sort_screen(Database *db, const char *user_id, UserType user_type)
+{
+    clear_screen();
+    printf("\n=== 信息排序界面 ===\n");
+
+    int choice;
+    printf("1. 业主缴费信息单属性排序\n");
+    printf("2. 业主缴费信息多属性排序\n");
+    printf("3. 按姓名升序排序业主信息\n");
+    printf("4. 返回主界面\n");
+    printf("请输入选项: ");
+    scanf("%d", &choice);
+    getchar();
+
+    QueryResult result;
+    char sql[1024];
+
+    switch (choice)
+    {
+    case 1:
+    {
+        // 单属性排序
+        printf("请选择排序字段: \n");
+        printf("1. 缴费时间\n");
+        printf("2. 缴费金额\n");
+        printf("3. 业主姓名\n");
+        printf("请输入: ");
+        int attr;
+        scanf("%d", &attr);
+        getchar();
+
+        char *order_by = NULL;
+        if (attr == 1)
+            order_by = "payment.payment_date";
+        else if (attr == 2)
+            order_by = "payment.amount";
+        else if (attr == 3)
+            order_by = "owner.name";
+        else
+        {
+            printf("无效选项。\n");
+            pause();
+            return;
         }
 
-        printf("\n按Enter键继续...");
-        getchar();
+        snprintf(sql, sizeof(sql),
+                 "SELECT owner.name AS 业主姓名, payment.amount AS 缴费金额, payment.payment_date AS 缴费时间 "
+                 "FROM payment "
+                 "JOIN apartment ON payment.apartment_id = apartment.id "
+                 "JOIN owner ON apartment.owner_id = owner.id "
+                 "JOIN building ON apartment.building_id = building.id "
+                 "WHERE building.manager_id = '%s' "
+                 "ORDER BY %s ASC;",
+                 user_id, order_by);
+
+        if (execute_query(db, sql, &result))
+        {
+            print_query_result(&result);
+            free_query_result(&result);
+        }
+        else
+            printf("查询失败。\n");
+
+        break;
     }
+    case 2:
+    {
+        // 多属性排序
+        printf("多属性排序：先按缴费金额降序，再按缴费时间升序。\n");
+
+        snprintf(sql, sizeof(sql),
+                 "SELECT owner.name AS 业主姓名, payment.amount AS 缴费金额, payment.payment_date AS 缴费时间 "
+                 "FROM payment "
+                 "JOIN apartment ON payment.apartment_id = apartment.id "
+                 "JOIN owner ON apartment.owner_id = owner.id "
+                 "JOIN building ON apartment.building_id = building.id "
+                 "WHERE building.manager_id = '%s' "
+                 "ORDER BY payment.amount DESC, payment.payment_date ASC;",
+                 user_id);
+
+        if (execute_query(db, sql, &result))
+        {
+            print_query_result(&result);
+            free_query_result(&result);
+        }
+        else
+            printf("查询失败。\n");
+
+        break;
+    }
+    case 3:
+    {
+        // 按姓名升序
+        snprintf(sql, sizeof(sql),
+                 "SELECT owner.name AS 业主姓名, owner.phone AS 电话 "
+                 "FROM owner "
+                 "JOIN apartment ON owner.id = apartment.owner_id "
+                 "JOIN building ON apartment.building_id = building.id "
+                 "WHERE building.manager_id = '%s' "
+                 "GROUP BY owner.id "
+                 "ORDER BY owner.name ASC;",
+                 user_id);
+
+        if (execute_query(db, sql, &result))
+        {
+            print_query_result(&result);
+            free_query_result(&result);
+        }
+        else
+            printf("查询失败。\n");
+
+        break;
+    }
+    case 4:
+        return;
+    default:
+        printf("无效选项。\n");
+    }
+
+    pause();
+    show_info_sort_screen(db, user_id, user_type);
+}
+
+/**
+ * @brief 显示信息统计界面
+ *
+ * 对系统内数据进行统计分析并呈现的功能
+ *
+ * @param db 数据库连接指针
+ * @param user_id 当前登录用户的ID
+ * @param user_type 当前登录用户的类型
+ */
+void show_info_statistics_screen(Database *db, const char *user_id, UserType user_type)
+{
+    int choice;
+    clear_screen();
+    printf("\n=== 信息统计界面 ===\n");
+
+    printf("1. 统计未缴费业主数量\n");
+    printf("2. 按缴费状态统计（已缴费/未缴费）\n");
+    printf("3. 统计某年所有未缴费的业主\n");
+    printf("4. 统计截止某时间已缴费业主数量\n");
+    printf("5. 返回主界面\n");
+    printf("请输入选项: ");
+    scanf("%d", &choice);
+    getchar();
+
+    QueryResult result;
+    char sql[1024];
+
+    switch (choice)
+    {
+    case 1:
+    {
+        // 统计未缴费业主数量
+        snprintf(sql, sizeof(sql),
+                 "SELECT COUNT(*) AS 未缴费业主数量 FROM owner "
+                 "JOIN apartment ON owner.id = apartment.owner_id "
+                 "JOIN payment ON apartment.id = payment.apartment_id "
+                 "JOIN building ON apartment.building_id = building.id "
+                 "WHERE building.manager_id = '%s' AND payment.status = '未缴费';",
+                 user_id);
+
+        if (execute_query(db, sql, &result))
+        {
+            print_query_result(&result);
+            free_query_result(&result);
+        }
+        else
+            printf("统计失败。\n");
+
+        break;
+    }
+    case 2:
+    {
+        // 按缴费状态统计
+        printf("请选择缴费状态统计:\n");
+        printf("1. 已缴费业主数量\n");
+        printf("2. 未缴费业主数量\n");
+        printf("请输入选项: ");
+        int status_choice;
+        scanf("%d", &status_choice);
+        getchar();
+
+        char *status = (status_choice == 1) ? "已缴费" : "未缴费";
+        snprintf(sql, sizeof(sql),
+                 "SELECT COUNT(*) AS 业主数量 FROM owner "
+                 "JOIN apartment ON owner.id = apartment.owner_id "
+                 "JOIN payment ON apartment.id = payment.apartment_id "
+                 "JOIN building ON apartment.building_id = building.id "
+                 "WHERE building.manager_id = '%s' AND payment.status = '%s';",
+                 user_id, status);
+
+        if (execute_query(db, sql, &result))
+        {
+            print_query_result(&result);
+            free_query_result(&result);
+        }
+        else
+            printf("统计失败。\n");
+
+        break;
+    }
+    case 3:
+    {
+        // 统计某年所有未缴费的业主
+        int year;
+        printf("请输入查询年份: ");
+        scanf("%d", &year);
+        getchar();
+
+        snprintf(sql, sizeof(sql),
+                 "SELECT COUNT(*) AS 未缴费业主数量 FROM owner "
+                 "JOIN apartment ON owner.id = apartment.owner_id "
+                 "JOIN payment ON apartment.id = payment.apartment_id "
+                 "JOIN building ON apartment.building_id = building.id "
+                 "WHERE building.manager_id = '%s' AND payment.status = '未缴费' "
+                 "AND strftime('%%Y', payment.payment_date) = '%d';",
+                 user_id, year);
+
+        if (execute_query(db, sql, &result))
+        {
+            print_query_result(&result);
+            free_query_result(&result);
+        }
+        else
+            printf("统计失败。\n");
+
+        break;
+    }
+    case 4:
+    {
+        // 统计截至某时间已缴费业主数量
+        char date[20];
+        printf("请输入截止日期（格式: YYYY-MM-DD）：");
+        fgets(date, sizeof(date), stdin);
+        trim_newline(date);
+
+        snprintf(sql, sizeof(sql),
+                 "SELECT COUNT(*) AS 已缴费业主数量 FROM owner "
+                 "JOIN apartment ON owner.id = apartment.owner_id "
+                 "JOIN payment ON apartment.id = payment.apartment_id "
+                 "JOIN building ON apartment.building_id = building.id "
+                 "WHERE building.manager_id = '%s' AND payment.status = '已缴费' "
+                 "AND payment.payment_date <= '%s';",
+                 user_id, date);
+
+        if (execute_query(db, sql, &result))
+        {
+            print_query_result(&result);
+            free_query_result(&result);
+        }
+        else
+            printf("统计失败。\n");
+
+        break;
+    }
+    case 5:
+        return;
+    default:
+        printf("无效选项。\n");
+    }
+
+    pause();
+    show_info_statistics_screen(db, user_id, user_type);
 }
 
 /**

@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <sys/time.h>
 
 // 清除输入缓冲区
 void clear_input_buffer()
@@ -41,184 +42,276 @@ void clear_input_buffer()
 // 显示缴费记录
 void show_payment_history(Database *db, const char *user_id)
 {
-    system("cls");
+    system("clear || cls");
     printf("=====缴费记录=====\n");
-    const char *query = "SELECT * FROM transactions WHERE user_id=?;";
+
+    const char *query = "SELECT transaction_id, amount, payment_date FROM transactions WHERE user_id=?";
     sqlite3_stmt *stmt;
-    int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
+
+    if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) != SQLITE_OK)
     {
-        printf("SQLite错误: %s\n", sqlite3_errmsg(db->db));
+        printf("SQL错误: %s\n", sqlite3_errmsg(db->db));
         return;
     }
+
     sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
+
     printf("交易ID\t\t金额\t\t日期\n");
+    printf("--------------------------------\n");
+
     int found = 0;
-    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
-    {   found = 1;
-        const char *transaction_id = sqlite3_column_text(stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        found = 1;
+
+        // 交易ID
+        const unsigned char *transaction_id = sqlite3_column_text(stmt, 0);
+
+        // 金额
         double amount = sqlite3_column_double(stmt, 1);
-        const char *date = sqlite3_column_text(stmt, 2);
-        printf("%s\t%.2f\t%s\n", transaction_id, amount, date);
-    } 
-    if (!found) 
+
+        // 日期处理（假设存的是时间戳）
+        time_t pay_date = sqlite3_column_int64(stmt, 2);
+        char date_buf[20];
+        strftime(date_buf, sizeof(date_buf), "%Y-%m-%d", localtime(&pay_date));
+
+        printf("%-16s￥%-10.2f%s\n",
+               transaction_id ? (const char *)transaction_id : "NULL",
+               amount,
+               date_buf);
+    }
+
+    if (!found)
     {
         printf("\n⚠️ 当前用户暂无缴费记录。\n");
     }
+
     sqlite3_finalize(stmt);
-    printf("\n------------------------------------\n");
-    printf("按任意键返回...\n");
+    printf("\n按任意键返回...");
     clear_input_buffer();
 }
-double query_total_fee(Database *db, const char *user_id) 
+
+double query_total_fee(Database *db, const char *user_id)
 {
     // 1. 定义所有变量
     const char *query = "SELECT SUM(amount) FROM transactions WHERE user_id=?;";
     sqlite3_stmt *stmt;
     double total_fee = -1.0;
-    
+
     // 2. 准备语句
-    if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) != SQLITE_OK)
+    {
         fprintf(stderr, "准备查询失败: %s\n", sqlite3_errmsg(db->db));
         return -1.0;
     }
-    
+
     // 3. 绑定参数
     sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
-    
+
     // 4. 执行查询
     int rc = sqlite3_step(stmt);
-    if (rc == SQLITE_ROW) {
+    if (rc == SQLITE_ROW)
+    {
         total_fee = sqlite3_column_double(stmt, 0);
-    } else if (rc != SQLITE_DONE) {
+    }
+    else if (rc != SQLITE_DONE)
+    {
         fprintf(stderr, "查询执行失败: %s\n", sqlite3_errmsg(db->db));
     }
-    
+
     // 5. 释放资源
     sqlite3_finalize(stmt);
-    
+
     // 6. 返回结果
     return total_fee;
 }
 
-void show_total_fee(Database *db, const char *user_id) 
+void show_total_fee(Database *db, const char *user_id)
 {
     system("cls");
     printf("===== 缴费总金额 =====\n");
     double total = query_total_fee(db, user_id);
-    if (total < 0) {
+    if (total < 0)
+    {
         printf("❌ 查询失败: 请检查数据库或用户记录。\n");
-    } else if (total == 0) {
+    }
+    else if (total == 0)
+    {
         printf("用户 %s 暂无缴费记录。\n", user_id);
-    } else {
-        printf("用户 %s 的累计缴费总额：￥%.2f\n", user_id, total);
-    }
-    
-    printf("\n按任意键返回...");
-    clear_input_buffer();
-}
-
-void process_payment_screen(Database *db, const char *user_id) 
-{
-    system("cls");
-    printf("=====缴费流程=====\n");
-    
-    // 获取缴费金额
-    double amount;
-    printf("请输入缴费金额: ");
-    if (scanf("%lf", &amount) != 1 || amount <= 0) {
-        printf("输入错误，金额必须为正数\n");
-        clear_input_buffer();
-        return;
-    }
-    clear_input_buffer();
-    
-    // 获取费用类型
-    char fee_type[50] = {0}; // 初始化为全0
-    printf("请输入费用类型(如:物业费/水电费等): ");
-    if (scanf("%49s", fee_type) != 1 || strlen(fee_type) == 0) {
-        printf("输入错误，请重试\n");
-        clear_input_buffer();
-        return;
-    }
-    clear_input_buffer();
-    
-    // 准备SQL语句
-    const char *query = "INSERT INTO transactions(transaction_id, user_id, amount, payment_date, fee_type) VALUES(?,?,?,?,?);";
-    sqlite3_stmt *stmt = NULL;
-    
-    int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
-    if (rc != SQLITE_OK) {
-        fprintf(stderr, "无法准备插入语句: %s\n", sqlite3_errmsg(db->db));
-        return;
-    }
-    
-    // 生成交易ID和日期
-    char *trans_id = generate_transaction_id();
-    char *current_date = get_current_date();
-    
-    // 检查生成的ID和日期是否有效
-    if (!trans_id || !current_date) {
-        fprintf(stderr, "生成交易信息失败\n");
-        free(trans_id);
-        free(current_date);
-        sqlite3_finalize(stmt);
-        return;
-    }
-    
-    // 绑定参数
-    sqlite3_bind_text(stmt, 1, trans_id, -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt, 2, user_id, -1, SQLITE_STATIC);
-    sqlite3_bind_double(stmt, 3, amount);
-    sqlite3_bind_text(stmt, 4, current_date, -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt, 5, fee_type, -1, SQLITE_STATIC);
-    
-    // 执行SQL
-    rc = sqlite3_step(stmt);
-    if (rc != SQLITE_DONE) {
-        fprintf(stderr, "缴费失败: %s\n", sqlite3_errmsg(db->db));
-    } else {
-        printf("缴费成功！交易号: %s, 金额: %.2f, 类型: %s\n", 
-              trans_id, amount, fee_type);
-    }
-    
-    // 释放资源
-    sqlite3_finalize(stmt);
-    free(trans_id);
-    free(current_date);
-    
-    printf("按任意键返回...\n");
-    getchar();
-}
-
-// 查询应缴费用
-void query_due_amount(Database *db, const char *user_id)
-{
-    system("cls");
-    printf("=====查询应缴费用=====\n");
-    const char *query = "SELECT SUM(amount) FROM transactions WHERE user_id=?;";
-    sqlite3_stmt *stmt;
-    int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
-        fprintf(stderr, "无法准备查询语句: %s\n", sqlite3_errmsg(db->db));
-        return;
-    }
-    sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
-    if (sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        double total_amount = sqlite3_column_double(stmt, 0);
-        printf("应缴费用: %.2f\n", total_amount);
     }
     else
     {
-        printf("未找到任何记录\n");
+        printf("用户 %s 的累计缴费总额：￥%.2f\n", user_id, total);
     }
-    sqlite3_finalize(stmt);
-    printf("按任意键返回...\n");
+
+    printf("\n按任意键返回...");
     clear_input_buffer();
 }
+void process_payment_screen(Database *db, const char *user_id)
+{
+    // 清屏并显示标题
+    system("clear || cls");
+    printf("======== 费用缴纳 ========\n\n");
 
+    // 费用类型配置
+    const char *fee_types[] = {"物业费", "水电费", "停车费", "维修基金"};
+    const int valid_days[] = {365, 30, 30, 365}; // 各类型默认有效期（天）
+
+    // 费用类型选择
+    printf("请选择费用类型:\n");
+    for (int i = 0; i < sizeof(fee_types) / sizeof(fee_types[0]); i++)
+    {
+        printf("%d. %s\n", i + 1, fee_types[i]);
+    }
+    printf("选择(1-%d): ", (int)(sizeof(fee_types) / sizeof(fee_types[0])));
+
+    int fee_type;
+    if (scanf("%d", &fee_type) != 1 ||
+        fee_type < 1 ||
+        fee_type > (int)(sizeof(fee_types) / sizeof(fee_types[0])))
+    {
+        printf("! 无效选择\n");
+        clear_input_buffer();
+        return;
+    }
+    clear_input_buffer();
+
+    // 金额输入处理
+    double amount = 0;
+    do
+    {
+        printf("\n请输入%s金额（1-100000元）: ", fee_types[fee_type - 1]);
+        if (scanf("%lf", &amount) != 1)
+        {
+            printf("! 请输入有效数字\n");
+            clear_input_buffer();
+            continue;
+        }
+
+        if (amount <= 0)
+        {
+            printf("! 金额必须大于0\n");
+        }
+        else if (amount > 100000)
+        {
+            printf("! 单笔缴费不得超过10万元\n");
+        }
+        else
+        {
+            break;
+        }
+        clear_input_buffer();
+    } while (1);
+
+    // 生成交易信息
+    time_t now = time(NULL);
+    time_t period_start = now;
+    time_t period_end = now + (valid_days[fee_type - 1] * 24 * 60 * 60);
+
+    // ===== 修改的交易ID生成部分 =====
+    char trans_id[25] = {0}; // 稍微增大缓冲区
+    struct timeval tv;
+    gettimeofday(&tv, NULL); // 获取毫秒级时间
+    struct tm *tm_pay = localtime(&now);
+
+    // 生成更唯一的交易ID（带毫秒和5位随机数）
+    snprintf(trans_id, sizeof(trans_id), "%c%04d%02d%02d%03d%05d",
+             fee_types[fee_type - 1][0], // 费用类型首字母
+             tm_pay->tm_year + 1900,     // 年
+             tm_pay->tm_mon + 1,         // 月
+             tm_pay->tm_mday,            // 日
+             (int)(tv.tv_usec / 1000),   // 毫秒
+             rand() % 100000);           // 5位随机数
+
+    // 数据库操作（带重试机制）
+    int retry_count = 0;
+    bool success = false;
+    sqlite3_stmt *stmt = NULL;
+
+    do
+    {
+        const char *query = "INSERT INTO transactions "
+                            "(transaction_id, user_id, amount, payment_date, fee_type, due_date, period_start, period_end) "
+                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) != SQLITE_OK)
+        {
+            fprintf(stderr, "数据库错误: %s\n", sqlite3_errmsg(db->db));
+            break;
+        }
+
+        // 绑定参数
+        sqlite3_bind_text(stmt, 1, trans_id, -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 2, user_id, -1, SQLITE_STATIC);
+        sqlite3_bind_double(stmt, 3, amount);
+        sqlite3_bind_int64(stmt, 4, (sqlite3_int64)now);
+        sqlite3_bind_text(stmt, 5, fee_types[fee_type - 1], -1, SQLITE_STATIC);
+        sqlite3_bind_int64(stmt, 6, (sqlite3_int64)period_end);
+        sqlite3_bind_int64(stmt, 7, (sqlite3_int64)period_start);
+        sqlite3_bind_int64(stmt, 8, (sqlite3_int64)period_end);
+
+        int rc = sqlite3_step(stmt);
+        if (rc == SQLITE_DONE)
+        {
+            success = true;
+            break;
+        }
+
+        // 如果是唯一性冲突且还有重试次数
+        if (rc == SQLITE_CONSTRAINT &&
+            strstr(sqlite3_errmsg(db->db), "transaction_id") &&
+            retry_count < 2)
+        {
+            // 重新生成更唯一的ID
+            gettimeofday(&tv, NULL);
+            snprintf(trans_id, sizeof(trans_id), "%c%04d%02d%02d%03d%05d",
+                     fee_types[fee_type - 1][0],
+                     tm_pay->tm_year + 1900,
+                     tm_pay->tm_mon + 1,
+                     tm_pay->tm_mday,
+                     (int)(tv.tv_usec / 1000),
+                     rand() % 100000);
+            retry_count++;
+            sqlite3_finalize(stmt);
+            continue;
+        }
+
+        fprintf(stderr, "缴费失败: %s\n", sqlite3_errmsg(db->db));
+        break;
+    } while (1);
+
+    if (stmt)
+        sqlite3_finalize(stmt);
+    // ===== 修改的交易ID生成部分结束 =====
+
+    // 显示结果（格式化日期用于显示）
+    char display_date[20];
+    strftime(display_date, sizeof(display_date), "%Y-%m-%d", localtime(&now));
+
+    char display_due_date[20];
+    strftime(display_due_date, sizeof(display_due_date), "%Y-%m-%d", localtime(&period_end));
+
+    printf("\n════════════════════════\n");
+    if (success)
+    {
+        printf("✅ 缴费成功\n");
+        printf("────────────────────────\n");
+        printf("交易号:    %s\n", trans_id);
+        printf("用户ID:    %s\n", user_id);
+        printf("费用类型:  %s\n", fee_types[fee_type - 1]);
+        printf("缴费金额:  ￥%.2f\n", amount);
+        printf("缴费日期:  %s\n", display_date);
+        printf("有效期至:  %s\n", display_due_date);
+    }
+    else
+    {
+        printf("! 缴费失败，请稍后重试\n");
+    }
+    printf("════════════════════════\n");
+
+    printf("\n按任意键返回主菜单...");
+    clear_input_buffer();
+}
 // 查询剩余费用
 void query_remaining_balance(Database *db, const char *user_id)
 {
@@ -252,6 +345,23 @@ void query_community_info(Database *db)
 {
     system("cls");
     printf("=====查询小区基本信息=====\n");
+    const char *check_sql = "SELECT 1 FROM sqlite_master WHERE type='table' AND name='community_info'";
+    sqlite3_stmt *check_stmt;
+    if (sqlite3_prepare_v2(db->db, check_sql, -1, &check_stmt, NULL) != SQLITE_OK)
+    {
+        fprintf(stderr, "数据库错误: %s\n", sqlite3_errmsg(db->db));
+        return;
+    }
+
+    if (sqlite3_step(check_stmt) != SQLITE_ROW)
+    {
+        printf("\n⚠️ 小区信息表未初始化，请联系物业管理人员\n");
+        sqlite3_finalize(check_stmt);
+        printf("\n按任意键返回...");
+        clear_input_buffer();
+        return;
+    }
+    sqlite3_finalize(check_stmt);
     const char *query = "SELECT * FROM community_info;";
     sqlite3_stmt *stmt;
     int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
@@ -277,16 +387,15 @@ void query_community_info(Database *db)
 // 查询收费信息
 void query_fee_info(Database *db, const char *user_id)
 {
-    system("cls");
+    system("clear || cls"); // 修改为跨平台清屏
     printf("===== 物业费标准 =====\n");
 
-    const char *query = "SELECT fee_id, fee_name, fee_amount FROM fee_info;";
-    sqlite3_stmt *stmt;
-    
-    // 准备查询
-    int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
-    if (rc != SQLITE_OK) {
-        fprintf(stderr, "❌ 查询失败: %s\n", sqlite3_errmsg(db->db));
+    // 先检查表是否存在
+    const char *check_table = "SELECT 1 FROM sqlite_master WHERE type='table' AND name='fee_info'";
+    sqlite3_stmt *check_stmt;
+    if (sqlite3_prepare_v2(db->db, check_table, -1, &check_stmt, NULL) != SQLITE_OK)
+    {
+        fprintf(stderr, "❌ 检查表失败: %s\n", sqlite3_errmsg(db->db));
         return;
     }
     // 打印表头
@@ -318,6 +427,7 @@ void query_fee_info(Database *db, const char *user_id)
 // 查询服务人员信息
 void query_service_staff_info(Database *db, const char *user_id)
 {
+    // 1. 跨平台清屏（静默模式，不显示错误）
     system("cls");
     printf("===== 用户信息查询 =====\n\n");
 
@@ -342,8 +452,8 @@ void query_service_staff_info(Database *db, const char *user_id)
         "ORDER BY b.building_name, r.room_number;";
 
     sqlite3_stmt *stmt;
-    int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
+
+    if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) != SQLITE_OK)
     {
         fprintf(stderr, "查询失败: %s\n", sqlite3_errmsg(db->db));
         return;
@@ -526,7 +636,7 @@ void show_owner_personal_info_screen(Database *db, const char *user_id, UserType
         if (num == 1)
         {
             printf("请输入用户名\n");
-            scanf("%s",username);
+            scanf("%s", username);
             if (change_username(db, user_id, username))
             {
                 printf("用户名更改成功\n");
@@ -576,8 +686,8 @@ void show_payment_management_screen(Database *db, const char *user_id, UserType 
         case 1:
             show_payment_history(db, user_id);
             break;
-        case 2:process_payment_screen
-            (db, user_id);
+        case 2:
+            process_payment_screen(db, user_id);
             break;
         case 3:
             query_due_payments(db, user_id);
@@ -586,7 +696,7 @@ void show_payment_management_screen(Database *db, const char *user_id, UserType 
             query_fee_info(db, user_id);
             break;
         case 5:
-            show_total_fee(db, user_id);  
+            show_total_fee(db, user_id);
             break;
         case 0:
             return;
@@ -607,7 +717,6 @@ void show_owner_query_screen(Database *db, const char *user_id, UserType user_ty
     {
         printf("\n===== 业主信息查询 =====\n");
         printf("1--查询小区基本信息\n");
-        printf("2--查询收费信息\n");
         printf("3--查询为您服务的工作人员信息\n");
         printf("0--返回上一级\n");
         printf("请输入您的选择: ");
