@@ -527,7 +527,7 @@ void main_screen_owner(Database *db, const char *user_id, UserType user_type)
     while (1)
     {
         printf("请输入你要进入的页面\n");
-        printf("1--更改信息     2--缴费管理      3--信息查询    4--信息排序     0--退出\n");
+        printf("1--更改信息     2--缴费管理      3--信息查询      0--退出\n");
         scanf("%d", &number);
         if (number == 0)
         {
@@ -546,10 +546,6 @@ void main_screen_owner(Database *db, const char *user_id, UserType user_type)
         else if (number == 3)
         {
             show_owner_query_screen(db, user_id, user_type);
-        }
-        else if (number == 4)
-        {
-            show_owner_sort_screen(db, user_id, user_type);
         }
         else
         {
@@ -653,6 +649,7 @@ void show_owner_query_screen(Database *db, const char *user_id, UserType user_ty
     {
         printf("\n===== 业主信息查询 =====\n");
         printf("1--查询小区基本信息\n");
+        printf("2--查询收费信息\n");
         printf("3--查询为您服务的工作人员信息\n");
         printf("0--返回上一级\n");
         printf("请输入您的选择: ");
@@ -705,102 +702,8 @@ void show_owner_query_screen(Database *db, const char *user_id, UserType user_ty
     }
 }
 
-// 业主信息排序界面
-// //需要的函数
-// 按 ID 升序排序的比较函数 - 重命名以避免与user.c冲突
-int compare_owner_id_asc(const void *a, const void *b)
-{
-    Owner *ownerA = *(Owner **)a;
-    Owner *ownerB = *(Owner **)b;
-    return ownerA->user_id - ownerB->user_id;
-}
 
-// 按 ID 降序排序的比较函数 - 重命名
-int compare_owner_id_desc(const void *a, const void *b)
-{
-    Owner *ownerA = *(Owner **)a;
-    Owner *ownerB = *(Owner **)b;
-    return ownerB->user_id - ownerA->user_id;
-}
 
-// 按姓名升序排序的比较函数 - 重命名
-int compare_owner_name_asc(const void *a, const void *b)
-{
-    Owner *ownerA = *(Owner **)a;
-    Owner *ownerB = *(Owner **)b;
-    return strcmp(ownerA->name, ownerB->name);
-}
-
-// 按姓名降序排序的比较函数 - 重命名
-int compare_owner_name_desc(const void *a, const void *b)
-{
-    Owner *ownerA = *(Owner **)a;
-    Owner *ownerB = *(Owner **)b;
-    return strcmp(ownerB->name, ownerA->name);
-}
-void show_owner_sort_screen(Database *db, const char *user_id, UserType user_type)
-{
-    int choice;
-    while (1)
-    {
-        printf("\n===== 业主信息排序 =====\n");
-        printf("1--按 ID 升序\n");
-        printf("2--按 ID 降序\n");
-        printf("3--按姓名升序\n");
-        printf("4--按姓名降序\n");
-        printf("0--返回上一级\n");
-        printf("请输入您的选择: ");
-
-        if (scanf("%d", &choice) != 1)
-        {
-            clear_input_buffer();
-            printf("输入无效，请重新输入。\n");
-            continue;
-        }
-        // 根据用户的选择进行处理
-        switch (choice)
-        {
-        case 1:
-            // 按 ID 升序排序 - 更新函数名称
-            {
-                sort_owners(db, compare_owner_id_asc);
-                display_owners(db);
-                break;
-            }
-
-        case 2:
-            // 按 ID 降序排序 - 更新函数名称
-            {
-                sort_owners(db, compare_owner_id_desc);
-                display_owners(db);
-                break;
-            }
-
-        case 3:
-            // 按姓名升序排序 - 更新函数名称
-            {
-                sort_owners(db, compare_owner_name_asc);
-                display_owners(db);
-                break;
-            }
-
-        case 4:
-            // 按姓名降序排序 - 更新函数名称
-            {
-                sort_owners(db, compare_owner_name_desc);
-                display_owners(db);
-                break;
-            }
-
-        case 0:
-            // 返回上一级菜单
-            {
-                printf("返回上一级菜单。\n");
-                return;
-            }
-        }
-    }
-}
 // TODO: 实现业主信息排序界面显示和操作逻辑
 // 业主信息统计界面
 void show_owner_statistics_screen(Database *db, const char *user_id, UserType user_type)
@@ -826,110 +729,87 @@ void show_owner_main_screen(Database *db, const char *user_id, UserType user_typ
  * @param db 数据库连接
  * @param user_id 用户ID
  */
-void query_due_payments(Database *db, const char *user_id)
+void query_due_payments(Database *db, const char *user_id) 
 {
-    system("cls");
+    clear_screen();  // 使用跨平台清屏
+    update_overdue_transactions(db);  // 更新逾期状态
 
-    // 先更新所有交易的逾期状态
-    update_overdue_transactions(db);
-
-    // 查询用户所有未支付的费用总额
     char query[512];
     QueryResult result;
 
+    // ==================== 1. 查询总应缴金额 ====================
+    // 关键修改：使用NOT IN排除已支付状态（假设TRANS_PAID=1）
     snprintf(query, sizeof(query),
-             "SELECT SUM(amount) FROM transactions "
-             "WHERE user_id = '%s' AND (status = %d OR status = %d)",
-             user_id, TRANS_UNPAID, TRANS_OVERDUE);
+            "SELECT SUM(amount) FROM transactions "
+            "WHERE user_id = '%s' AND status != %d",  // 排除已支付
+            user_id, TRANS_PAID);
 
-    if (!execute_query(db, query, &result))
-    {
-        printf("查询应缴费用失败\n");
+    if (!execute_query(db, query, &result)) {
+        printf("查询失败: %s\n", sqlite3_errmsg(db->db));
         return;
     }
 
     float total_amount = 0;
-    if (result.row_count > 0 && result.rows[0].values[0] != NULL)
-    {
+    if (result.row_count > 0 && result.rows[0].values[0] != NULL) {
         total_amount = atof(result.rows[0].values[0]);
     }
 
     printf("\n===== 应缴费用 =====\n");
     printf("总应缴金额: %.2f 元\n", total_amount);
 
-    // 按费用类型统计
+    // ==================== 2. 按类型分类统计 ====================
     free_query_result(&result);
-
     snprintf(query, sizeof(query),
-             "SELECT fee_type, SUM(amount) FROM transactions "
-             "WHERE user_id = '%s' AND (status = %d OR status = %d) "
-             "GROUP BY fee_type",
-             user_id, TRANS_UNPAID, TRANS_OVERDUE);
+            "SELECT fee_type, SUM(amount) FROM transactions "
+            "WHERE user_id = '%s' AND status != %d "  // 相同排除条件
+            "GROUP BY fee_type",
+            user_id, TRANS_PAID);
 
-    if (!execute_query(db, query, &result))
-    {
-        printf("查询费用类型统计失败\n");
+    if (!execute_query(db, query, &result)) {
+        printf("分类统计失败\n");
         return;
     }
 
     printf("\n费用类型明细:\n");
-
-    for (int i = 0; i < result.row_count; i++)
-    {
+    for (int i = 0; i < result.row_count; i++) {
         int fee_type = atoi(result.rows[i].values[0]);
         float amount = atof(result.rows[i].values[1]);
 
+        // 未修改的类型显示逻辑
         char fee_type_str[20];
-        switch (fee_type)
-        {
-        case TRANS_PROPERTY_FEE:
-            strcpy(fee_type_str, "物业费");
-            break;
-        case TRANS_PARKING_FEE:
-            strcpy(fee_type_str, "停车费");
-            break;
-        case TRANS_WATER_FEE:
-            strcpy(fee_type_str, "水费");
-            break;
-        case TRANS_ELECTRICITY_FEE:
-            strcpy(fee_type_str, "电费");
-            break;
-        case TRANS_GAS_FEE:
-            strcpy(fee_type_str, "燃气费");
-            break;
-        default:
-            strcpy(fee_type_str, "其他费用");
-            break;
+        switch (fee_type) {
+            case TRANS_PROPERTY_FEE: strcpy(fee_type_str, "物业费"); break;
+            case TRANS_PARKING_FEE:  strcpy(fee_type_str, "停车费"); break;
+            case TRANS_WATER_FEE:    strcpy(fee_type_str, "水费");   break;
+            case TRANS_ELECTRICITY_FEE: strcpy(fee_type_str, "电费"); break;
+            case TRANS_GAS_FEE:      strcpy(fee_type_str, "燃气费"); break;
+            default:                strcpy(fee_type_str, "其他费用"); break;
         }
-
         printf("%s: %.2f 元\n", fee_type_str, amount);
     }
 
+    // ==================== 3. 单独显示逾期金额 ====================
     free_query_result(&result);
-
-    // 查询逾期费用
     snprintf(query, sizeof(query),
-             "SELECT SUM(amount) FROM transactions "
-             "WHERE user_id = '%s' AND status = %d",
-             user_id, TRANS_OVERDUE);
+            "SELECT SUM(amount) FROM transactions "
+            "WHERE user_id = '%s' AND status = %d",  // 仅逾期
+            user_id, TRANS_OVERDUE);
 
-    if (!execute_query(db, query, &result))
-    {
-        printf("查询逾期费用失败\n");
+    if (!execute_query(db, query, &result)) {
+        printf("逾期查询失败\n");
         return;
     }
 
     float overdue_amount = 0;
-    if (result.row_count > 0 && result.rows[0].values[0] != NULL)
-    {
+    if (result.row_count > 0 && result.rows[0].values[0] != NULL) {
         overdue_amount = atof(result.rows[0].values[0]);
     }
 
-    if (overdue_amount > 0)
-    {
-        printf("\n注意: 您有 %.2f 元的费用已逾期未付，请尽快缴纳！\n", overdue_amount);
+    if (overdue_amount > 0) {
+        printf("\n注意: 您有 %.2f 元的费用已逾期未付！\n", overdue_amount);
     }
 
+    // ==================== 4. 最终交互 ====================
     free_query_result(&result);
     printf("\n按任意键返回...");
     getchar();
