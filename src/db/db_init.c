@@ -175,6 +175,42 @@ static const char *INSERT_DEFAULT_STAFF =
     "INSERT OR IGNORE INTO staff (staff_id, user_id, staff_type_id, hire_date, status) "
     "VALUES ('1', '2', 'default_type', strftime('%s','now'), 1);";
 
+// 添加默认费用标准的定义
+static const char *INSERT_DEFAULT_FEE_STANDARDS[] = {
+    // 物业费标准（按房屋类型）
+    "INSERT OR IGNORE INTO fee_standards (standard_id, fee_type, price_per_unit, unit, effective_date) "
+    "VALUES ('prop_std_1', 1, 2.5, '元/平方米/月', strftime('%s','now'));",  // 普通住宅
+    
+    "INSERT OR IGNORE INTO fee_standards (standard_id, fee_type, price_per_unit, unit, effective_date) "
+    "VALUES ('prop_std_2', 1, 3.5, '元/平方米/月', strftime('%s','now'));",  // 电梯住宅
+    
+    "INSERT OR IGNORE INTO fee_standards (standard_id, fee_type, price_per_unit, unit, effective_date) "
+    "VALUES ('prop_std_3', 1, 5.0, '元/平方米/月', strftime('%s','now'));",  // 高档住宅
+    
+    // 停车费标准（按车位类型）
+    "INSERT OR IGNORE INTO fee_standards (standard_id, fee_type, price_per_unit, unit, effective_date) "
+    "VALUES ('park_std_1', 2, 200.0, '元/月', strftime('%s','now'));",      // 露天车位
+    
+    "INSERT OR IGNORE INTO fee_standards (standard_id, fee_type, price_per_unit, unit, effective_date) "
+    "VALUES ('park_std_2', 2, 300.0, '元/月', strftime('%s','now'));",      // 地下车位
+    
+    // 水费标准（阶梯水价）
+    "INSERT OR IGNORE INTO fee_standards (standard_id, fee_type, price_per_unit, unit, effective_date) "
+    "VALUES ('water_std_1', 3, 4.5, '元/吨', strftime('%s','now'));",       // 基础用水
+    
+    // 电费标准（阶梯电价）
+    "INSERT OR IGNORE INTO fee_standards (standard_id, fee_type, price_per_unit, unit, effective_date) "
+    "VALUES ('elec_std_1', 4, 0.55, '元/度', strftime('%s','now'));",       // 基础用电
+    
+    "INSERT OR IGNORE INTO fee_standards (standard_id, fee_type, price_per_unit, unit, effective_date) "
+    "VALUES ('elec_std_2', 4, 0.65, '元/度', strftime('%s','now'));",       // 超出部分
+    
+    // 燃气费标准
+    "INSERT OR IGNORE INTO fee_standards (standard_id, fee_type, price_per_unit, unit, effective_date) "
+    "VALUES ('gas_std_1', 5, 3.2, '元/立方米', strftime('%s','now'));",     // 民用燃气
+    NULL
+};
+
 /**
  * db_init_tables
  *
@@ -220,6 +256,19 @@ int db_init_tables(Database *db)
         if (result != SQLITE_OK)
         {
             fprintf(stderr, "初始化角色数据失败: %s\n", sqlite3_errmsg(db->db));
+            return result;
+        }
+        i++;
+    }
+
+    // 初始化费用标准
+    i = 0;
+    while (INSERT_DEFAULT_FEE_STANDARDS[i] != NULL)
+    {
+        result = db_execute(db, INSERT_DEFAULT_FEE_STANDARDS[i]);
+        if (result != SQLITE_OK)
+        {
+            fprintf(stderr, "初始化费用标准失败: %s\n", sqlite3_errmsg(db->db));
             return result;
         }
         i++;

@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <time.h>
 
 /**
  * query_callback - 查询回调函数
@@ -147,6 +148,46 @@ bool execute_update(Database *db, const char *query)
     {
         fprintf(stderr, "SQL执行错误: %s\n", err_msg);
         sqlite3_free(err_msg);
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * 执行参数化更新操作
+ * 
+ * @param db 数据库连接
+ * @param query SQL查询语句
+ * @param period_start 账期开始时间
+ * @param period_end 账期结束时间
+ * @param due_date 截止日期
+ * @return 执行成功返回true，失败返回false
+ */
+bool execute_parameterized_update(Database *db, const char *query, time_t period_start, time_t period_end, time_t due_date)
+{
+    sqlite3_stmt *stmt;
+    int rc;
+
+    rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "准备语句失败: %s\n", sqlite3_errmsg(db->db));
+        return false;
+    }
+
+    // 绑定参数
+    sqlite3_bind_int64(stmt, 1, period_start);  // 开始时间
+    sqlite3_bind_int64(stmt, 2, due_date);      // 截止日期
+    sqlite3_bind_int64(stmt, 3, period_start);  // 账期开始
+    sqlite3_bind_int64(stmt, 4, period_end);    // 账期结束
+    sqlite3_bind_int64(stmt, 5, period_end);    // 用于费用标准有效期检查
+
+    // 执行语句
+    rc = sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+
+    if (rc != SQLITE_DONE) {
+        fprintf(stderr, "执行更新失败: %s\n", sqlite3_errmsg(db->db));
         return false;
     }
 

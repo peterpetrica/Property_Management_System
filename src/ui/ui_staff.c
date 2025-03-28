@@ -367,46 +367,7 @@ void show_staff_query_screen(Database *db, const char *user_id, UserType user_ty
             break;
 
         case 2:
-            // 查询用户缴费情况
-            {
-                clear_staff_screen();
-                printf("\n===== 用户缴费情况 =====\n\n");
-                const char *query = 
-                    "SELECT u.user_id, u.username, "
-                    "COUNT(t.transaction_id) as total_trans, "
-                    "SUM(CASE WHEN t.status = 1 THEN t.amount ELSE 0 END) as paid_amount, "
-                    "SUM(CASE WHEN t.status = 0 THEN t.amount ELSE 0 END) as unpaid_amount "
-                    "FROM users u "
-                    "LEFT JOIN transactions t ON u.user_id = t.user_id "
-                    "WHERE u.role_id = 'role_owner' "
-                    "GROUP BY u.user_id, u.username;";
-
-                sqlite3_stmt *stmt;
-                if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
-                {
-                    printf("%-12s%-16s%-16s%-16s%-16s\n", 
-                           "用户ID", "用户名", "交易总数", "已缴金额", "未缴金额");
-                    printf("------------------------------------------------------------------------\n");
-                    
-                    int found = 0;
-                    while (sqlite3_step(stmt) == SQLITE_ROW)
-                    {
-                        found = 1;
-                        printf("%-12s%-16s%-16d%-16.2f%-16.2f\n",
-                            sqlite3_column_text(stmt, 0),
-                            sqlite3_column_text(stmt, 1),
-                            sqlite3_column_int(stmt, 2),
-                            sqlite3_column_double(stmt, 3),
-                            sqlite3_column_double(stmt, 4));
-                    }
-                    
-                    if (!found) {
-                        printf("\n未找到任何用户缴费信息\n");
-                    }
-                    
-                    sqlite3_finalize(stmt);
-                }
-            }
+            case2_handler(db);
             break;
 
         case 3:
@@ -572,4 +533,252 @@ void show_staff_maintenance_screen(Database *db, const char *user_id, UserType u
     }
 
     wait_for_user();
+}
+
+// 显示当前费用标准
+void show_current_fee_standards(Database *db)
+{
+    printf("\n===== 当前收费标准 =====\n\n");
+    const char *query = 
+        "SELECT fee_type, price_per_unit, unit, "
+        "(CASE "
+        "  WHEN fee_type = 1 THEN '物业费' "
+        "  WHEN fee_type = 2 THEN '停车费' "
+        "  WHEN fee_type = 3 THEN '水费' "
+        "  WHEN fee_type = 4 THEN '电费' "
+        "  WHEN fee_type = 5 THEN '燃气费' "
+        "  ELSE '其他费用' END) as type_name "
+        "FROM fee_standards "
+        "WHERE end_date = 0 OR end_date > strftime('%s','now') "
+        "ORDER BY fee_type;";
+
+    sqlite3_stmt *stmt;
+    if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
+    {
+        printf("┌────────────┬──────────┬─────────────┐\n");
+        printf("│ %-10s │ %-8s │ %-11s │\n", 
+               "费用类型", "单价", "计费单位");
+        printf("├────────────┼──────────┼─────────────┤\n");
+
+        while (sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            printf("│ %-10s │ %8.2f │ %-11s │\n",
+                   sqlite3_column_text(stmt, 3),
+                   sqlite3_column_double(stmt, 1),
+                   sqlite3_column_text(stmt, 2));
+        }
+        printf("└────────────┴──────────┴─────────────┘\n");
+        sqlite3_finalize(stmt);
+    }
+}
+
+// 修改查询用户缴费情况函数
+void case2_handler(Database *db)
+{
+    clear_staff_screen();
+    show_current_fee_standards(db);
+    
+    printf("\n===== 用户缴费情况 =====\n\n");
+    const char *query = 
+        "WITH room_fees AS ("
+        "    SELECT r.owner_id, "
+        "           u.username, "
+        "           u.name, "
+        "           r.room_number, "
+        "           r.area_sqm, "
+        "           fs.fee_type, "
+        "           fs.price_per_unit, "
+        "           CASE "
+        "               WHEN fs.fee_type = 1 THEN r.area_sqm * fs.price_per_unit "
+        "               WHEN fs.fee_type = 2 THEN fs.price_per_unit "
+        "               ELSE 0 "
+        "           END as fee_amount "
+        "    FROM users u "
+        "    JOIN rooms r ON u.user_id = r.owner_id "
+        "    CROSS JOIN fee_standards fs "
+        "    WHERE u.role_id = 'role_owner' "
+        "    AND fs.fee_type IN (1, 2) "  // 只计算物业费和停车费
+        "    AND (fs.end_date = 0 OR fs.end_date > strftime('%s','now'))"
+        "), user_summary AS ("
+        "    SELECT rf.owner_id, "
+        "           rf.username, "
+        "           rf.name, "
+        "           rf.room_number, "
+        "           SUM(rf.fee_amount) as monthly_due, "
+        "           GROUP_CONCAT("
+        "               CASE "
+        "                   WHEN rf.fee_type = 1 THEN '物业费:' || printf('%.2f', rf.fee_amount) "
+        "                   WHEN rf.fee_type = 2 THEN '停车费:' || printf('%.2f', rf.fee_amount) "
+        "               END, '; '"
+        "           ) as fee_details, "
+        "           COALESCE((SELECT SUM(amount) FROM transactions "
+        "                    WHERE user_id = rf.owner_id "
+        "                    AND status = 1 "  // 已支付
+        "                    AND period_start >= strftime('%s','now','start of month')"
+        "                    AND period_end < strftime('%s','now','start of month','+1 month')"
+        "           ), 0) as paid_amount, "
+        "           COALESCE((SELECT SUM(amount) FROM transactions "
+        "                    WHERE user_id = rf.owner_id "
+        "                    AND status IN (0, 2) "  // 未支付或逾期
+        "                    AND period_start >= strftime('%s','now','start of month')"
+        "                    AND period_end < strftime('%s','now','start of month','+1 month')"
+        "           ), 0) as unpaid_amount "
+        "    FROM room_fees rf "
+        "    GROUP BY rf.owner_id, rf.username, rf.name, rf.room_number"
+        ")"
+        "SELECT * FROM user_summary "
+        "ORDER BY username;";
+
+    sqlite3_stmt *stmt;
+    if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
+    {
+        printf("┌───────┬──────────┬──────────┬──────────┬────────────┬────────────┬────────────┬───────────────────────┐\n");
+        printf("│ %-5s │ %-8s │ %-8s │ %-8s │ %-10s │ %-10s │ %-10s │ %-19s │\n",
+               "序号", "用户名", "姓名", "房号", "月应缴", "已缴金额", "未缴金额", "费用明细");
+        printf("├───────┼──────────┼──────────┼──────────┼────────────┼────────────┼────────────┼───────────────────────┤\n");
+
+        int row_num = 0;
+        double total_monthly = 0;
+        double total_paid = 0;
+        double total_unpaid = 0;
+
+        while (sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            row_num++;
+            const char *username = (const char *)sqlite3_column_text(stmt, 1);
+            const char *name = (const char *)sqlite3_column_text(stmt, 2);
+            const char *room_number = (const char *)sqlite3_column_text(stmt, 3);
+            double monthly_fee = sqlite3_column_double(stmt, 4);
+            const char *fee_details = (const char *)sqlite3_column_text(stmt, 5);
+            double paid = sqlite3_column_double(stmt, 6);
+            double unpaid = sqlite3_column_double(stmt, 7);
+
+            // 转换费用明细格式
+            char formatted_details[100] = {0};
+            int pos = 0;
+            const char *p = fee_details;
+            while (*p && pos < 99) {
+                if (*p == '1') {
+                    pos += snprintf(formatted_details + pos, 100 - pos, "物业费:%.2f;", atof(strchr(p, ':') + 1));
+                } else if (*p == '2') {
+                    pos += snprintf(formatted_details + pos, 100 - pos, "停车费:%.2f;", atof(strchr(p, ':') + 1));
+                }
+                p = strchr(p, ';');
+                if (!p) break;
+                p++;
+            }
+
+            printf("│ %-5d │ %-8s │ %-8s │ %-8s │ %10.2f │ %10.2f │ %10.2f │ %-19s │\n",
+                   row_num,
+                   username ? username : "N/A",
+                   name ? name : "N/A",
+                   room_number ? room_number : "N/A",
+                   monthly_fee,
+                   paid,
+                   unpaid,
+                   formatted_details);
+
+            total_monthly += monthly_fee;
+            total_paid += paid;
+            total_unpaid += unpaid;
+        }
+
+        if (row_num > 0)
+        {
+            printf("├───────┴──────────┴──────────┴──────────┼────────────┼────────────┼────────────┼───────────────────────┤\n");
+            printf("│ 总计                                   │ %10.2f │ %10.2f │ %10.2f │                    │\n",
+                   total_monthly, total_paid, total_unpaid);
+            printf("└──────────────────────────────────────┴────────────┴────────────┴────────────┴───────────────────────┘\n");
+        }
+        else
+        {
+            printf("└───────┴──────────┴──────────┴──────────┴────────────┴────────────┴────────────┴───────────────────────┘\n");
+            printf("\n未找到任何用户缴费信息\n");
+        }
+
+        sqlite3_finalize(stmt);
+    }
+}
+
+// 发送缴费提醒函数
+void send_payment_reminder(Database *db, const char *user_id, double unpaid_amount, const char *fee_types) 
+{
+    char reminder[512];
+    char username[100];
+    time_t now = time(NULL);
+    struct tm *t = localtime(&now);
+    
+    // 获取用户名
+    if (!query_username_by_user_id(db, user_id, username)) {
+        strcpy(username, "业主");
+    }
+    
+    // 获取当前费用标准信息
+    char fee_standards[256] = "";
+    get_current_fee_standards_info(db, fee_standards, sizeof(fee_standards));
+
+    // 生成提醒内容
+    snprintf(reminder, sizeof(reminder),
+             "尊敬的%s:\n\n"
+             "您目前有以下费用未缴纳：\n"
+             "总金额：%.2f元\n"
+             "费用类型：%s\n\n"
+             "请您及时缴纳费用。如已缴费请忽略此提醒。\n\n"
+             "发送时间：%d-%02d-%02d\n"
+             "物业服务中心",
+             username, unpaid_amount, fee_types,
+             t->tm_year + 1900, t->tm_mon + 1, t->tm_mday);
+
+    // 保存提醒到数据库
+    char query[1024];
+    snprintf(query, sizeof(query),
+             "INSERT INTO payment_reminders (user_id, reminder_content, send_time, status) "
+             "VALUES ('%s', '%s', %ld, 0)",
+             user_id, reminder, (long)now);
+
+    if (execute_update(db, query)) {
+        printf("\n已成功向用户 %s 发送缴费提醒\n", username);
+    } else {
+        printf("\n发送提醒失败\n");
+    }
+}
+
+// 获取当前费用标准信息
+void get_current_fee_standards_info(Database *db, char *buffer, size_t buffer_size) 
+{
+    const char *query = 
+        "SELECT fee_type, price_per_unit, unit "
+        "FROM fee_standards "
+        "WHERE end_date = 0 OR end_date > strftime('%s','now') "
+        "ORDER BY fee_type;";
+
+    sqlite3_stmt *stmt;
+    if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK) {
+        char *curr_pos = buffer;
+        int remaining = buffer_size;
+        
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            const char *type_str;
+            int fee_type = sqlite3_column_int(stmt, 0);
+            
+            switch (fee_type) {
+                case TRANS_PROPERTY_FEE: type_str = "物业费"; break;
+                case TRANS_PARKING_FEE: type_str = "停车费"; break;
+                case TRANS_WATER_FEE: type_str = "水费"; break;
+                case TRANS_ELECTRICITY_FEE: type_str = "电费"; break;
+                case TRANS_GAS_FEE: type_str = "燃气费"; break;
+                default: type_str = "其他费用"; break;
+            }
+            
+            int written = snprintf(curr_pos, remaining, "%s: %.2f %s\n",
+                                 type_str,
+                                 sqlite3_column_double(stmt, 1),
+                                 sqlite3_column_text(stmt, 2));
+                                 
+            if (written >= remaining) break;
+            curr_pos += written;
+            remaining -= written;
+        }
+        sqlite3_finalize(stmt);
+    }
 }
