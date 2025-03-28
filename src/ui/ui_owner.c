@@ -677,9 +677,8 @@ void show_payment_management_screen(Database *db, const char *user_id, UserType 
         printf("\n===== 缴费管理 =====\n");
         printf("1. 查看缴费记录\n");
         printf("2. 缴纳费用\n");
-        printf("3. 查询应缴费用\n");
-        printf("4. 查询物业费标准\n");
-        printf("5.查询缴费总金额\n");
+        printf("3. 查询物业费标准\n");
+        printf("4.查询缴费总金额\n");
         printf("0. 返回上一级\n");
         printf("请输入您的选择: ");
         scanf("%d", &choice);
@@ -694,12 +693,9 @@ void show_payment_management_screen(Database *db, const char *user_id, UserType 
             process_payment_screen(db, user_id);
             break;
         case 3:
-            query_due_payments(db, user_id);
-            break;
-        case 4:
             query_fee_info(db, user_id);
             break;
-        case 5:
+        case 4:
             show_total_fee(db, user_id);
             break;
         case 0:
@@ -799,111 +795,7 @@ void show_owner_main_screen(Database *db, const char *user_id, UserType user_typ
  * @param db 数据库连接
  * @param user_id 用户ID
  */
-void query_due_payments(Database *db, const char *user_id)
-{
-    clear_screen();                  // 使用跨平台清屏
-    update_overdue_transactions(db); // 更新逾期状态
 
-    char query[512];
-    QueryResult result;
-
-    // ==================== 1. 查询总应缴金额 ====================
-    // 关键修改：使用NOT IN排除已支付状态（假设TRANS_PAID=1）
-    snprintf(query, sizeof(query),
-             "SELECT SUM(amount) FROM transactions "
-             "WHERE user_id = '%s' AND status != %d", // 排除已支付
-             user_id, TRANS_PAID);
-
-    if (!execute_query(db, query, &result))
-    {
-        printf("查询失败: %s\n", sqlite3_errmsg(db->db));
-        return;
-    }
-
-    float total_amount = 0;
-    if (result.row_count > 0 && result.rows[0].values[0] != NULL)
-    {
-        total_amount = atof(result.rows[0].values[0]);
-    }
-
-    printf("\n===== 应缴费用 =====\n");
-    printf("总应缴金额: %.2f 元\n", total_amount);
-
-    // ==================== 2. 按类型分类统计 ====================
-    free_query_result(&result);
-    snprintf(query, sizeof(query),
-             "SELECT fee_type, SUM(amount) FROM transactions "
-             "WHERE user_id = '%s' AND status != %d " // 相同排除条件
-             "GROUP BY fee_type",
-             user_id, TRANS_PAID);
-
-    if (!execute_query(db, query, &result))
-    {
-        printf("分类统计失败\n");
-        return;
-    }
-
-    printf("\n费用类型明细:\n");
-    for (int i = 0; i < result.row_count; i++)
-    {
-        int fee_type = atoi(result.rows[i].values[0]);
-        float amount = atof(result.rows[i].values[1]);
-
-        // 未修改的类型显示逻辑
-        char fee_type_str[20];
-        switch (fee_type)
-        {
-        case TRANS_PROPERTY_FEE:
-            strcpy(fee_type_str, "物业费");
-            break;
-        case TRANS_PARKING_FEE:
-            strcpy(fee_type_str, "停车费");
-            break;
-        case TRANS_WATER_FEE:
-            strcpy(fee_type_str, "水费");
-            break;
-        case TRANS_ELECTRICITY_FEE:
-            strcpy(fee_type_str, "电费");
-            break;
-        case TRANS_GAS_FEE:
-            strcpy(fee_type_str, "燃气费");
-            break;
-        default:
-            strcpy(fee_type_str, "其他费用");
-            break;
-        }
-        printf("%s: %.2f 元\n", fee_type_str, amount);
-    }
-
-    // ==================== 3. 单独显示逾期金额 ====================
-    free_query_result(&result);
-    snprintf(query, sizeof(query),
-             "SELECT SUM(amount) FROM transactions "
-             "WHERE user_id = '%s' AND status = %d", // 仅逾期
-             user_id, TRANS_OVERDUE);
-
-    if (!execute_query(db, query, &result))
-    {
-        printf("逾期查询失败\n");
-        return;
-    }
-
-    float overdue_amount = 0;
-    if (result.row_count > 0 && result.rows[0].values[0] != NULL)
-    {
-        overdue_amount = atof(result.rows[0].values[0]);
-    }
-
-    if (overdue_amount > 0)
-    {
-        printf("\n注意: 您有 %.2f 元的费用已逾期未付！\n", overdue_amount);
-    }
-
-    // ==================== 4. 最终交互 ====================
-    free_query_result(&result);
-    printf("\n按任意键返回...");
-    getchar();
-}
 
 // 查询特定业主的缴费信息
 void query_owner_payment_info(Database *db, const char *user_id)
