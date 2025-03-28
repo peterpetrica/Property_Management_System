@@ -314,31 +314,104 @@ void query_fee_info(Database *db, const char *user_id)
     printf("按任意键返回...");
     clear_input_buffer();
 }
+
 // 查询服务人员信息
 void query_service_staff_info(Database *db, const char *user_id)
 {
     system("cls");
-    printf("=====查询服务人员信息=====\n");
-    const char *query = "SELECT * FROM service_staff_info;";
+    printf("===== 用户信息查询 =====\n\n");
+
+    // 修改查询语句，获取用户的详细信息和缴费情况
+    const char *query = 
+        "SELECT "
+        "   u.user_id, "
+        "   u.username, "
+        "   u.name, "
+        "   u.phone_number, "
+        "   u.email, "
+        "   r.room_number, "
+        "   b.building_name, "
+        "   COUNT(t.transaction_id) as total_transactions, "
+        "   SUM(CASE WHEN t.status = 1 THEN t.amount ELSE 0 END) as paid_amount "
+        "FROM users u "
+        "LEFT JOIN rooms r ON u.user_id = r.owner_id "
+        "LEFT JOIN buildings b ON r.building_id = b.building_id "
+        "LEFT JOIN transactions t ON u.user_id = t.user_id "
+        "WHERE u.role_id = 'role_owner' "
+        "GROUP BY u.user_id, u.username, u.name, u.phone_number, u.email, r.room_number, b.building_name "
+        "ORDER BY b.building_name, r.room_number;";
+
     sqlite3_stmt *stmt;
     int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
     if (rc != SQLITE_OK)
     {
-        fprintf(stderr, "无法准备查询语句: %s\n", sqlite3_errmsg(db->db));
+        fprintf(stderr, "查询失败: %s\n", sqlite3_errmsg(db->db));
         return;
     }
-    sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
-    printf("服务人员ID\t\t姓名\t\t联系电话\n");
+
+    // 打印表头
+    printf("%-10s%-15s%-15s%-15s%-20s%-15s%-15s%-12s%-12s\n", 
+           "用户ID", "用户名", "姓名", "电话", "邮箱", "楼号", "房间号", "交易次数", "已缴金额");
+    printf("------------------------------------------------------------------------------------------------\n");
+
+    int found = 0;
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
     {
-        const char *staff_id = sqlite3_column_text(stmt, 0);
-        const char *name = sqlite3_column_text(stmt, 1);
-        const char *phone_number = sqlite3_column_text(stmt, 2);
-        printf("%s\t%s\t%s\n", staff_id, name, phone_number);
+        found = 1;
+        const char *user_id = (const char *)sqlite3_column_text(stmt, 0);
+        const char *username = (const char *)sqlite3_column_text(stmt, 1);
+        const char *name = (const char *)sqlite3_column_text(stmt, 2);
+        const char *phone = (const char *)sqlite3_column_text(stmt, 3);
+        const char *email = (const char *)sqlite3_column_text(stmt, 4);
+        const char *room_number = (const char *)sqlite3_column_text(stmt, 5);
+        const char *building_name = (const char *)sqlite3_column_text(stmt, 6);
+        int total_trans = sqlite3_column_int(stmt, 7);
+        double paid_amount = sqlite3_column_double(stmt, 8);
+
+        printf("%-10s%-15s%-15s%-15s%-20s%-15s%-15s%-12d%-12.2f\n",
+            user_id ? user_id : "N/A",
+            username ? username : "未知",
+            name ? name : "未知",
+            phone ? phone : "未知",
+            email ? email : "未知",
+            building_name ? building_name : "未分配",
+            room_number ? room_number : "未分配",
+            total_trans,
+            paid_amount);
+
+        // 查询未缴费信息
+        const char *unpaid_query = 
+            "SELECT COUNT(*) as count, SUM(amount) as total "
+            "FROM transactions "
+            "WHERE user_id = ? AND status = 0;";
+        
+        sqlite3_stmt *unpaid_stmt;
+        if (sqlite3_prepare_v2(db->db, unpaid_query, -1, &unpaid_stmt, NULL) == SQLITE_OK)
+        {
+            sqlite3_bind_text(unpaid_stmt, 1, user_id, -1, SQLITE_STATIC);
+            if (sqlite3_step(unpaid_stmt) == SQLITE_ROW)
+            {
+                int unpaid_count = sqlite3_column_int(unpaid_stmt, 0);
+                double unpaid_amount = sqlite3_column_double(unpaid_stmt, 1);
+                if (unpaid_count > 0)
+                {
+                    printf("    ⚠️ 待缴费: %d笔, 总金额: %.2f元\n", unpaid_count, unpaid_amount);
+                }
+            }
+            sqlite3_finalize(unpaid_stmt);
+        }
+        printf("------------------------------------------------------------------------------------------------\n");
     }
+
+    if (!found)
+    {
+        printf("\n⚠️ 暂无用户信息\n");
+    }
+
     sqlite3_finalize(stmt);
-    printf("按任意键返回...\n");
+    printf("\n按任意键返回...");
     clear_input_buffer();
+    getchar();
 }
 
 // 修改用户名
@@ -815,4 +888,72 @@ void query_due_payments(Database *db, const char *user_id)
     free_query_result(&result);
     printf("\n按任意键返回...");
     getchar();
+}
+
+// 查询特定业主的缴费信息
+void query_owner_payment_info(Database *db, const char *user_id) {
+    system("cls");
+    printf("===== 查询业主缴费信息 =====\n");
+
+    const char *query = "SELECT transaction_id, fee_type, amount, payment_date, status FROM transactions WHERE user_id = ?;";
+    sqlite3_stmt *stmt;
+    int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "SQLite错误: %s\n", sqlite3_errmsg(db->db));
+        return;
+    }
+
+    sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
+
+    printf("交易ID\t费用类型\t金额\t支付日期\t状态\n");
+    printf("-------------------------------------------------\n");
+    int found = 0;
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+        found = 1;
+        const char *transaction_id = sqlite3_column_text(stmt, 0);
+        int fee_type = sqlite3_column_int(stmt, 1);
+        double amount = sqlite3_column_double(stmt, 2);
+        const char *payment_date = sqlite3_column_text(stmt, 3);
+        int status = sqlite3_column_int(stmt, 4);
+
+        printf("%s\t%d\t\t%.2f\t%s\t%d\n", transaction_id, fee_type, amount, payment_date ? payment_date : "未支付", status);
+    }
+
+    if (!found) {
+        printf("\n⚠️ 当前业主暂无缴费记录。\n");
+    }
+
+    sqlite3_finalize(stmt);
+    printf("\n按任意键返回...\n");
+    clear_input_buffer();
+}
+
+// 查询所有业主的缴费情况
+void query_all_owners_payment_info(Database *db) {
+    system("cls");
+    printf("===== 查询所有业主缴费情况 =====\n");
+
+    const char *query = "SELECT u.user_id, u.name, SUM(t.amount) AS total_paid FROM users u "
+                        "LEFT JOIN transactions t ON u.user_id = t.user_id "
+                        "WHERE u.role_id = 'role_owner' GROUP BY u.user_id, u.name;";
+    sqlite3_stmt *stmt;
+    int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "SQLite错误: %s\n", sqlite3_errmsg(db->db));
+        return;
+    }
+
+    printf("业主ID\t姓名\t\t累计缴费金额\n");
+    printf("-----------------------------------------\n");
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+        const char *user_id = sqlite3_column_text(stmt, 0);
+        const char *name = sqlite3_column_text(stmt, 1);
+        double total_paid = sqlite3_column_double(stmt, 2);
+
+        printf("%s\t%s\t\t%.2f\n", user_id, name, total_paid);
+    }
+
+    sqlite3_finalize(stmt);
+    printf("\n按任意键返回...\n");
+    clear_input_buffer();
 }

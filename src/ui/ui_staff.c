@@ -28,6 +28,23 @@
 #include <string.h>
 #include <time.h>
 
+// 清除输入缓冲区
+void clear_staff_input_buffer()
+{
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
+
+// 清屏函数
+void clear_staff_screen()
+{
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+}
+
 // 等待用户按键返回
 int wait_for_user()
 {
@@ -48,7 +65,7 @@ void show_staff_main_screen(Database *db, const char *user_id, UserType user_typ
     int choice = 0;
     do
     {
-        system("clear || cls"); // 修复清屏命令兼容性
+        clear_staff_screen(); // 修复清屏命令兼容性
         printf("欢迎来到服务人员主页面\n");
         printf("1.显示个人信息\n");
         printf("2.修改个人信息\n");
@@ -60,7 +77,7 @@ void show_staff_main_screen(Database *db, const char *user_id, UserType user_typ
         if (scanf("%d", &choice) != 1)
         {
             printf("输入错误，请重试\n");
-            while (getchar() != '\n'); // 清空缓冲区
+            clear_staff_input_buffer(); // 清空缓冲区
             continue;
         }
         switch (choice)
@@ -95,7 +112,7 @@ void show_staff_main_screen(Database *db, const char *user_id, UserType user_typ
 // 重命名为 show_staff_personal_info_screen
 void show_staff_personal_info_screen(Database *db, const char *user_id, UserType user_type)
 {
-    system("clear || cls");
+    clear_staff_screen();
     printf("个人信息界面\n");
 
     Staff staff;
@@ -117,7 +134,7 @@ void show_staff_personal_info_screen(Database *db, const char *user_id, UserType
 // 修改个人信息界面
 void modify_personal_info_screen(Database *db, const char *user_id, UserType user_type)
 {
-    system("clear || cls");
+    clear_staff_screen();
     printf("修改个人信息界面\n");
     Staff staff;
 
@@ -132,7 +149,7 @@ void modify_personal_info_screen(Database *db, const char *user_id, UserType use
     int choice=0;
     do
     {
-        system("clear || cls");
+        clear_staff_screen();
         printf("当前信息:\n");
         printf("1. 姓名: %s\n", staff.name);
         printf("2. 联系方式: %s\n", staff.phone_number);
@@ -143,7 +160,7 @@ void modify_personal_info_screen(Database *db, const char *user_id, UserType use
         if (scanf("%d", &choice) != 1)
         {
             printf("输入错误，请重试\n");
-            while (getchar() != '\n'); // 清空缓冲区
+            clear_staff_input_buffer(); // 清空缓冲区
             continue;
         }
         switch(choice)
@@ -236,7 +253,7 @@ void modify_personal_info_screen(Database *db, const char *user_id, UserType use
             if (scanf("%d", &choice) != 1||choice<1||choice>service_type_count)
             {
                 printf("输入错误，请重试\n");
-                while (getchar() != '\n'); // 清空缓冲区
+                clear_staff_input_buffer(); // 清空缓冲区
                 continue;
             }
             const char*selected_service_type=service_types[choice-1];
@@ -277,31 +294,173 @@ void modify_personal_info_screen(Database *db, const char *user_id, UserType use
     }
     wait_for_user();
 }
+
 // 服务人员信息查询界面
 void show_staff_query_screen(Database *db, const char *user_id, UserType user_type)
 {
-    system("clear || cls");
-    printf("服务人员信息查询界面\n");
+    int choice;
+    while (1)
+    {
+        clear_staff_screen();
+        printf("\n===== 服务人员信息查询 =====\n\n");
+        printf("1. 查询用户基本信息\n");
+        printf("2. 查询用户缴费情况\n");
+        printf("3. 查询用户房屋信息\n");
+        printf("0. 返回上一级\n");
+        printf("\n请输入您的选择: ");
 
-    Staff staff_list[100];
-    int count = query_all_staff(db, staff_list, 100);
-    if (count <= 0)
-    {
-        printf("没有找到任何服务人员信息\n");
-    }
-    else
-    {
-        printf("服务人员信息列表:\n");
-        for (int i = 0; i < count; i++)
+        if (scanf("%d", &choice) != 1)
         {
-            printf("%d. 姓名: %s, 联系方式: %s, 服务类型: %s\n",
-                   i + 1, staff_list[i].name, staff_list[i].phone_number, staff_list[i].staff_type_id);
+            clear_staff_input_buffer();
+            printf("输入无效，请重新输入\n");
+            continue;
         }
-    }
+        clear_staff_input_buffer();
 
-    printf("按任意键返回主菜单...\n");
-    while (getchar() != '\n'); // 清空缓冲区
-    getchar(); // 等待用户输入
+        switch (choice)
+        {
+        case 1:
+            {
+                clear_staff_screen();
+                printf("\n===== 用户基本信息 =====\n\n");
+                const char *query = 
+                    "SELECT u.user_id, u.username, u.name, u.phone_number, u.email "
+                    "FROM users u "
+                    "WHERE u.role_id = 'role_owner' "
+                    "ORDER BY u.user_id;";
+
+                sqlite3_stmt *stmt;
+                if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
+                {
+                    // 修改表头格式，使用更紧凑的布局
+                    printf("--------------------------------------------------------------------------------------------------------\n");
+                    printf("| %-8s | %-12s | %-12s | %-12s | %-25s |\n", 
+                           "ID", "用户名", "姓名", "电话", "邮箱");
+                    printf("--------------------------------------------------------------------------------------------------------\n");
+                    
+                    int found = 0;
+                    while (sqlite3_step(stmt) == SQLITE_ROW)
+                    {
+                        found = 1;
+                        const char *full_id = (const char *)sqlite3_column_text(stmt, 0);
+                        char short_id[9];  // 只显示ID的前8位
+                        strncpy(short_id, full_id, 8);
+                        short_id[8] = '\0';
+
+                        // 使用格式化的表格样式
+                        printf("| %-8s | %-12s | %-12s | %-12s | %-25s |\n",
+                            short_id,
+                            sqlite3_column_text(stmt, 1) ? (char*)sqlite3_column_text(stmt, 1) : "N/A",
+                            sqlite3_column_text(stmt, 2) ? (char*)sqlite3_column_text(stmt, 2) : "N/A",
+                            sqlite3_column_text(stmt, 3) ? (char*)sqlite3_column_text(stmt, 3) : "N/A",
+                            sqlite3_column_text(stmt, 4) ? (char*)sqlite3_column_text(stmt, 4) : "N/A");
+                        printf("--------------------------------------------------------------------------------------------------------\n");
+                    }
+                    
+                    if (!found) {
+                        printf("\n⚠️ 未找到任何用户信息\n");
+                    }
+                    
+                    sqlite3_finalize(stmt);
+                }
+            }
+            break;
+
+        case 2:
+            // 查询用户缴费情况
+            {
+                clear_staff_screen();
+                printf("\n===== 用户缴费情况 =====\n\n");
+                const char *query = 
+                    "SELECT u.user_id, u.username, "
+                    "COUNT(t.transaction_id) as total_trans, "
+                    "SUM(CASE WHEN t.status = 1 THEN t.amount ELSE 0 END) as paid_amount, "
+                    "SUM(CASE WHEN t.status = 0 THEN t.amount ELSE 0 END) as unpaid_amount "
+                    "FROM users u "
+                    "LEFT JOIN transactions t ON u.user_id = t.user_id "
+                    "WHERE u.role_id = 'role_owner' "
+                    "GROUP BY u.user_id, u.username;";
+
+                sqlite3_stmt *stmt;
+                if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
+                {
+                    printf("%-12s%-16s%-16s%-16s%-16s\n", 
+                           "用户ID", "用户名", "交易总数", "已缴金额", "未缴金额");
+                    printf("------------------------------------------------------------------------\n");
+                    
+                    int found = 0;
+                    while (sqlite3_step(stmt) == SQLITE_ROW)
+                    {
+                        found = 1;
+                        printf("%-12s%-16s%-16d%-16.2f%-16.2f\n",
+                            sqlite3_column_text(stmt, 0),
+                            sqlite3_column_text(stmt, 1),
+                            sqlite3_column_int(stmt, 2),
+                            sqlite3_column_double(stmt, 3),
+                            sqlite3_column_double(stmt, 4));
+                    }
+                    
+                    if (!found) {
+                        printf("\n未找到任何用户缴费信息\n");
+                    }
+                    
+                    sqlite3_finalize(stmt);
+                }
+            }
+            break;
+
+        case 3:
+            // 查询用户房屋信息
+            {
+                clear_staff_screen();
+                printf("\n===== 用户房屋信息 =====\n\n");
+                const char *query = 
+                    "SELECT u.user_id, u.username, b.building_name, r.room_number, r.floor, r.area_sqm "
+                    "FROM users u "
+                    "LEFT JOIN rooms r ON u.user_id = r.owner_id "
+                    "LEFT JOIN buildings b ON r.building_id = b.building_id "
+                    "WHERE u.role_id = 'role_owner' "
+                    "ORDER BY b.building_name, r.room_number;";
+
+                sqlite3_stmt *stmt;
+                if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
+                {
+                    printf("%-12s%-16s%-16s%-16s%-16s%-16s\n", 
+                           "用户ID", "用户名", "楼号", "房间号", "楼层", "面积(㎡)");
+                    printf("------------------------------------------------------------------------\n");
+                    
+                    int found = 0;
+                    while (sqlite3_step(stmt) == SQLITE_ROW)
+                    {
+                        found = 1;
+                        printf("%-12s%-16s%-16s%-16s%-16d%-16.2f\n",
+                            sqlite3_column_text(stmt, 0),
+                            sqlite3_column_text(stmt, 1),
+                            sqlite3_column_text(stmt, 2),
+                            sqlite3_column_text(stmt, 3),
+                            sqlite3_column_int(stmt, 4),
+                            sqlite3_column_double(stmt, 5));
+                    }
+                    
+                    if (!found) {
+                        printf("\n未找到任何用户房屋信息\n");
+                    }
+                    
+                    sqlite3_finalize(stmt);
+                }
+            }
+            break;
+
+        case 0:
+            return;
+
+        default:
+            printf("无效的选择，请重新输入\n");
+        }
+        
+        printf("\n按Enter键继续...");
+        getchar();
+    }
 }
 
 // 比较函数：按姓名比较服务人员
@@ -315,7 +474,7 @@ int compare_staff_by_name(const void *a, const void *b)
 // 服务人员信息排序界面
 void show_staff_sort_screen(Database *db, const char *user_id, UserType user_type)
 {
-    system("clear || cls");
+    clear_staff_screen();
     printf("服务人员信息排序界面\n");
 
     Staff staff_list[100]; // 定义 staff_list 数组
@@ -343,7 +502,7 @@ void show_staff_sort_screen(Database *db, const char *user_id, UserType user_typ
 // 服务人员信息统计界面
 void show_staff_statistics_screen(Database *db, const char *user_id, UserType user_type)
 {
-    system("clear || cls");
+    clear_staff_screen();
     printf("服务人员数据统计界面\n");
 
     int total_staff = count_all_staff(db);
@@ -370,7 +529,7 @@ void show_staff_statistics_screen(Database *db, const char *user_id, UserType us
 // 服务人员系统维护界面
 void show_staff_maintenance_screen(Database *db, const char *user_id, UserType user_type)
 {
-    system("clear || cls");
+    clear_staff_screen();
     printf("服务人员系统维护界面\n");
 
     printf("1. 数据备份\n");
@@ -380,8 +539,7 @@ void show_staff_maintenance_screen(Database *db, const char *user_id, UserType u
     if (scanf("%d", &choice) != 1)
     {
         printf("输入错误，请重试\n");
-        while (getchar() != '\n')
-            ; // 清空缓冲区
+        clear_staff_input_buffer(); // 清空缓冲区
         return;
     }
 
