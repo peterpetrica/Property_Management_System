@@ -160,36 +160,37 @@ void show_system_maintenance_screen(Database *db, const char *user_id, UserType 
         printf("4. 数据恢复\n");
         printf("0. 返回上一级\n");
         printf("\n请选择: ");
-        
+
         scanf("%d", &choice);
         clear_input_buffer();
 
-        switch (choice) {
-            case 1:
-                manage_fee_standards_screen(db, user_id, user_type);
-                break;
-            case 2:
-                generate_monthly_fees_screen(db, user_id, user_type);
-                break;
-            case 3:
-                backup_database(db);
-                printf("数据备份完成\n");
-                printf("按任意键继续...");
-                getchar();
-                break;
-            case 4:
-                restore_database(db);
-                printf("数据恢复完成\n");
-                printf("按任意键继续...");
-                getchar();
-                break;
-            case 0:
-                return;
-            default:
-                printf("无效的选择\n");
-                printf("按任意键继续...");
-                getchar();
-                break;
+        switch (choice)
+        {
+        case 1:
+            manage_fee_standards_screen(db, user_id, user_type);
+            break;
+        case 2:
+            generate_monthly_fees_screen(db, user_id, user_type);
+            break;
+        case 3:
+            backup_database(db);
+            printf("数据备份完成\n");
+            printf("按任意键继续...");
+            getchar();
+            break;
+        case 4:
+            restore_database(db);
+            printf("数据恢复完成\n");
+            printf("按任意键继续...");
+            getchar();
+            break;
+        case 0:
+            return;
+        default:
+            printf("无效的选择\n");
+            printf("按任意键继续...");
+            getchar();
+            break;
         }
     }
 }
@@ -888,7 +889,7 @@ void generate_periodic_fees_screen(Database *db, const char *user_id, UserType u
 
     int year, month, fee_type, due_days;
 
-    system("cls");
+    system("clear||cls");
     printf("\n===== 生成周期性费用 =====\n");
     printf("请输入年份: ");
     scanf("%d", &year);
@@ -976,7 +977,7 @@ void manage_fee_standards_screen(Database *db, const char *user_id, UserType use
     int choice;
     while (1)
     {
-        system("cls");
+        system("clear||cls");
         printf("\n===== 费用标准管理 =====\n");
         printf("1. 查看现有费用标准\n");
         printf("2. 添加新费用标准\n");
@@ -991,7 +992,7 @@ void manage_fee_standards_screen(Database *db, const char *user_id, UserType use
         case 1:
             // 查看费用标准实现
             {
-                system("cls");
+                system("clear||cls");
                 printf("\n===== 现有费用标准 =====\n");
 
                 char query[512];
@@ -1086,7 +1087,7 @@ void manage_fee_standards_screen(Database *db, const char *user_id, UserType use
         case 2:
             // 添加费用标准实现
             {
-                system("cls");
+                system("clear||cls");
                 printf("\n===== 添加新费用标准 =====\n");
 
                 FeeStandard standard;
@@ -1203,22 +1204,23 @@ void manage_fee_standards_screen(Database *db, const char *user_id, UserType use
  * @param user_id 当前登录用户的ID
  * @param user_type 当前登录用户的类型
  */
-void generate_monthly_fees_screen(Database *db, const char *user_id, UserType user_type) 
+void generate_monthly_fees_screen(Database *db, const char *user_id, UserType user_type)
 {
     clear_screen();
     printf("\n===== 生成月度费用 =====\n");
-    
+
     int year, month;
     time_t now = time(NULL);
     struct tm *t = localtime(&now);
-    
+
     printf("当前日期: %d年%d月\n\n", t->tm_year + 1900, t->tm_mon + 1);
     printf("请输入要生成的年份: ");
     scanf("%d", &year);
     printf("请输入要生成的月份(1-12): ");
     scanf("%d", &month);
-    
-    if (month < 1 || month > 12) {
+
+    if (month < 1 || month > 12)
+    {
         printf("无效的月份\n");
         wait_for_key();
         return;
@@ -1229,15 +1231,15 @@ void generate_monthly_fees_screen(Database *db, const char *user_id, UserType us
     start_tm.tm_year = year - 1900;
     start_tm.tm_mon = month - 1;
     start_tm.tm_mday = 1;
-    
+
     struct tm end_tm = start_tm;
     end_tm.tm_mon++;
-    
+
     time_t period_start = mktime(&start_tm);
     time_t period_end = mktime(&end_tm);
 
     printf("\n生成周期: %d年%d月1日 - %d年%d月1日\n",
-           year, month, 
+           year, month,
            month == 12 ? year + 1 : year,
            month == 12 ? 1 : month + 1);
 
@@ -1246,15 +1248,18 @@ void generate_monthly_fees_screen(Database *db, const char *user_id, UserType us
     scanf("%d", &due_days);
 
     printf("\n正在生成费用...\n");
-    
+
     bool success = true;
     success &= generate_property_fees(db, period_start, period_end, due_days);
     success &= generate_parking_fees(db, period_start, period_end, due_days);
     success &= generate_utility_fees(db, period_start, period_end, due_days);
 
-    if (success) {
+    if (success)
+    {
         printf("\n✓ 成功生成%d年%d月的费用账单\n", year, month);
-    } else {
+    }
+    else
+    {
         printf("\n✗ 生成费用账单时发生错误\n");
     }
 
