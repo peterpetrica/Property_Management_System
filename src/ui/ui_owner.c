@@ -34,7 +34,7 @@
 // 显示缴费记录
 void show_payment_history(Database *db, const char *user_id)
 {
-    system("clear || cls");
+    // system("clear||cls");
     printf("=====缴费记录=====\n");
 
     const char *query = "SELECT transaction_id, amount, payment_date FROM transactions WHERE user_id=?";
@@ -147,7 +147,7 @@ void process_payment_screen(Database *db, const char *user_id)
     char trans_id[25] = {0};
 
     // 清屏并显示标题
-    system("clear || cls");
+    // system("clear||cls");
     printf("======== 费用缴纳 ========\n\n");
 
     // 费用类型配置
@@ -432,7 +432,7 @@ void query_fee_info(Database *db, const char *user_id)
     int rc = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
 
-    system("clear || cls"); // 修改为跨平台清屏
+    // system("clear||cls");
     printf("===== 物业费标准 =====\n");
 
     // 先检查表是否存在
@@ -474,7 +474,7 @@ void query_fee_info(Database *db, const char *user_id)
 // 查询服务人员信息
 void query_service_staff_info(Database *db, const char *user_id)
 {
-    system("clear || cls");
+    // system("clear||cls");
     printf("\n============= 服务人员信息 =============\n\n");
 
     // 修改查询语句为查询服务人员信息
