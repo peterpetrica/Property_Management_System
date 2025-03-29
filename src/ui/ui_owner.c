@@ -428,34 +428,47 @@ void query_community_info()
 // 查询收费信息
 void query_fee_info(Database *db, const char *user_id)
 {
-    sqlite3_stmt *stmt = NULL;
-    int rc = sqlite3_step(stmt);
-    sqlite3_finalize(stmt);
-
     // system("clear||cls");
     printf("===== 物业费标准 =====\n");
 
-    // 先检查表是否存在
-    const char *check_table = "SELECT 1 FROM sqlite_master WHERE type='table' AND name='fee_info'";
-    sqlite3_stmt *check_stmt;
-    if (sqlite3_prepare_v2(db->db, check_table, -1, &check_stmt, NULL) != SQLITE_OK)
-    {
-        fprintf(stderr, "❌ 检查表失败: %s\n", sqlite3_errmsg(db->db));
-        return;
-    }
+    // 定义费用类型
+    const char *fee_type_names[] = {
+        "其他费用",
+        "物业费",
+        "停车费",
+        "水费",
+        "电费",
+        "燃气费",
+    };
+
+    int fee_types[] = {1, 2, 3, 4, 5}; // 对应物业费、停车费、水费、电费、燃气费
+    int fee_count = sizeof(fee_types) / sizeof(fee_types[0]);
+
     // 打印表头
-    printf("费用ID\t\t费用名称\t\t费用金额\n");
+    printf("费用ID\t\t费用名称\t\t费用金额\t\t单位\n");
     printf("--------------------------------------------\n");
 
-    // 遍历结果
+    // 遍历每种费用类型
     int found = 0;
-    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
+    for (int i = 0; i < fee_count; i++)
     {
-        found = 1;
-        const char *fee_id = (const char *)sqlite3_column_text(stmt, 0);
-        const char *fee_name = (const char *)sqlite3_column_text(stmt, 1);
-        double fee_amount = sqlite3_column_double(stmt, 2);
-        printf("%-8s\t%-16s\t￥%.2f\n", fee_id, fee_name, fee_amount);
+        FeeStandard standard;
+        if (get_current_fee_standard(db, fee_types[i], &standard))
+        {
+            found = 1;
+
+            // 格式化日期
+            char effective_date[20] = {0};
+            time_t eff_time = standard.effective_date;
+            strftime(effective_date, sizeof(effective_date), "%Y-%m-%d", localtime(&eff_time));
+
+            // 输出费用信息
+            printf("%-8s\t%-16s\t￥%.2f\t\t/%s\n",
+                   standard.standard_id,
+                   fee_type_names[standard.fee_type],
+                   standard.price_per_unit,
+                   standard.unit);
+        }
     }
 
     // 检查是否无数据
@@ -464,8 +477,6 @@ void query_fee_info(Database *db, const char *user_id)
         printf("\n⚠️ 当前无物业费标准数据。\n");
     }
 
-    // 释放资源
-    sqlite3_finalize(stmt);
     printf("\n--------------------------------------------\n");
     printf("按任意键返回...");
     clear_input_buffer();
