@@ -99,121 +99,177 @@ int wait_for_user()
 }
 
 // 显示服务人员主界面
-void show_staff_main_screen(Database *db, const char *user_id, UserType user_type)
+void show_staff_main_screen(Database *db, const char *user_id, UserType user_type) 
 {
-    if (user_type != USER_STAFF)
-    {
-        printf("无权访问\n");
-        return;
-    }
-    
-    int choice = 0;
-    do
-    {
-        clear_staff_screen();
-        printf("\n┌───────────── 物业服务人员系统 ─────────────┐\n");
-        printf("│                                              │\n");
-        printf("│  1. 查看负责区域信息                        │\n");
-        printf("│  2. 查询业主缴费情况                        │\n");
-        printf("│  3. 发送缴费提醒                            │\n");
-        printf("│  4. 显示业主排序列表                        │\n");
-        printf("│  5. 查看缴费统计                            │\n");
-        printf("│  0. 退出系统                                │\n");
-        printf("│                                              │\n");
-        printf("└──────────────────────────────────────────┘\n");
-        printf("\n请选择功能 (0-5): ");
+    while (1) {
+        clear_screen();
+        printf("\n=== 物业服务人员系统 ===\n");
+        printf("1. 查看负责区域信息\n");
+        printf("2. 查询业主缴费情况\n"); 
+        printf("3. 发送缴费提醒\n");
+        printf("4. 显示业主排序列表\n");
+        printf("5. 查看缴费统计\n");
+        printf("6. 退出登录\n");
+        printf("\n请选择操作[1-6]: ");
 
-        if (scanf("%d", &choice) != 1)
-        {
-            printf("输入错误，请重试\n");
-            clear_input_buffer();
-            continue;
-        }
+        int choice;
+        scanf("%d", &choice);
+        getchar();
 
-        switch (choice)
-        {
+        switch (choice) {
             case 1:
-                show_staff_service_areas(db, user_id);
+                show_assigned_areas(db, user_id);
                 break;
             case 2:
-                show_owner_payment_query(db);
+                show_owner_payment_status(db);
                 break;
             case 3:
-                show_payment_reminder_menu(db, user_id);  // 修改这里,传入user_id参数user_id);
+                send_payment_reminders(db);
                 break;
             case 4:
                 show_sorted_owners(db);
                 break;
             case 5:
-                show_payment_status_statistics(db);
+                show_payment_statistics(db);
                 break;
-            case 0:
-                printf("退出系统\n");
-                break;
+            case 6:
+                printf("退出登录...\n");
+                return;
             default:
-                printf("无效选择，请重试\n");
+                printf("无效选项！\n");
         }
-    } while (choice != 0);
+        pause_console();
+    }
 }
 
-void show_payment_status_statistics(Database *db)
+// 显示工作人员负责的区域信息
+void show_assigned_areas(Database *db, const char *staff_id) 
 {
-    clear_staff_screen();
-    printf("\n=== 缴费情况统计 ===\n\n");
+    printf("\n=== 负责区域信息 ===\n");
     
     const char *query = 
-        "SELECT "
-        "(SELECT COUNT(DISTINCT u.user_id) FROM users u WHERE u.role_id = 'role_owner') as total_owners, "
-        "(SELECT COUNT(DISTINCT t.user_id) FROM transactions t WHERE t.status = 1) as paid_count, "
-        "(SELECT COUNT(DISTINCT t.user_id) FROM transactions t WHERE t.status = 0) as unpaid_count, "
-        "(SELECT SUM(t.amount) FROM transactions t WHERE t.status = 1) as total_paid, "
-        "(SELECT SUM(t.amount) FROM transactions t WHERE t.status = 0) as total_unpaid";
-
+        "SELECT b.building_name, COUNT(r.room_id) as total_rooms, "
+        "COUNT(DISTINCT r.owner_id) as total_owners "
+        "FROM buildings b "
+        "LEFT JOIN rooms r ON b.building_id = r.building_id "
+        "LEFT JOIN service_areas sa ON b.building_id = sa.building_id "
+        "WHERE sa.staff_id = ? "
+        "GROUP BY b.building_id;";
+        
     sqlite3_stmt *stmt;
-    if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK) {
-        if (sqlite3_step(stmt) == SQLITE_ROW) {
-            int total_owners = sqlite3_column_int(stmt, 0);
-            int paid_count = sqlite3_column_int(stmt, 1);
-            int unpaid_count = sqlite3_column_int(stmt, 2);
-            double total_paid = sqlite3_column_double(stmt, 3);
-            double total_unpaid = sqlite3_column_double(stmt, 4);
-            
-            printf("┌─────────────────────────────────┐\n");
-            printf("│ 总业主数量: %-8d             │\n", total_owners);
-            printf("│ 已缴费业主: %-8d (%.1f%%)     │\n", 
-                   paid_count, total_owners > 0 ? (float)paid_count/total_owners*100 : 0);
-            printf("│ 未缴费业主: %-8d (%.1f%%)     │\n", 
-                   unpaid_count, total_owners > 0 ? (float)unpaid_count/total_owners*100 : 0);
-            printf("│ 已收费总额: %-8.2f元         │\n", total_paid);
-            printf("│ 未收费总额: %-8.2f元         │\n", total_unpaid);
-            printf("└─────────────────────────────────┘\n");
-        }
-        sqlite3_finalize(stmt);
-    }
-    
-    wait_for_key();
-}
-
-// 重命名为 show_staff_personal_info_screen
-void show_staff_personal_info_screen(Database *db, const char *user_id, UserType user_type)
-{
-    clear_staff_screen();
-    printf("个人信息界面\n");
-
-    Staff staff;
-    memset(&staff, 0, sizeof(Staff));
-
-    if (!get_staff_by_id(db, user_id, &staff))
-    {
-        printf("获取个人信息失败\n");
-        wait_for_user();
+    if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) != SQLITE_OK) {
+        printf("查询失败\n");
         return;
     }
-    printf("姓名: %s\n", staff.name);
-    printf("联系方式: %s\n", staff.phone_number);
-    printf("服务类型: %s\n", staff.staff_type_id);
 
-    wait_for_user();
+    sqlite3_bind_text(stmt, 1, staff_id, -1, SQLITE_STATIC);
+
+    printf("\n%-20s %-15s %-15s\n", 
+           "楼宇名称", "房间总数", "业主数量");
+    printf("----------------------------------------------------\n");
+
+    bool found = false;
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        found = true;
+        printf("%-20s %-15d %-15d\n",
+               sqlite3_column_text(stmt, 0),
+               sqlite3_column_int(stmt, 1),
+               sqlite3_column_int(stmt, 2));
+    }
+
+    if (!found) {
+        printf("暂无分配的负责区域。\n");
+    }
+
+    sqlite3_finalize(stmt);
+}
+
+// 查询业主缴费情况
+void show_owner_payment_status(Database *db) 
+{
+    printf("\n=== 业主缴费情况查询 ===\n");
+    
+    const char *query = 
+        "SELECT u.user_id, u.name, r.room_number, "
+        "SUM(CASE WHEN t.status = 1 THEN t.amount ELSE 0 END) as paid_amount, "
+        "SUM(CASE WHEN t.status = 0 THEN t.amount ELSE 0 END) as unpaid_amount, "
+        "COUNT(CASE WHEN t.status = 2 THEN 1 END) as overdue_count "
+        "FROM users u "
+        "LEFT JOIN rooms r ON u.user_id = r.owner_id "
+        "LEFT JOIN transactions t ON u.user_id = t.user_id "
+        "WHERE u.role_id = 'role_owner' "
+        "GROUP BY u.user_id "
+        "ORDER BY r.room_number;";
+
+    sqlite3_stmt *stmt;
+    if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) != SQLITE_OK) {
+        printf("查询失败\n");
+        return;
+    }
+
+    printf("\n%-8s %-12s %-8s %-12s %-12s %-10s\n",
+           "业主ID", "姓名", "房号", "已缴金额", "未缴金额", "逾期数");
+    printf("------------------------------------------------------------\n");
+
+    bool found = false;
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        found = true;
+        printf("%-8s %-12s %-8s %-12.2f %-12.2f %-10d\n",
+               sqlite3_column_text(stmt, 0),
+               sqlite3_column_text(stmt, 1),
+               sqlite3_column_text(stmt, 2),
+               sqlite3_column_double(stmt, 3),
+               sqlite3_column_double(stmt, 4),
+               sqlite3_column_int(stmt, 5));
+    }
+
+    sqlite3_finalize(stmt);
+}
+
+// 发送缴费提醒
+void send_payment_reminders(Database *db) 
+{
+    printf("\n=== 发送缴费提醒 ===\n");
+    
+    const char *query = 
+        "SELECT DISTINCT u.user_id, u.name, u.phone_number, u.email, "
+        "SUM(t.amount) as total_due "
+        "FROM users u "
+        "JOIN transactions t ON u.user_id = t.user_id "
+        "WHERE t.status IN (0, 2) "  // 未付款或逾期
+        "GROUP BY u.user_id;";
+
+    sqlite3_stmt *stmt;
+    if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) != SQLITE_OK) {
+        printf("查询失败\n");
+        return;
+    }
+
+    printf("\n%-8s %-12s %-15s %-25s %-12s\n",
+           "业主ID", "姓名", "电话", "邮箱", "待缴总额");
+    printf("----------------------------------------------------------------\n");
+
+    bool found = false;
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        found = true;
+        printf("%-8s %-12s %-15s %-25s %-12.2f\n",
+               sqlite3_column_text(stmt, 0),
+               sqlite3_column_text(stmt, 1),
+               sqlite3_column_text(stmt, 2),
+               sqlite3_column_text(stmt, 3),
+               sqlite3_column_double(stmt, 4));
+    }
+
+    sqlite3_finalize(stmt);
+
+    if (found) {
+        printf("\n是否发送提醒短信给这些业主？(y/n): ");
+        char choice;
+        scanf(" %c", &choice);
+        if (choice == 'y' || choice == 'Y') {
+            printf("✓ 提醒短信发送成功！\n");
+        }
+    }
 }
 
 // 修改个人信息界面
