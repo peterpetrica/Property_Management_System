@@ -222,3 +222,19 @@ void trim_newline(char *str)
         str[len - 1] = '\0';
     }
 }
+
+/**
+ * @brief 清除输入缓冲区
+ */
+void clear_input_buffer(void) {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
+
+/**
+ * @brief 暂停程序执行，等待用户按任意键继续
+ */
+void pause(void) {
+    printf("\n按任意键继续...");
+    getchar();
+}

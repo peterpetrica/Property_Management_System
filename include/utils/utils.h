@@ -31,4 +31,7 @@ void safe_strcpy(char *dest, const char *src, size_t dest_size);
  */
 void trim_newline(char *str);
 
+// 添加清除输入缓冲区函数声明
+void clear_input_buffer(void);
+
 #endif /* UTILS_H */

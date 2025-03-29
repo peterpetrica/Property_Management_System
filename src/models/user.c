@@ -41,7 +41,6 @@ bool create_owner(Database *db, Owner *owner, const char *password)
         fprintf(stderr, "创建业主账户参数无效\n");
         return false;
     }
-    return false;
 
     char hashed_password[128];
     if (!hash_password(password, hashed_password, sizeof(hashed_password)))
@@ -50,26 +49,29 @@ bool create_owner(Database *db, Owner *owner, const char *password)
         return false;
     }
 
-    const char *query = "INSERT INTO users (user_id,username,password_hash,name,phone_number,email,role_id,registration_date) VALUES(?,?,?,?,?,?,?,?);";
-    sqlite3_stmt *stmt;
-    int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
-        fprintf(stderr, "无法准备插入语句: %s\n", sqlite3_errmsg(db->db));
-        return false;
+    // 先插入用户表
+    char insert_query[512];
+    snprintf(insert_query, sizeof(insert_query),
+             "INSERT INTO users (username, password_hash, name, phone_number, "
+             "email, role_id, status, registration_date) "
+             "VALUES ('%s', '%s', '%s', '%s', '%s', 'role_owner', 1, %ld);",
+             owner->username, hashed_password, owner->name, 
+             owner->phone_number, owner->email, 
+             (long)owner->registration_date);
+             
+    if (!execute_update(db, insert_query)) {
+        return false; 
     }
-    sqlite3_bind_text(stmt, 1, owner->user_id, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 2, owner->username, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 3, hashed_password, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 4, owner->name, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 5, owner->phone_number, -1, SQLITE_STATIC);
-    rc = sqlite3_step(stmt);
-    sqlite3_finalize(stmt);
-    if (rc != SQLITE_DONE)
-    {
-        fprintf(stderr, "无法插入业主信息: %s\n", sqlite3_errmsg(db->db));
-        return false;
+    
+    // 获取自动分配的ID
+    const char *id_query = "SELECT last_insert_rowid();";
+    QueryResult result;
+    if (execute_query(db, id_query, &result) && result.row_count > 0) {
+        owner->user_id[0] = '\0';
+        strncat(owner->user_id, result.rows[0].values[0], sizeof(owner->user_id)-1);
+        free_query_result(&result);
     }
+
     return true;
 }
 
@@ -781,91 +783,131 @@ int compare_id_asc(const void *a, const void *b)
  * @param compare_func 用于排序的比较函数
  */
 
-        void sort_owners(Database *db, int (*compare_func)(const void *, const void *))
- {
-            // 确保数据库存在
-            if (db == NULL || db->db == NULL) {
-                printf("数据库连接无效，无法排序。\n");
-                return;
-            }
-        
-            // 查询业主数据
-            const char *query = "SELECT user_id, name FROM users WHERE role_id = "
-                                "(SELECT role_id FROM roles WHERE role_name = '业主')";
-        
-            QueryResult result;
-            if (!execute_query(db, query, &result)) { // 执行查询并获取结果
-                printf("查询失败。\n");
-                return;
-            }
-        
-            // 如果没有业主数据
-            if (result.row_count == 0) {
-                printf("没有业主数据。\n");
-                free_query_result(&result); // 释放查询结果
-                return;
-            }
-        
-            // 申请内存存储业主数据
-            Owner *owners = malloc(sizeof(Owner) * result.row_count);
-            if (!owners) {
-                printf("内存分配失败\n");
-                free_query_result(&result);
-                return;
-            }
-        
-            // 解析查询结果并填充 owners 数组
-            for (int i = 0; i < result.row_count; i++) {
-                strcpy(owners[i].user_id, result.rows[i].values[0]); // user_id
-                strcpy(owners[i].name, result.rows[i].values[1]);    // name
-            }
-        
-            // 使用 qsort 对业主数组进行排序
-            printf("正在对业主进行排序...\n");
-            qsort(owners, result.row_count, sizeof(Owner), compare_func);
-            printf("排序完成。\n");
-        
-            // 显示排序后的业主列表
-            for (int i = 0; i < result.row_count; i++) {
-                printf("ID: %s, Name: %s\n", owners[i].user_id, owners[i].name);
-            }
-        
-            // 释放内存
-            free(owners);
-            free_query_result(&result); // 释放查询结果
+void sort_owners(Database *db, int (*compare_func)(const void *, const void *))
+{
+    // 确保数据库存在
+    if (db == NULL || db->db == NULL)
+    {
+        printf("数据库连接无效，无法排序。\n");
+        return;
+    }
+
+    // 查询业主数据
+    const char *query = "SELECT user_id, name FROM users WHERE role_id = "
+                        "(SELECT role_id FROM roles WHERE role_name = '业主')";
+
+    QueryResult result;
+    if (!execute_query(db, query, &result))
+    { // 执行查询并获取结果
+        printf("查询失败。\n");
+        return;
+    }
+
+    // 如果没有业主数据
+    if (result.row_count == 0)
+    {
+        printf("没有业主数据。\n");
+        free_query_result(&result); // 释放查询结果
+        return;
+    }
+
+    // 申请内存存储业主数据
+    Owner *owners = malloc(sizeof(Owner) * result.row_count);
+    if (!owners)
+    {
+        printf("内存分配失败\n");
+        free_query_result(&result);
+        return;
+    }
+
+    // 解析查询结果并填充 owners 数组
+    for (int i = 0; result.row_count; i++)
+    {
+        strcpy(owners[i].user_id, result.rows[i].values[0]); // user_id
+        strcpy(owners[i].name, result.rows[i].values[1]);    // name
+    }
+
+    // 使用 qsort 对业主数组进行排序
+    printf("正在对业主进行排序...\n");
+    qsort(owners, result.row_count, sizeof(Owner), compare_func);
+    printf("排序完成。\n");
+
+    // 显示排序后的业主列表
+    for (int i = 0; result.row_count; i++)
+    {
+        printf("ID: %s, Name: %s\n", owners[i].user_id, owners[i].name);
+    }
+
+    // 释放内存
+    free(owners);
+    free_query_result(&result); // 释放查询结果
 }
 
+/**
+ * @brief 重新分配用户ID
+ *
+ * @param db 数据库连接
+ * @return bool 重新分配成功返回true，失败返回false
+ */
+bool reassign_user_ids(Database *db)
+{
+    const char *query =
+        "UPDATE users "
+        "SET user_id = (SELECT COUNT(*) FROM users u2 WHERE u2.registration_date <= users.registration_date) "
+        "WHERE user_id != (SELECT COUNT(*) FROM users u2 WHERE u2.registration_date <= users.registration_date);";
 
-
+    return execute_update(db, query);
+}
 
 /**
  * @brief 显示业主列表
  *
  * @param db 数据库连接
  */
-void display_owners(Database *db)
-{
-    printf("显示业主列表...\n");
+void display_owners(Database *db) {
+    printf("\n===== 业主信息列表 =====\n");
 
-    const char *query = "SELECT user_id, name, phone_number FROM users WHERE role_id = 1";
+    const char *query = 
+        "SELECT DISTINCT "
+        "   u.user_id, "     
+        "   u.username, "  
+        "   u.name, "
+        "   u.phone_number, "
+        "   b.building_name, "
+        "   r.room_number, "
+        "   r.area_sqm "
+        "FROM users u "
+        "LEFT JOIN rooms r ON u.user_id = r.owner_id "
+        "LEFT JOIN buildings b ON r.building_id = b.building_id "
+        "WHERE u.role_id = 'role_owner' "
+        "  AND u.status = 1 "
+        "ORDER BY u.user_id;"; 
+
     sqlite3_stmt *stmt;
-
-    if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) != SQLITE_OK)
-    {
-        printf("准备查询失败: %s\n", sqlite3_errmsg(db->db));
+    if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) != SQLITE_OK) {
+        printf("查询失败: %s\n", sqlite3_errmsg(db->db));
         return;
     }
 
-    printf("%-20s %-20s %-15s\n", "业主ID", "姓名", "联系电话");
-    printf("--------------------------------------------------\n");
+    printf("\n%-6s %-10s %-15s %-8s %-8s %-8s\n",
+           "ID", "姓名", "电话", "楼号", "房号", "面积"); // 修改表头宽度
+    printf("------------------------------------------------\n");
 
-    while (sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        const char *id = (const char *)sqlite3_column_text(stmt, 0);
-        const char *name = (const char *)sqlite3_column_text(stmt, 1);
-        const char *phone = (const char *)sqlite3_column_text(stmt, 2);
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        char short_id[7] = {0};  // 用于存储截断的ID
+        const char *full_id = (const char*)sqlite3_column_text(stmt, 0);
+        if(full_id) {
+            strncpy(short_id, full_id, 5);  // 只取前5位
+            short_id[5] = '\0';
+        }
 
-        printf("%-20s %-20s %-15s\n", id, name, phone);
+        printf("%-6s %-10s %-15s %-8s %-8s %8.2f\n",
+               full_id ? short_id : "未设置",  // 使用截断的ID
+               sqlite3_column_text(stmt, 2) ? (const char*)sqlite3_column_text(stmt, 2) : "未知",
+               sqlite3_column_text(stmt, 3) ? (const char*)sqlite3_column_text(stmt, 3) : "未知", 
+               sqlite3_column_text(stmt, 4) ? (const char*)sqlite3_column_text(stmt, 4) : "未分配",
+               sqlite3_column_text(stmt, 5) ? (const char*)sqlite3_column_text(stmt, 5) : "未分配",
+               sqlite3_column_double(stmt, 6));
     }
 
     sqlite3_finalize(stmt);

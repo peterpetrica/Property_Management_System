@@ -158,6 +158,7 @@ void show_system_maintenance_screen(Database *db, const char *user_id, UserType 
         printf("2. 生成月度费用\n");
         printf("3. 数据备份\n");
         printf("4. 数据恢复\n");
+        printf("5. 重置用户ID\n");  // 新增选项
         printf("0. 返回上一级\n");
         printf("\n请选择: ");
         
@@ -180,6 +181,15 @@ void show_system_maintenance_screen(Database *db, const char *user_id, UserType 
             case 4:
                 restore_database(db);
                 printf("数据恢复完成\n");
+                printf("按任意键继续...");
+                getchar();
+                break;
+            case 5:
+                if (reassign_user_ids(db)) {
+                    printf("用户ID重置成功\n");
+                } else {
+                    printf("用户ID重置失败\n");
+                }
                 printf("按任意键继续...");
                 getchar();
                 break;
@@ -1259,4 +1269,89 @@ void generate_monthly_fees_screen(Database *db, const char *user_id, UserType us
     }
 
     wait_for_key();
+}
+
+/**
+ * @brief 显示房屋分配管理界面
+ *
+ * 提供房屋分配给业主的功能
+ *
+ * @param db 数据库连接指针
+ * @param admin_id 当前登录管理员的ID
+ */
+void show_room_assignment_screen(Database *db, const char *admin_id) {
+    clear_screen();
+    printf("\n=== 房屋分配管理 ===\n");
+    
+    // 1. 显示未分配房屋的业主列表
+    const char *unassigned_query = 
+        "SELECT u.user_id, u.name, u.phone_number "
+        "FROM users u "
+        "LEFT JOIN rooms r ON u.user_id = r.owner_id "
+        "WHERE u.role_id = 'role_owner' AND r.room_id IS NULL "
+        "ORDER BY u.user_id";
+        
+    printf("\n待分配房屋的业主:\n");
+    printf("%-8s %-12s %-15s\n", "用户ID", "姓名", "电话");
+    printf("--------------------------------\n");
+    
+    sqlite3_stmt *stmt;
+    if(sqlite3_prepare_v2(db->db, unassigned_query, -1, &stmt, NULL) == SQLITE_OK) {
+        while(sqlite3_step(stmt) == SQLITE_ROW) {
+            printf("%-8d %-12s %-15s\n",
+                sqlite3_column_int(stmt, 0),
+                sqlite3_column_text(stmt, 1),
+                sqlite3_column_text(stmt, 2));
+        }
+        sqlite3_finalize(stmt);
+    }
+    
+    // 2. 显示可用房屋
+    const char *available_query =
+        "SELECT r.room_id, b.building_name, r.room_number, r.floor, r.area_sqm "
+        "FROM rooms r "
+        "JOIN buildings b ON r.building_id = b.building_id "
+        "WHERE r.owner_id IS NULL AND r.status = 0 "
+        "ORDER BY b.building_name, r.floor, r.room_number";
+        
+    printf("\n可用房屋:\n");
+    printf("%-8s %-8s %-8s %-6s %-8s\n", 
+           "房屋ID", "楼号", "房号", "楼层", "面积");
+    printf("----------------------------------------\n");
+    
+    if(sqlite3_prepare_v2(db->db, available_query, -1, &stmt, NULL) == SQLITE_OK) {
+        while(sqlite3_step(stmt) == SQLITE_ROW) {
+            printf("%-8s %-8s %-8s %-6d %-8.2f\n",
+                sqlite3_column_text(stmt, 0),
+                sqlite3_column_text(stmt, 1),
+                sqlite3_column_text(stmt, 2),
+                sqlite3_column_int(stmt, 3),
+                sqlite3_column_double(stmt, 4));
+        }
+        sqlite3_finalize(stmt);
+    }
+    
+    // 3. 执行分配
+    int user_id;
+    char room_id[10];
+    printf("\n请输入要分配的业主ID: ");
+    scanf("%d", &user_id);
+    printf("请输入要分配的房屋ID: ");
+    scanf("%s", room_id);
+    
+    char update_query[256];
+    snprintf(update_query, sizeof(update_query),
+             "UPDATE rooms SET owner_id = %d, status = 1 "
+             "WHERE room_id = '%s' AND owner_id IS NULL",
+             user_id, room_id);
+             
+    if(execute_update(db, update_query)) {
+        printf("\n✓ 房屋分配成功!\n");
+    } else {
+        printf("\n✗ 房屋分配失败,请检查输入信息\n");
+    }
+    
+    printf("\n按Enter键继续...");
+    getchar();
+    getchar();
 }

@@ -31,14 +31,6 @@
 #include <time.h>
 #include <sys/time.h>
 
-// 清除输入缓冲区
-void clear_input_buffer()
-{
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF)
-        ;
-}
-
 // 显示缴费记录
 void show_payment_history(Database *db, const char *user_id)
 {
@@ -800,7 +792,7 @@ void show_owner_main_screen(Database *db, const char *user_id, UserType user_typ
 // 查询特定业主的缴费信息
 void query_owner_payment_info(Database *db, const char *user_id)
 {
-    system("cls");
+    system("cls"); 
     printf("===== 查询业主缴费信息 =====\n");
 
     const char *query = "SELECT transaction_id, fee_type, amount, payment_date, status FROM transactions WHERE user_id = ?;";
@@ -813,20 +805,26 @@ void query_owner_payment_info(Database *db, const char *user_id)
     }
 
     sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
-
-    printf("交易ID\t费用类型\t金额\t支付日期\t状态\n");
+    
+    printf("交易号\t\t费用类型\t金额\t支付日期\t状态\n");  // 修改表头
     printf("-------------------------------------------------\n");
     int found = 0;
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
     {
-        found = 1;
-        const char *transaction_id = sqlite3_column_text(stmt, 0);
-        int fee_type = sqlite3_column_int(stmt, 1);
-        double amount = sqlite3_column_double(stmt, 2);
-        const char *payment_date = sqlite3_column_text(stmt, 3);
-        int status = sqlite3_column_int(stmt, 4);
+        found = 1; 
+        char short_trans_id[7] = {0};
+        const char *full_trans_id = (const char*)sqlite3_column_text(stmt, 0);
+        if(full_trans_id) {
+            strncpy(short_trans_id, full_trans_id, 5);  // 只取前5位
+            short_trans_id[5] = '\0';
+        }
 
-        printf("%s\t%d\t\t%.2f\t%s\t%d\n", transaction_id, fee_type, amount, payment_date ? payment_date : "未支付", status);
+        printf("%s\t%d\t\t%.2f\t%s\t%d\n", 
+            short_trans_id,  // 使用截断的交易ID
+            sqlite3_column_int(stmt, 1),
+            sqlite3_column_double(stmt, 2),
+            sqlite3_column_text(stmt, 3) ? (const char*)sqlite3_column_text(stmt, 3) : "未支付",
+            sqlite3_column_int(stmt, 4));
     }
 
     if (!found)

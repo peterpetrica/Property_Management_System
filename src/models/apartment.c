@@ -54,6 +54,12 @@ void log_info(const char *format, ...)
     va_end(args);
 }
 
+// 修改房号生成函数
+void generate_room_number(int floor, int room, char *room_number) {
+    // 使用统一格式: A101 表示A栋1层01室
+    snprintf(room_number, 5, "A%d%02d", floor, room);
+}
+
 /**
  * 添加新房屋
  *
@@ -106,6 +112,12 @@ bool add_room(Database *db, const char *user_id, UserType user_type, Room *room)
     free_query_result(&result);
 
     generate_uuid(room->room_id);
+
+    // 生成标准格式的房号
+    char room_number[5];
+    int room_num = atoi(room->room_number);
+    generate_room_number(room->floor, room_num, room_number);
+    strncpy(room->room_number, room_number, sizeof(room->room_number)-1);
 
     snprintf(query, sizeof(query),
              "INSERT INTO rooms (room_id, building_id, room_number, floor, area_sqm, owner_id, status) "

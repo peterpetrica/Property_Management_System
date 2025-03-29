@@ -103,6 +103,12 @@ void show_building_test_screen(Database *db, const char *user_id, UserType user_
  */
 void show_admin_main_screen(Database *db, const char *user_id, UserType user_type);
 
+// 添加缺失的函数声明
+void clear_input_buffer(void);
+void generate_monthly_fees_screen(Database *db, const char *user_id, UserType user_type);
+bool reassign_user_ids(Database *db);
+void pause(void);
+
 // 以下函数声明是重复的，保持原样
 
 void show_info_management_screen(Database *db, const char *user_id, UserType user_type);

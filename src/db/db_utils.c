@@ -160,3 +160,28 @@ bool restore_database(Database *db)
 
     return (rc == SQLITE_DONE);
 }
+
+/**
+ * 重置数据库
+ *
+ * @param db 数据库连接指针
+ * @return 重置成功返回true，失败返回false
+ */
+bool clean_database(Database *db) {
+    const char *cleanup_queries[] = {
+        "DELETE FROM transactions;",
+        "DELETE FROM rooms;",
+        "DELETE FROM users WHERE role_id = 'role_owner';",
+        "VACUUM;",
+        NULL
+    };
+
+    for (int i = 0; cleanup_queries[i]; i++) {
+        if (!execute_update(db, cleanup_queries[i])) {
+            fprintf(stderr, "清理数据失败: %s\n", cleanup_queries[i]);
+            return false;
+        }
+    }
+
+    return db_init_tables(db);
+}

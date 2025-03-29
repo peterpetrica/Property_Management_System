@@ -27,6 +27,10 @@ typedef struct
     char name[64];
     char phone_number[20];
     char email[64];
+    char id_number[20];   // 身份证号
+    char gender[10];      // 性别 
+    char address[256];    // 住址
+    time_t registration_date; // 注册时间
     bool notification_required;
 } Owner;
 

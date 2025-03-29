@@ -561,6 +561,18 @@ bool generate_property_fees(Database *db, time_t period_start, time_t period_end
 
     time_t due_date = period_end + (due_days * 24 * 60 * 60); // 计算截止日期
 
+    // 更新计算物业费的SQL
+    snprintf(query, sizeof(query),
+        "INSERT INTO transactions (transaction_id, user_id, room_id, fee_type, amount, "
+        "payment_date, due_date, status, period_start, period_end) "
+        "SELECT LOWER(HEX(RANDOMBLOB(16))), r.owner_id, r.room_id, "
+        "1, r.area_sqm * fs.price_per_unit, " // 按房屋面积计算物业费
+        "0, ?, 0, ?, ? "
+        "FROM rooms r "
+        "JOIN fee_standards fs ON fs.fee_type = 1 "  // 物业费
+        "WHERE r.owner_id IS NOT NULL "
+        "AND (fs.end_date = 0 OR fs.end_date > ?)");
+
     // 为每个房屋生成物业费记录
     for (int i = 0; i < rooms.row_count; i++)
     {
