@@ -44,7 +44,6 @@ void pause_console(void); // 改名避免与系统函数冲突
 bool backup_database(Database *db);
 bool restore_database(Database *db);
 bool clean_database(Database *db);
-bool db_init_tables(Database *db); 
 bool execute_update(Database *db, const char *sql);
 bool update_overdue_transactions(Database *db);
 

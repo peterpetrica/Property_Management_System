@@ -14,6 +14,7 @@
  */
 
 #include "db/database.h"
+#include "utils/utils.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -26,18 +27,18 @@ static const char *CREATE_ROLES_TABLE =
     "permission_level INTEGER NOT NULL"
     ");";
 
-// 创建用户表
+// 创建用户表 - 修改了user_id为TEXT类型
 static const char *CREATE_USERS_TABLE =
     "CREATE TABLE IF NOT EXISTS users ("
-    "user_id INTEGER PRIMARY KEY AUTOINCREMENT," // 改为自增整数
-    "username TEXT NOT NULL UNIQUE,"            // 用户名
-    "password_hash TEXT NOT NULL,"              // 密码哈希
-    "name TEXT NOT NULL,"                       // 真实姓名
-    "phone_number TEXT,"                        // 电话号码
-    "email TEXT,"                               // 电子邮件
-    "role_id TEXT NOT NULL,"                    // 角色ID
-    "status INTEGER DEFAULT 1,"                 // 状态
-    "registration_date INTEGER NOT NULL,"       // 注册时间
+    "user_id TEXT PRIMARY KEY,"           // 用户ID
+    "username TEXT NOT NULL UNIQUE,"      // 用户名
+    "password_hash TEXT NOT NULL,"        // 密码哈希
+    "name TEXT NOT NULL,"                 // 真实姓名
+    "phone_number TEXT,"                  // 电话号码
+    "email TEXT,"                         // 电子邮件
+    "role_id TEXT NOT NULL,"              // 角色ID
+    "status INTEGER DEFAULT 1,"           // 状态
+    "registration_date INTEGER NOT NULL," // 注册时间
     "FOREIGN KEY (role_id) REFERENCES roles(role_id)"
     ");";
 
@@ -149,7 +150,7 @@ static const char *CREATE_TRANSACTIONS_TABLE =
     "FOREIGN KEY (parking_id) REFERENCES parking_spaces(parking_id)"
     ");";
 
-// 初始化角色数据
+// 初始化角色数据 - 使用静态标识符而非UUID
 static const char *INSERT_ROLES[] = {
     "INSERT OR IGNORE INTO roles (role_id, role_name, permission_level) VALUES ('role_admin', '管理员', 1);",
     "INSERT OR IGNORE INTO roles (role_id, role_name, permission_level) VALUES ('role_staff', '物业服务人员', 2);",
@@ -157,111 +158,267 @@ static const char *INSERT_ROLES[] = {
     NULL // 结束标记
 };
 
-// 初始化默认管理员账户
-static const char *INSERT_DEFAULT_ADMIN =
-    "INSERT OR IGNORE INTO users (username, password_hash, name, role_id, status, registration_date) "
-    "VALUES ('admin', 'admin123', '系统管理员', 'role_admin', 1, strftime('%s','now'));";
-
-// 初始化默认物业服务人员账户
-static const char *INSERT_DEFAULT_STAFF_TYPE =
-    "INSERT OR IGNORE INTO staff_types (staff_type_id, type_name, description) "
-    "VALUES ('default_type', '普通物业人员', '默认物业服务人员类型');";
-
-static const char *INSERT_DEFAULT_STAFF_USER =
-    "INSERT OR IGNORE INTO users (username, password_hash, name, role_id, status, registration_date) "
-    "VALUES ('staff', 'staff123', '物业服务员', 'role_staff', 1, strftime('%s','now'));";
-
-static const char *INSERT_DEFAULT_STAFF =
-    "INSERT OR IGNORE INTO staff (staff_id, user_id, staff_type_id, hire_date, status) "
-    "VALUES ('1', '2', 'default_type', strftime('%s','now'), 1);";
-
-// 修改 INSERT_DEFAULT_FEE_STANDARDS 数组,删除重复的条目
+// 初始化默认费用标准
 static const char *INSERT_DEFAULT_FEE_STANDARDS[] = {
     // 物业费标准（按房屋类型）
     "INSERT OR IGNORE INTO fee_standards (standard_id, fee_type, price_per_unit, unit, effective_date) "
-    "VALUES ('PF01', 1, 3.5, '元/㎡/月', strftime('%s','2024-01-01'));",  // 普通住宅物业费
-    
+    "VALUES ('PF01', 1, 3.5, '元/㎡/月', strftime('%s','2024-01-01'));", // 普通住宅物业费
+
     // 停车费标准（按车位类型）
     "INSERT OR IGNORE INTO fee_standards (standard_id, fee_type, price_per_unit, unit, effective_date) "
-    "VALUES ('CF01', 2, 300.0, '元/月', strftime('%s','2024-01-01'));",    // 地上停车费
-    
+    "VALUES ('CF01', 2, 300.0, '元/月', strftime('%s','2024-01-01'));", // 地上停车费
+
     "INSERT OR IGNORE INTO fee_standards (standard_id, fee_type, price_per_unit, unit, effective_date) "
-    "VALUES ('CF02', 2, 400.0, '元/月', strftime('%s','2024-01-01'));",    // 地下停车费
-    
+    "VALUES ('CF02', 2, 400.0, '元/月', strftime('%s','2024-01-01'));", // 地下停车费
+
     // 水费标准
     "INSERT OR IGNORE INTO fee_standards (standard_id, fee_type, price_per_unit, unit, effective_date) "
-    "VALUES ('WF01', 3, 4.9, '元/m³', strftime('%s','2024-01-01'));",      // 水费
-    
+    "VALUES ('WF01', 3, 4.9, '元/m³', strftime('%s','2024-01-01'));", // 水费
+
     // 电费标准
     "INSERT OR IGNORE INTO fee_standards (standard_id, fee_type, price_per_unit, unit, effective_date) "
-    "VALUES ('EF01', 4, 0.98, '元/kWh', strftime('%s','2024-01-01'));",    // 电费
-    
-    // 燃气费标准 
+    "VALUES ('EF01', 4, 0.98, '元/kWh', strftime('%s','2024-01-01'));", // 电费
+
+    // 燃气费标准
     "INSERT OR IGNORE INTO fee_standards (standard_id, fee_type, price_per_unit, unit, effective_date) "
-    "VALUES ('GF01', 5, 3.2, '元/m³', strftime('%s','2024-01-01'));",      // 燃气费
+    "VALUES ('GF01', 5, 3.2, '元/m³', strftime('%s','2024-01-01'));", // 燃气费
 
-    NULL
-};
+    NULL};
 
-// 修改默认用户数据,使用更简洁的username
-static const char *INSERT_DEFAULT_USERS[] = {
-    // 使用简单自增ID作为用户标识
-    "INSERT OR IGNORE INTO users ("
-    "username, password_hash, name, phone_number, email, role_id, "
-    "status, registration_date"
-    ") VALUES ("
-    "'zhangsan', 'test123', '张三', '13800138001', 'test1@example.com', "
-    "'role_owner', 1, strftime('%s','now'))",
-
-    "INSERT OR IGNORE INTO users ("
-    "username, password_hash, name, phone_number, email, role_id, "
-    "status, registration_date"
-    ") VALUES ("
-    "'lisi', 'test123', '李四', '13800138002', 'test2@example.com', "
-    "'role_owner', 1, strftime('%s','now'))",
-
-    "INSERT OR IGNORE INTO users ("
-    "username, password_hash, name, phone_number, email, role_id, "
-    "status, registration_date"
-    ") VALUES ("
-    "'wangwu', 'test123', '王五', '13800138003', 'test3@example.com', "
-    "'role_owner', 1, strftime('%s','now'))",
-
-    NULL
-};
-
-// 添加默认房屋数据
+// 初始化默认楼栋数据
 static const char *INSERT_DEFAULT_BUILDINGS[] = {
     // 添加测试楼栋A1
     "INSERT OR IGNORE INTO buildings (building_id, building_name, address, floors_count) "
     "VALUES ('B001', 'A1', '小区1号院', 33)",
-    
+
     // 添加测试楼栋A2
     "INSERT OR IGNORE INTO buildings (building_id, building_name, address, floors_count) "
     "VALUES ('B002', 'A2', '小区1号院', 33)",
-    
-    NULL
-};
 
-// 修改房屋数据,统一房号格式
-static const char *INSERT_DEFAULT_ROOMS[] = {
-    "INSERT OR IGNORE INTO rooms ("
-    "room_id, building_id, room_number, floor, area_sqm, owner_id, status"
-    ") VALUES ("
-    "'R001', 'B001', 'A101', 1, 89.5, 1, 1)",  // 使用简单数字ID
+    NULL};
 
-    "INSERT OR IGNORE INTO rooms ("
-    "room_id, building_id, room_number, floor, area_sqm, owner_id, status"
-    ") VALUES ("
-    "'R002', 'B001', 'A102', 1, 126.5, 2, 1)",
+/**
+ * 使用UUID初始化默认管理员账户
+ * 注意：用户ID使用UUID，但角色ID使用静态标识符'role_admin'
+ */
+int db_init_admin(Database *db)
+{
+    char admin_uuid[37];
+    generate_uuid(admin_uuid);
 
-    "INSERT OR IGNORE INTO rooms ("
-    "room_id, building_id, room_number, floor, area_sqm, owner_id, status"
-    ") VALUES ("
-    "'R003', 'B001', 'A103', 1, 89.5, 3, 1)",
+    char sql[512];
+    snprintf(sql, sizeof(sql),
+             "INSERT OR IGNORE INTO users (user_id, username, password_hash, name, role_id, status, registration_date) "
+             "VALUES ('%s', 'admin', 'admin123', '系统管理员', 'role_admin', 1, strftime('%%s','now'));",
+             admin_uuid);
 
-    NULL
-};
+    int result = db_execute(db, sql);
+    if (result != SQLITE_OK)
+    {
+        fprintf(stderr, "初始化管理员账户失败: %s\n", sqlite3_errmsg(db->db));
+        return result;
+    }
+
+    printf("管理员账户初始化完成\n");
+    return SQLITE_OK;
+}
+
+/**
+ * 使用UUID初始化默认物业服务人员账户
+ */
+int db_init_staff(Database *db)
+{
+    int result;
+    char staff_type_uuid[37];
+    char staff_user_uuid[37];
+    char staff_uuid[37];
+
+    // 生成UUID
+    generate_uuid(staff_type_uuid);
+    generate_uuid(staff_user_uuid);
+    generate_uuid(staff_uuid);
+
+    // 构建SQL语句
+    char sql[512];
+
+    // 插入默认物业人员类型
+    snprintf(sql, sizeof(sql),
+             "INSERT OR IGNORE INTO staff_types (staff_type_id, type_name, description) "
+             "VALUES ('%s', '普通物业人员', '默认物业服务人员类型');",
+             staff_type_uuid);
+
+    result = db_execute(db, sql);
+    if (result != SQLITE_OK)
+    {
+        fprintf(stderr, "初始化物业人员类型失败: %s\n", sqlite3_errmsg(db->db));
+        return result;
+    }
+
+    // 检查是否已存在staff用户
+    snprintf(sql, sizeof(sql), "SELECT user_id FROM users WHERE username = 'staff' LIMIT 1;");
+    sqlite3_stmt *stmt;
+    result = sqlite3_prepare_v2(db->db, sql, -1, &stmt, NULL);
+
+    if (result == SQLITE_OK && sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        // 用户已存在，使用现有用户ID
+        const char *existing_id = (const char *)sqlite3_column_text(stmt, 0);
+        strcpy(staff_user_uuid, existing_id);
+        printf("使用已存在的物业人员用户ID: %s\n", staff_user_uuid);
+        sqlite3_finalize(stmt);
+    }
+    else
+    {
+        // 用户不存在，需要创建
+        sqlite3_finalize(stmt);
+
+        // 插入默认物业人员用户
+        snprintf(sql, sizeof(sql),
+                 "INSERT INTO users (user_id, username, password_hash, name, role_id, status, registration_date) "
+                 "VALUES ('%s', 'staff', 'staff123', '物业服务员', 'role_staff', 1, strftime('%%s','now'));",
+                 staff_user_uuid);
+
+        result = db_execute(db, sql);
+        if (result != SQLITE_OK)
+        {
+            fprintf(stderr, "初始化物业人员用户失败: %s\n", sqlite3_errmsg(db->db));
+            return result;
+        }
+    }
+
+    // 检查staff关联记录是否已存在
+    snprintf(sql, sizeof(sql), "SELECT staff_id FROM staff WHERE user_id = '%s' LIMIT 1;", staff_user_uuid);
+    result = sqlite3_prepare_v2(db->db, sql, -1, &stmt, NULL);
+
+    if (result == SQLITE_OK && sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        // staff记录已存在，无需再创建
+        sqlite3_finalize(stmt);
+        printf("物业服务人员记录已存在\n");
+    }
+    else
+    {
+        sqlite3_finalize(stmt);
+
+        // 插入默认物业人员记录
+        snprintf(sql, sizeof(sql),
+                 "INSERT INTO staff (staff_id, user_id, staff_type_id, hire_date, status) "
+                 "VALUES ('%s', '%s', '%s', strftime('%%s','now'), 1);",
+                 staff_uuid, staff_user_uuid, staff_type_uuid);
+
+        result = db_execute(db, sql);
+        if (result != SQLITE_OK)
+        {
+            fprintf(stderr, "初始化物业人员记录失败: %s\n", sqlite3_errmsg(db->db));
+            return result;
+        }
+    }
+
+    printf("物业服务人员账户初始化完成\n");
+    return SQLITE_OK;
+}
+
+/**
+ * 初始化默认用户和房间数据
+ */
+int db_init_default_data(Database *db)
+{
+    int result;
+    char sql[512];
+
+    // 用户名数组
+    const char *usernames[] = {"zhangsan", "lisi", "wangwu"};
+    const char *names[] = {"张三", "李四", "王五"};
+    const char *phones[] = {"13800138001", "13800138002", "13800138003"};
+    const char *emails[] = {"test1@example.com", "test2@example.com", "test3@example.com"};
+
+    // 用户UUID数组
+    char user_uuids[3][37];
+
+    // 检查用户是否已存在，并获取其ID
+    for (int i = 0; i < 3; i++)
+    {
+        snprintf(sql, sizeof(sql), "SELECT user_id FROM users WHERE username = '%s' LIMIT 1;", usernames[i]);
+        sqlite3_stmt *stmt;
+        result = sqlite3_prepare_v2(db->db, sql, -1, &stmt, NULL);
+
+        if (result == SQLITE_OK && sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            // 用户已存在，使用现有ID
+            const char *existing_id = (const char *)sqlite3_column_text(stmt, 0);
+            strcpy(user_uuids[i], existing_id);
+            printf("使用已存在的用户ID: %s 对应用户: %s\n", user_uuids[i], usernames[i]);
+            sqlite3_finalize(stmt);
+        }
+        else
+        {
+            // 用户不存在，生成新ID并创建用户
+            sqlite3_finalize(stmt);
+            generate_uuid(user_uuids[i]);
+
+            snprintf(sql, sizeof(sql),
+                     "INSERT INTO users ("
+                     "user_id, username, password_hash, name, phone_number, email, role_id, "
+                     "status, registration_date"
+                     ") VALUES ("
+                     "'%s', '%s', 'test123', '%s', '%s', '%s', "
+                     "'role_owner', 1, strftime('%%s','now'))",
+                     user_uuids[i], usernames[i], names[i], phones[i], emails[i]);
+
+            result = db_execute(db, sql);
+            if (result != SQLITE_OK)
+            {
+                fprintf(stderr, "初始化用户数据失败: %s\n", sqlite3_errmsg(db->db));
+                return result;
+            }
+        }
+    }
+
+    // 房间号数组
+    const char *room_numbers[] = {"A101", "A102", "A103"};
+    const double areas[] = {89.5, 126.5, 89.5};
+
+    // 检查房间是否已存在
+    for (int i = 0; i < 3; i++)
+    {
+        snprintf(sql, sizeof(sql),
+                 "SELECT room_id FROM rooms WHERE building_id = 'B001' AND room_number = '%s' LIMIT 1;",
+                 room_numbers[i]);
+        sqlite3_stmt *stmt;
+        result = sqlite3_prepare_v2(db->db, sql, -1, &stmt, NULL);
+
+        if (result == SQLITE_OK && sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            // 房间已存在
+            printf("房间 %s 已存在\n", room_numbers[i]);
+            sqlite3_finalize(stmt);
+        }
+        else
+        {
+            // 房间不存在，创建新房间
+            sqlite3_finalize(stmt);
+            char room_uuid[37];
+            generate_uuid(room_uuid);
+
+            snprintf(sql, sizeof(sql),
+                     "INSERT INTO rooms ("
+                     "room_id, building_id, room_number, floor, area_sqm, owner_id, status"
+                     ") VALUES ("
+                     "'%s', 'B001', '%s', 1, %.1f, '%s', 1)",
+                     room_uuid, room_numbers[i], areas[i], user_uuids[i]);
+
+            result = db_execute(db, sql);
+            if (result != SQLITE_OK)
+            {
+                fprintf(stderr, "初始化房间数据失败: %s\n", sqlite3_errmsg(db->db));
+                return result;
+            }
+        }
+    }
+
+    printf("默认用户和房间数据初始化完成\n");
+    return SQLITE_OK;
+}
 
 /**
  * db_init_tables
@@ -274,6 +431,14 @@ static const char *INSERT_DEFAULT_ROOMS[] = {
 int db_init_tables(Database *db)
 {
     int result;
+
+    // 开始事务
+    result = db_execute(db, "BEGIN TRANSACTION;");
+    if (result != SQLITE_OK)
+    {
+        fprintf(stderr, "无法开始事务: %s\n", sqlite3_errmsg(db->db));
+        return result;
+    }
 
     const char *create_tables[] = {
         CREATE_ROLES_TABLE,
@@ -296,6 +461,7 @@ int db_init_tables(Database *db)
         if (result != SQLITE_OK)
         {
             fprintf(stderr, "创建表失败: %s\n", sqlite3_errmsg(db->db));
+            db_execute(db, "ROLLBACK;");
             return result;
         }
         i++;
@@ -308,6 +474,7 @@ int db_init_tables(Database *db)
         if (result != SQLITE_OK)
         {
             fprintf(stderr, "初始化角色数据失败: %s\n", sqlite3_errmsg(db->db));
+            db_execute(db, "ROLLBACK;");
             return result;
         }
         i++;
@@ -321,17 +488,7 @@ int db_init_tables(Database *db)
         if (result != SQLITE_OK)
         {
             fprintf(stderr, "初始化费用标准失败: %s\n", sqlite3_errmsg(db->db));
-            return result;
-        }
-        i++;
-    }
-
-    // 初始化用户数据
-    i = 0;
-    while (INSERT_DEFAULT_USERS[i] != NULL) {
-        result = db_execute(db, INSERT_DEFAULT_USERS[i]);
-        if (result != SQLITE_OK) {
-            fprintf(stderr, "初始化用户数据失败: %s\n", sqlite3_errmsg(db->db));
+            db_execute(db, "ROLLBACK;");
             return result;
         }
         i++;
@@ -339,95 +496,51 @@ int db_init_tables(Database *db)
 
     // 初始化楼栋数据
     i = 0;
-    while (INSERT_DEFAULT_BUILDINGS[i] != NULL) {
+    while (INSERT_DEFAULT_BUILDINGS[i] != NULL)
+    {
         result = db_execute(db, INSERT_DEFAULT_BUILDINGS[i]);
-        if (result != SQLITE_OK) {
+        if (result != SQLITE_OK)
+        {
             fprintf(stderr, "初始化楼栋数据失败: %s\n", sqlite3_errmsg(db->db));
+            db_execute(db, "ROLLBACK;");
             return result;
         }
         i++;
     }
 
-    // 初始化房间数据
-    i = 0;
-    while (INSERT_DEFAULT_ROOMS[i] != NULL) {
-        result = db_execute(db, INSERT_DEFAULT_ROOMS[i]);
-        if (result != SQLITE_OK) {
-            fprintf(stderr, "初始化房间数据失败: %s\n", sqlite3_errmsg(db->db));
-            return result;
-        }
-        i++;
+    // 初始化管理员账户
+    result = db_init_admin(db);
+    if (result != SQLITE_OK)
+    {
+        db_execute(db, "ROLLBACK;");
+        return result;
     }
 
-    // 重置用户ID自增序列从1开始
-    const char *reset_seq = "UPDATE SQLITE_SEQUENCE SET seq = 0 WHERE name = 'users';";
-    result = db_execute(db, reset_seq);
-    if (result != SQLITE_OK) {
-        fprintf(stderr, "重置用户ID序列失败: %s\n", sqlite3_errmsg(db->db));
+    // 初始化物业服务人员账户
+    result = db_init_staff(db);
+    if (result != SQLITE_OK)
+    {
+        db_execute(db, "ROLLBACK;");
+        return result;
+    }
+
+    // 初始化默认用户和房间数据
+    result = db_init_default_data(db);
+    if (result != SQLITE_OK)
+    {
+        db_execute(db, "ROLLBACK;");
+        return result;
+    }
+
+    // 提交事务
+    result = db_execute(db, "COMMIT;");
+    if (result != SQLITE_OK)
+    {
+        fprintf(stderr, "无法提交事务: %s\n", sqlite3_errmsg(db->db));
+        db_execute(db, "ROLLBACK;");
         return result;
     }
 
     printf("数据库初始化完成\n");
-    return SQLITE_OK;
-}
-
-/**
- * db_init_admin
- *
- * 初始化系统默认管理员账户
- *
- * @param db 数据库连接指针
- * @return SQLITE_OK 表示成功，其他值表示失败
- */
-int db_init_admin(Database *db)
-{
-    int result = db_execute(db, INSERT_DEFAULT_ADMIN);
-    if (result != SQLITE_OK)
-    {
-        fprintf(stderr, "初始化管理员账户失败: %s\n", sqlite3_errmsg(db->db));
-        return result;
-    }
-
-    printf("管理员账户初始化完成\n");
-    return SQLITE_OK;
-}
-
-/**
- * db_init_staff
- *
- * 初始化系统默认物业服务人员账户
- *
- * @param db 数据库连接指针
- * @return SQLITE_OK 表示成功，其他值表示失败
- */
-int db_init_staff(Database *db)
-{
-    int result;
-
-    // 插入默认物业人员类型
-    result = db_execute(db, INSERT_DEFAULT_STAFF_TYPE);
-    if (result != SQLITE_OK)
-    {
-        fprintf(stderr, "初始化物业人员类型失败: %s\n", sqlite3_errmsg(db->db));
-        return result;
-    }
-
-    // 插入默认物业人员用户
-    result = db_execute(db, INSERT_DEFAULT_STAFF_USER);
-    if (result != SQLITE_OK)
-    {
-        fprintf(stderr, "初始化物业人员用户失败: %s\n", sqlite3_errmsg(db->db));
-        return result;
-    }
-
-    // 插入默认物业人员记录
-    result = db_execute(db, INSERT_DEFAULT_STAFF);
-    if (result != SQLITE_OK)
-    {
-        fprintf(stderr, "初始化物业人员记录失败: %s\n", sqlite3_errmsg(db->db));
-        return result;
-    }
-
-    printf("物业服务人员账户初始化完成\n");
     return SQLITE_OK;
 }

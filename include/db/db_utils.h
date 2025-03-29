@@ -20,9 +20,9 @@
 
 // 数据库操作函数
 bool backup_database(Database *db);
-bool restore_database(Database *db); 
+bool restore_database(Database *db);
 bool clean_database(Database *db);
-bool db_init_tables(Database *db);
+int db_init_tables(Database *db);
 
 // 查询辅助函数
 bool execute_update(Database *db, const char *sql);
