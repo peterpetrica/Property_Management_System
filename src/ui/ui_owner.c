@@ -954,49 +954,38 @@ void query_due_payments(Database *db, const char *user_id)
 // 查询特定业主的缴费信息
 void query_owner_payment_info(Database *db, const char *user_id)
 {
-    // system("clear||cls");
-    printf("===== 查询业主缴费信息 =====\n");
+    printf("\n===== 缴费记录查询 =====\n");
 
-    const char *query = "SELECT transaction_id, fee_type, amount, payment_date, status FROM transactions WHERE user_id = ?;";
+    const char *query = 
+        "SELECT CAST(transaction_id AS INTEGER) as id, "
+        "fee_type, amount, payment_date, status "
+        "FROM transactions WHERE user_id = ? "
+        "ORDER BY payment_date DESC;";
+        
     sqlite3_stmt *stmt;
-    int rc = sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
-        fprintf(stderr, "SQLite错误: %s\n", sqlite3_errmsg(db->db));
+    if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) != SQLITE_OK) {
+        printf("查询失败: %s\n", sqlite3_errmsg(db->db));
         return;
     }
 
     sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
-    
-    printf("交易号\t\t费用类型\t金额\t支付日期\t状态\n");  // 修改表头
-    printf("-------------------------------------------------\n");
-    int found = 0;
-    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
-    {
-        found = 1; 
-        char short_trans_id[7] = {0};
-        const char *full_trans_id = (const char*)sqlite3_column_text(stmt, 0);
-        if(full_trans_id) {
-            strncpy(short_trans_id, full_trans_id, 5);  // 只取前5位
-            short_trans_id[5] = '\0';
-        }
 
-        printf("%s\t%d\t\t%.2f\t%s\t%d\n", 
-            short_trans_id,  // 使用截断的交易ID
-            sqlite3_column_int(stmt, 1),
-            sqlite3_column_double(stmt, 2),
-            sqlite3_column_text(stmt, 3) ? (const char*)sqlite3_column_text(stmt, 3) : "未支付",
-            sqlite3_column_int(stmt, 4));
-    }
+    printf("\n%-6s %-10s %-10s %-12s %-8s\n",
+           "单号", "费用类型", "金额", "支付日期", "状态");
+    printf("----------------------------------------\n");
 
-    if (!found)
-    {
-        printf("\n⚠️ 当前业主暂无缴费记录。\n");
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        const char *status_text = sqlite3_column_int(stmt, 4) == 1 ? "已支付" : "未支付";
+        
+        printf("%-6d %-10d %-10.2f %-12s %-8s\n",
+               sqlite3_column_int(stmt, 0),
+               sqlite3_column_int(stmt, 1),
+               sqlite3_column_double(stmt, 2),
+               sqlite3_column_text(stmt, 3) ? (const char*)sqlite3_column_text(stmt, 3) : "未支付",
+               status_text);
     }
 
     sqlite3_finalize(stmt);
-    printf("\n按任意键返回...\n");
-    clear_input_buffer();
 }
 
 // 查询所有业主的缴费情况

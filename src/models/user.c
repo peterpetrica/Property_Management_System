@@ -869,8 +869,7 @@ void display_owners(Database *db) {
 
     const char *query = 
         "SELECT DISTINCT "
-        "   u.user_id, "     
-        "   u.username, "  
+        "   CAST(u.user_id AS INTEGER) as id, "  // 转换为整数显示
         "   u.name, "
         "   u.phone_number, "
         "   b.building_name, "
@@ -881,7 +880,7 @@ void display_owners(Database *db) {
         "LEFT JOIN buildings b ON r.building_id = b.building_id "
         "WHERE u.role_id = 'role_owner' "
         "  AND u.status = 1 "
-        "ORDER BY u.user_id;"; 
+        "ORDER BY id;";
 
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) != SQLITE_OK) {
@@ -889,25 +888,18 @@ void display_owners(Database *db) {
         return;
     }
 
-    printf("\n%-6s %-10s %-15s %-8s %-8s %-8s\n",
-           "ID", "姓名", "电话", "楼号", "房号", "面积"); // 修改表头宽度
+    printf("\n%-5s %-10s %-15s %-8s %-8s %-8s\n",
+           "ID", "姓名", "电话", "楼号", "房号", "面积");
     printf("------------------------------------------------\n");
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
-        char short_id[7] = {0};  // 用于存储截断的ID
-        const char *full_id = (const char*)sqlite3_column_text(stmt, 0);
-        if(full_id) {
-            strncpy(short_id, full_id, 5);  // 只取前5位
-            short_id[5] = '\0';
-        }
-
-        printf("%-6s %-10s %-15s %-8s %-8s %8.2f\n",
-               full_id ? short_id : "未设置",  // 使用截断的ID
-               sqlite3_column_text(stmt, 2) ? (const char*)sqlite3_column_text(stmt, 2) : "未知",
-               sqlite3_column_text(stmt, 3) ? (const char*)sqlite3_column_text(stmt, 3) : "未知", 
+        printf("%-5d %-10s %-15s %-8s %-8s %8.2f\n",
+               sqlite3_column_int(stmt, 0),  // 直接显示数字ID
+               sqlite3_column_text(stmt, 1) ? (const char*)sqlite3_column_text(stmt, 1) : "未知",
+               sqlite3_column_text(stmt, 2) ? (const char*)sqlite3_column_text(stmt, 2) : "未知", 
+               sqlite3_column_text(stmt, 3) ? (const char*)sqlite3_column_text(stmt, 3) : "未分配",
                sqlite3_column_text(stmt, 4) ? (const char*)sqlite3_column_text(stmt, 4) : "未分配",
-               sqlite3_column_text(stmt, 5) ? (const char*)sqlite3_column_text(stmt, 5) : "未分配",
-               sqlite3_column_double(stmt, 6));
+               sqlite3_column_double(stmt, 5));
     }
 
     sqlite3_finalize(stmt);

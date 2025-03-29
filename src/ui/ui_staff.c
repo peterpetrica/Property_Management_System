@@ -19,7 +19,7 @@
 #include "models/building.h"
 #include "models/apartment.h"
 #include "models/user.h"
-#include "models/transaction.h"
+#include "models/transaction.h"  // 添加此行
 #include "models/service.h"
 #include "db/db_query.h"
 #include "utils/utils.h"
@@ -29,7 +29,6 @@
 #include <time.h>
 #include <ctype.h> // 添加这行
 
-<<<<<<< HEAD
 // 静态函数声明
 static void wait_for_key(void);
 static const char* get_fee_type_name(int fee_type); 
@@ -78,21 +77,13 @@ void send_bulk_payment_reminders(Database *db) {
         sqlite3_finalize(stmt);
     }
     wait_for_key();
-=======
-// 清除输入缓冲区
-void clear_staff_input_buffer()
-{
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF)
-        ;
->>>>>>> 9bb55ede620c230e6f442b9b056af0940979a952
 }
 
 // 清屏函数
 void clear_staff_screen()
 {
 #ifdef _WIN32
-    // system("clear||cls");
+    system("cls");
 #else
     system("clear");
 #endif
@@ -104,7 +95,7 @@ int wait_for_user()
     printf("按任意键返回主菜单...\n");
     getchar();
     getchar(); // 等待用户输入
-    return 0;  // Return an integer as per the declaration
+    return 0; // Return an integer as per the declaration
 }
 
 // 显示服务人员主界面
@@ -240,7 +231,7 @@ void modify_personal_info_screen(Database *db, const char *user_id, UserType use
     }
     const char *service_types[] = {"保洁", "保安", "管理员", "维修工", "园艺师"};
     const int service_type_count = sizeof(service_types) / sizeof(service_types[0]);
-    int choice = 0;
+    int choice=0;
     do
     {
         clear_staff_screen();
@@ -257,70 +248,70 @@ void modify_personal_info_screen(Database *db, const char *user_id, UserType use
             clear_input_buffer(); // 清空缓冲区
             continue;
         }
-        switch (choice)
+        switch(choice)
         {
-        case 1:
-        {
-            char new_name[40];
-            do
+            case 1:
             {
-                printf("当前姓名: %s\n", staff.name);
-                printf("请输入新的姓名: ");
-                scanf("%s", new_name);
-                int valid = 1;
-                for (int i = 0; new_name[i] != '\0'; i++)
+                char new_name[40];
+                do
                 {
-                    if (new_name[i] >= '0' && new_name[i] <= '9')
+                    printf("当前姓名: %s\n", staff.name);
+                    printf("请输入新的姓名: ");
+                    scanf("%s", new_name);
+                    int valid=1;
+                    for(int i=0;new_name[i]!='\0';i++)
                     {
-                        valid = 0;
+                        if(new_name[i]>='0'&&new_name[i]<='9')
+                        {
+                            valid=0;
+                            break;
+                        }
+                    }
+                    if(!valid)
+                    {
+                        printf("不合法名字，请重新输入\n");
+                    }
+                    else if(strcmp(staff.name, new_name) == 0)
+                    {
+                        printf("新姓名不能与原姓名相同，请重新输入\n");
+                    }
+                    else
+                    {
+                        strcpy(staff.name, new_name);
                         break;
                     }
-                }
-                if (!valid)
-                {
-                    printf("不合法名字，请重新输入\n");
-                }
-                else if (strcmp(staff.name, new_name) == 0)
-                {
-                    printf("新姓名不能与原姓名相同，请重新输入\n");
-                }
-                else
-                {
-                    strcpy(staff.name, new_name);
-                    break;
-                }
-            } while (1);
-            break;
-        }
-        case 2:
-        {
+                }while(1);
+                break;
+            }
+            case 2:
+            {
             char new_phone_number[40];
             do
             {
                 printf("当前联系方式: %s\n", staff.phone_number);
                 printf("请输入新的联系方式: ");
                 scanf("%s", new_phone_number);
-                int valid = 1;
-                if (strlen(new_phone_number) != 11)
+                int valid=1;
+                if(strlen(new_phone_number)!=11)
                 {
-                    valid = 0;
+                    valid=0;
                 }
                 else
                 {
-                    for (int i = 0; new_phone_number[i] != '\0'; i++)
+                    for(int i=0;new_phone_number[i]!='\0';i++)
                     {
-                        if (new_phone_number[i] < '0' || new_phone_number[i] > '9')
+                        if(new_phone_number[i]<'0'||new_phone_number[i]>'9')
                         {
-                            valid = 0;
+                            valid=0;
                             break;
                         }
                     }
                 }
-                if (!valid)
+                if(!valid)
                 {
                     printf("不合法联系方式，请重新输入\n");
                 }
-                else if (strcmp(staff.phone_number, new_phone_number) == 0)
+                else if(strcmp(staff.phone_number, new_phone_number) == 0)
                 {
                     printf("新联系方式不能与原联系方式相同，请重新输入\n");
                 }
@@ -329,14 +320,17 @@ void modify_personal_info_screen(Database *db, const char *user_id, UserType use
                     strcpy(staff.phone_number, new_phone_number);
                     break;
                 }
-            } while (1);
+            }while(1);
             break;
-        }
-        case 3:
+           }
+            case 3:
+           {
+        do
         {
-            do
+            printf("当前服务类型: %s\n", staff.staff_type_id);
+            printf("可选服务类型：\n");
+            for (int i = 0; i < service_type_count; i++)
             {
-<<<<<<< HEAD
                 printf("%d. %s\n", i + 1, service_types[i]);
             }
             printf("请输入服务类型编号(1-%d): ",service_type_count);
@@ -360,35 +354,6 @@ void modify_personal_info_screen(Database *db, const char *user_id, UserType use
         }while(1);
         break;  
  }    
-=======
-                printf("当前服务类型: %s\n", staff.staff_type_id);
-                printf("可选服务类型：\n");
-                for (int i = 0; i < service_type_count; i++)
-                {
-                    printf("%d. %s\n", i + 1, service_types[i]);
-                }
-                printf("请输入服务类型编号(1-%d): ", service_type_count);
-                int choice;
-                if (scanf("%d", &choice) != 1 || choice < 1 || choice > service_type_count)
-                {
-                    printf("输入错误，请重试\n");
-                    clear_staff_input_buffer(); // 清空缓冲区
-                    continue;
-                }
-                const char *selected_service_type = service_types[choice - 1];
-                if (strcmp(staff.staff_type_id, selected_service_type) == 0)
-                {
-                    printf("新服务类型不能与原服务类型相同，请重新输入\n");
-                }
-                else
-                {
-                    strcpy(staff.staff_type_id, selected_service_type);
-                    break;
-                }
-            } while (1);
-            break;
-        }
->>>>>>> 9bb55ede620c230e6f442b9b056af0940979a952
         case 0:
             printf("返回主菜单...\n");
             return;
@@ -397,11 +362,11 @@ void modify_personal_info_screen(Database *db, const char *user_id, UserType use
             break;
         }
     } while (choice != 0);
-    // 更新信息
+    //更新信息
     if (update_staff(db, user_id, user_type, &staff))
     {
         printf("个人信息更新成功\n");
-        if (!get_staff_by_id(db, user_id, &staff))
+        if(!get_staff_by_id(db, user_id, &staff))
         {
             printf("获取个人信息失败\n");
             wait_for_user();
@@ -440,19 +405,7 @@ void show_staff_query_screen(Database *db, const char *user_id, UserType user_ty
         switch (choice)
         {
         case 1:
-        {
-            clear_staff_screen();
-            printf("\n===== 用户基本信息 =====\n\n");
-            const char *query =
-                "SELECT u.user_id, u.username, u.name, u.phone_number, u.email "
-                "FROM users u "
-                "WHERE u.role_id = 'role_owner' "
-                "ORDER BY u.user_id;";
-
-            sqlite3_stmt *stmt;
-            if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
             {
-<<<<<<< HEAD
                 clear_staff_screen();
                 printf("\n===== 用户基本信息 =====\n\n");
                 const char *query = 
@@ -463,18 +416,10 @@ void show_staff_query_screen(Database *db, const char *user_id, UserType user_ty
                     "WHERE u.role_id = 'role_owner' "
                     "AND u.registration_date > 0 "  // 只显示通过注册获得的用户
                     "ORDER BY u.registration_date DESC;";  // 按注册时间倒序排列
-=======
-                // 修改表头格式，使用更紧凑的布局
-                printf("--------------------------------------------------------------------------------------------------------\n");
-                printf("| %-8s | %-12s | %-12s | %-12s | %-25s |\n",
-                       "ID", "用户名", "姓名", "电话", "邮箱");
-                printf("--------------------------------------------------------------------------------------------------------\n");
->>>>>>> 9bb55ede620c230e6f442b9b056af0940979a952
 
-                int found = 0;
-                while (sqlite3_step(stmt) == SQLITE_ROW)
+                sqlite3_stmt *stmt;
+                if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
                 {
-<<<<<<< HEAD
                     printf("┌────────────────────────────────────────────────────────────────────────────────────┐\n");
                     printf("│ %-12s │ %-10s │ %-8s │ %-11s │ %-15s │ %-10s │ %-20s │\n", 
                            "用户ID", "用户名", "姓名", "电话", "注册时间", "性别", "身份证号");
@@ -522,33 +467,9 @@ void show_staff_query_screen(Database *db, const char *user_id, UserType user_ty
                     }
                     
                     sqlite3_finalize(stmt);
-=======
-                    found = 1;
-                    const char *full_id = (const char *)sqlite3_column_text(stmt, 0);
-                    char short_id[9]; // 只显示ID的前8位
-                    strncpy(short_id, full_id, 8);
-                    short_id[8] = '\0';
-
-                    // 使用格式化的表格样式
-                    printf("| %-8s | %-12s | %-12s | %-12s | %-25s |\n",
-                           short_id,
-                           sqlite3_column_text(stmt, 1) ? (char *)sqlite3_column_text(stmt, 1) : "N/A",
-                           sqlite3_column_text(stmt, 2) ? (char *)sqlite3_column_text(stmt, 2) : "N/A",
-                           sqlite3_column_text(stmt, 3) ? (char *)sqlite3_column_text(stmt, 3) : "N/A",
-                           sqlite3_column_text(stmt, 4) ? (char *)sqlite3_column_text(stmt, 4) : "N/A");
-                    printf("--------------------------------------------------------------------------------------------------------\n");
->>>>>>> 9bb55ede620c230e6f442b9b056af0940979a952
                 }
-
-                if (!found)
-                {
-                    printf("\n⚠️ 未找到任何用户信息\n");
-                }
-
-                sqlite3_finalize(stmt);
             }
-        }
-        break;
+            break;
 
         case 2:
             case2_handler(db);
@@ -559,7 +480,7 @@ void show_staff_query_screen(Database *db, const char *user_id, UserType user_ty
             {
                 clear_staff_screen();
                 printf("\n===== 用户房屋信息 =====\n\n");
-                const char *query =
+                const char *query = 
                     "SELECT u.user_id, u.username, b.building_name, r.room_number, r.floor, r.area_sqm "
                     "FROM users u "
                     "LEFT JOIN rooms r ON u.user_id = r.owner_id "
@@ -570,40 +491,25 @@ void show_staff_query_screen(Database *db, const char *user_id, UserType user_ty
                 sqlite3_stmt *stmt;
                 if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
                 {
-                    printf("%-12s%-16s%-16s%-16s%-16s%-16s\n",
+                    printf("%-12s%-16s%-16s%-16s%-16s%-16s\n", 
                            "用户ID", "用户名", "楼号", "房间号", "楼层", "面积(㎡)");
-<<<<<<< HEAD
-=======
-                    printf("------------------------------------------------------------------------\n");
-
->>>>>>> 9bb55ede620c230e6f442b9b056af0940979a952
                     int found = 0;
                     while (sqlite3_step(stmt) == SQLITE_ROW)
                     {
                         found = 1;
                         printf("%-12s%-16s%-16s%-16s%-16d%-16.2f\n",
-<<<<<<< HEAD
                             sqlite3_column_text(stmt, 0),
                             sqlite3_column_text(stmt, 1),
                             sqlite3_column_text(stmt, 2),
                             sqlite3_column_text(stmt, 3),
                             sqlite3_column_int(stmt, 4),     // 使用%d而不是%s
                             sqlite3_column_double(stmt, 5));
-=======
-                               sqlite3_column_text(stmt, 0),
-                               sqlite3_column_text(stmt, 1),
-                               sqlite3_column_text(stmt, 2),
-                               sqlite3_column_text(stmt, 3),
-                               sqlite3_column_int(stmt, 4),
-                               sqlite3_column_double(stmt, 5));
->>>>>>> 9bb55ede620c230e6f442b9b056af0940979a952
                     }
-
-                    if (!found)
-                    {
+                    
+                    if (!found) {
                         printf("\n未找到任何用户房屋信息\n");
                     }
-
+                    
                     sqlite3_finalize(stmt);
                 }
             }
@@ -615,7 +521,7 @@ void show_staff_query_screen(Database *db, const char *user_id, UserType user_ty
         default:
             printf("无效的选择，请重新输入\n");
         }
-
+        
         printf("\n按Enter键继续...");
         getchar();
     }
@@ -736,7 +642,7 @@ void show_staff_maintenance_screen(Database *db, const char *user_id, UserType u
 void show_current_fee_standards(Database *db)
 {
     printf("\n===== 当前收费标准 =====\n\n");
-    const char *query =
+    const char *query = 
         "SELECT fee_type, price_per_unit, unit, "
         "(CASE "
         "  WHEN fee_type = 1 THEN '物业费' "
@@ -753,7 +659,7 @@ void show_current_fee_standards(Database *db)
     if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
     {
         printf("┌────────────┬──────────┬─────────────┐\n");
-        printf("│ %-10s │ %-8s │ %-11s │\n",
+        printf("│ %-10s │ %-8s │ %-11s │\n", 
                "费用类型", "单价", "计费单位");
         printf("├────────────┼──────────┼─────────────┤\n");
 
@@ -772,7 +678,6 @@ void show_current_fee_standards(Database *db)
 // 修改查询用户缴费情况函数
 void case2_handler(Database *db)
 {
-<<<<<<< HEAD
     int choice;
     char owner_name[64];
     int year;
@@ -844,61 +749,6 @@ void query_owner_payment_by_year(Database *db, const char *owner_name, int year)
         "LEFT JOIN buildings b ON r.building_id = b.building_id "
         "WHERE u.name = ? AND strftime('%Y', datetime(t.payment_date, 'unixepoch')) = ? "
         "ORDER BY t.payment_date DESC";
-=======
-    clear_staff_screen();
-    show_current_fee_standards(db);
-
-    printf("\n===== 用户缴费情况 =====\n\n");
-    const char *query =
-        "WITH room_fees AS ("
-        "    SELECT r.owner_id, "
-        "           u.username, "
-        "           u.name, "
-        "           r.room_number, "
-        "           r.area_sqm, "
-        "           fs.fee_type, "
-        "           fs.price_per_unit, "
-        "           CASE "
-        "               WHEN fs.fee_type = 1 THEN r.area_sqm * fs.price_per_unit "
-        "               WHEN fs.fee_type = 2 THEN fs.price_per_unit "
-        "               ELSE 0 "
-        "           END as fee_amount "
-        "    FROM users u "
-        "    JOIN rooms r ON u.user_id = r.owner_id "
-        "    CROSS JOIN fee_standards fs "
-        "    WHERE u.role_id = 'role_owner' "
-        "    AND fs.fee_type IN (1, 2) " // 只计算物业费和停车费
-        "    AND (fs.end_date = 0 OR fs.end_date > strftime('%s','now'))"
-        "), user_summary AS ("
-        "    SELECT rf.owner_id, "
-        "           rf.username, "
-        "           rf.name, "
-        "           rf.room_number, "
-        "           SUM(rf.fee_amount) as monthly_due, "
-        "           GROUP_CONCAT("
-        "               CASE "
-        "                   WHEN rf.fee_type = 1 THEN '物业费:' || printf('%.2f', rf.fee_amount) "
-        "                   WHEN rf.fee_type = 2 THEN '停车费:' || printf('%.2f', rf.fee_amount) "
-        "               END, '; '"
-        "           ) as fee_details, "
-        "           COALESCE((SELECT SUM(amount) FROM transactions "
-        "                    WHERE user_id = rf.owner_id "
-        "                    AND status = 1 " // 已支付
-        "                    AND period_start >= strftime('%s','now','start of month')"
-        "                    AND period_end < strftime('%s','now','start of month','+1 month')"
-        "           ), 0) as paid_amount, "
-        "           COALESCE((SELECT SUM(amount) FROM transactions "
-        "                    WHERE user_id = rf.owner_id "
-        "                    AND status IN (0, 2) " // 未支付或逾期
-        "                    AND period_start >= strftime('%s','now','start of month')"
-        "                    AND period_end < strftime('%s','now','start of month','+1 month')"
-        "           ), 0) as unpaid_amount "
-        "    FROM room_fees rf "
-        "    GROUP BY rf.owner_id, rf.username, rf.name, rf.room_number"
-        ")"
-        "SELECT * FROM user_summary "
-        "ORDER BY username;";
->>>>>>> 9bb55ede620c230e6f442b9b056af0940979a952
 
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK) {
@@ -911,7 +761,6 @@ void query_owner_payment_by_year(Database *db, const char *owner_name, int year)
         double total_paid = 0.0;
         double total_unpaid = 0.0;
 
-<<<<<<< HEAD
         printf("┌──────────────────────────────────────────────────────────────────────┐\n");
         printf("│ %-8s │ %-8s │ %-6s │ %-10s │ %-10s │ %-8s │ %-6s │\n",
                "费用类型", "金额", "状态", "缴费日期", "到期日期", "楼号", "房号");
@@ -936,26 +785,6 @@ void query_owner_payment_by_year(Database *db, const char *owner_name, int year)
                 total_paid += amount;
             } else {
                 total_unpaid += amount;
-=======
-            // 转换费用明细格式
-            char formatted_details[100] = {0};
-            int pos = 0;
-            const char *p = fee_details;
-            while (*p && pos < 99)
-            {
-                if (*p == '1')
-                {
-                    pos += snprintf(formatted_details + pos, 100 - pos, "物业费:%.2f;", atof(strchr(p, ':') + 1));
-                }
-                else if (*p == '2')
-                {
-                    pos += snprintf(formatted_details + pos, 100 - pos, "停车费:%.2f;", atof(strchr(p, ':') + 1));
-                }
-                p = strchr(p, ';');
-                if (!p)
-                    break;
-                p++;
->>>>>>> 9bb55ede620c230e6f442b9b056af0940979a952
             }
             strftime(due_date_str, sizeof(due_date_str), "%Y-%m-%d", localtime(&due_date));
 
@@ -983,7 +812,6 @@ void query_owner_payment_by_year(Database *db, const char *owner_name, int year)
     wait_for_key();
 }
 
-<<<<<<< HEAD
 void query_owner_all_payments(Database *db, const char *owner_name)
 {
     clear_staff_screen();
@@ -1145,10 +973,6 @@ void show_payment_statistics(Database *db)
 
 // 发送缴费提醒函数信息
 void send_payment_reminder(Database *db, const char *user_id, double unpaid_amount, const char *fee_types) 
-=======
-// 发送缴费提醒函数
-void send_payment_reminder(Database *db, const char *user_id, double unpaid_amount, const char *fee_types)
->>>>>>> 9bb55ede620c230e6f442b9b056af0940979a952
 {
     char reminder[512]; 
     char username[100];
@@ -1156,8 +980,7 @@ void send_payment_reminder(Database *db, const char *user_id, double unpaid_amou
     struct tm *t = localtime(&now);
 
     // 获取用户名
-    if (!query_username_by_user_id(db, user_id, username))
-    {
+    if (!query_username_by_user_id(db, user_id, username)) {
         strcpy(username, "业主");
     }
 
@@ -1184,32 +1007,27 @@ void send_payment_reminder(Database *db, const char *user_id, double unpaid_amou
              "VALUES ('%s', '%s', %ld, 0)",
              user_id, reminder, (long)now);
 
-    if (execute_update(db, query))
-    {
+    if (execute_update(db, query)) {
         printf("\n已成功向用户 %s 发送缴费提醒\n", username);
-    }
-    else
-    {
+    } else {
         printf("\n发送提醒失败\n");
     }
 }
 
 // 获取当前费用标准信息
-void get_current_fee_standards_info(Database *db, char *buffer, size_t buffer_size)
+void get_current_fee_standards_info(Database *db, char *buffer, size_t buffer_size) 
 {
-    const char *query =
+    const char *query = 
         "SELECT fee_type, price_per_unit, unit "
         "FROM fee_standards "
         "WHERE end_date = 0 OR end_date > strftime('%s','now') "
         "ORDER BY fee_type;";
 
     sqlite3_stmt *stmt;
-    if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
-    {
+    if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK) {
         char *curr_pos = buffer;
         int remaining = buffer_size;
 
-<<<<<<< HEAD
         while (sqlite3_step(stmt) == SQLITE_ROW) {
             const char *type_str;
             int fee_type = sqlite3_column_int(stmt, 0);
@@ -1229,42 +1047,6 @@ void get_current_fee_standards_info(Database *db, char *buffer, size_t buffer_si
                                  sqlite3_column_text(stmt, 2));
 
             if (written >= remaining) break;
-=======
-        while (sqlite3_step(stmt) == SQLITE_ROW)
-        {
-            const char *type_str;
-            int fee_type = sqlite3_column_int(stmt, 0);
-
-            switch (fee_type)
-            {
-            case TRANS_PROPERTY_FEE:
-                type_str = "物业费";
-                break;
-            case TRANS_PARKING_FEE:
-                type_str = "停车费";
-                break;
-            case TRANS_WATER_FEE:
-                type_str = "水费";
-                break;
-            case TRANS_ELECTRICITY_FEE:
-                type_str = "电费";
-                break;
-            case TRANS_GAS_FEE:
-                type_str = "燃气费";
-                break;
-            default:
-                type_str = "其他费用";
-                break;
-            }
-
-            int written = snprintf(curr_pos, remaining, "%s: %.2f %s\n",
-                                   type_str,
-                                   sqlite3_column_double(stmt, 1),
-                                   sqlite3_column_text(stmt, 2));
-
-            if (written >= remaining)
-                break;
->>>>>>> 9bb55ede620c230e6f442b9b056af0940979a952
             curr_pos += written;
             remaining -= written;
         }
@@ -1808,21 +1590,22 @@ void show_statistics_menu(Database *db)
     int choice;
     do {
         clear_staff_screen();
-        printf("\n=== 数据统计报表 ===\n");
-        printf("1. 年度缴费统计\n");
-        printf("2. 当前缴费情况\n");
-        printf("3. 欠费分析报告\n");
+        printf("\n===== 缴费统计分析 =====\n");
+        printf("1. 按年度查看统计\n");
+        printf("2. 查看当前月度统计\n");
+        printf("3. 查看欠费分析\n");
         printf("0. 返回上级菜单\n");
         printf("\n请选择: ");
         
         scanf("%d", &choice);
         clear_input_buffer();
-        
-        switch(choice) {
+
+        switch (choice) {
             case 1: {
                 int year;
-                printf("请输入统计年份: ");
+                printf("请输入要查询的年份: ");
                 scanf("%d", &year);
+                clear_input_buffer();
                 show_yearly_statistics(db, year);
                 break;
             }
@@ -1833,10 +1616,14 @@ void show_statistics_menu(Database *db)
                 show_unpaid_analysis(db);
                 break;
             case 0:
-                return;
-            default: printf("无效选择，请重试\n");
+                printf("返回上级菜单\n");
+                break;
+            default:
+                printf("无效的选择，请重试\n");
+                pause_console();
+                break;
         }
-    } while(choice != 0);
+    } while (choice != 0);
 }
 
 // 添加新函数：年度统计

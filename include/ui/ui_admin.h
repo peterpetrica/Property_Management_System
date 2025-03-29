@@ -107,7 +107,7 @@ void show_admin_main_screen(Database *db, const char *user_id, UserType user_typ
 void clear_input_buffer(void);
 void generate_monthly_fees_screen(Database *db, const char *user_id, UserType user_type);
 bool reassign_user_ids(Database *db);
-void pause(void);
+void pause_console(void);  // 替换原来的 pause()
 
 // 以下函数声明是重复的，保持原样
 

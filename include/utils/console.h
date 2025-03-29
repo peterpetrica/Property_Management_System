@@ -36,4 +36,7 @@ void wait_for_key(); // 修改函数名，避免与系统函数冲突
  */
 void print_query_result(QueryResult *result);
 
+// 清屏功能
+void clear_screen(void);
+
 #endif /* CONSOLE_H */

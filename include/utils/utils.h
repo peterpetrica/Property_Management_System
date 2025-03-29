@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <time.h>
 #include <stdlib.h>
+#include "db/database.h" // 添加数据库头文件引用
+
 char *generate_transaction_id(void);
 char *get_current_date(void);
 // 生成UUID
@@ -33,5 +35,17 @@ void trim_newline(char *str);
 
 // 添加清除输入缓冲区函数声明
 void clear_input_buffer(void);
+
+// 添加缺失的函数声明
+void clear_screen(void);
+void pause_console(void); // 改名避免与系统函数冲突
+
+// 添加数据库相关操作的声明
+bool backup_database(Database *db);
+bool restore_database(Database *db);
+bool clean_database(Database *db);
+bool db_init_tables(Database *db); 
+bool execute_update(Database *db, const char *sql);
+bool update_overdue_transactions(Database *db);
 
 #endif /* UTILS_H */

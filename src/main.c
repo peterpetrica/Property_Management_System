@@ -26,6 +26,7 @@
 #include "ui/ui_staff.h"
 #include "ui/ui_owner.h"
 #include "utils/file_ops.h"
+#include "models/transaction.h"  // 添加此行
 
 #define DB_FILENAME "property_management.db"
 

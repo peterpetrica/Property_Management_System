@@ -31,16 +31,6 @@
 #include <time.h>
 
 /**
- * @brief 清屏函数
- *
- * 清除控制台显示内容，适用于Windows和Unix/Linux系统
- */
-void clear_screen()
-{
-    // system("clear||cls");
-}
-
-/**
  * @brief 显示管理员主界面
  *
  * 显示管理员系统的主菜单，提供各功能模块的入口
