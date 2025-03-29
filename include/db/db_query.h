@@ -29,6 +29,10 @@ bool execute_update(Database *db, const char *sql);
 // 释放查询结果资源
 void free_query_result(QueryResult *result);
 
+bool query_buildings(Database *db, QueryResult *result);
+
+bool fuzzy_query_owner(Database *db, const char *pattern, QueryResult *result);
+
 // 执行参数化查询
 int db_parameterized_query(Database *db, const char *query, void *params,
                            void (*bind_params)(sqlite3_stmt *, void *),
