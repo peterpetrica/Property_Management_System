@@ -462,7 +462,11 @@ int db_parameterized_query(Database *db, const char *query, void *params,
  */
 bool query_buildings(Database *db, QueryResult *result)
 {
-    const char *sql = "SELECT id, name, address, manager_id FROM building ORDER BY name";
+    const char *sql = 
+        "SELECT building_id, building_name, address, floors_count "
+        "FROM buildings "
+        "ORDER BY building_id";
+        
     return execute_query(db, sql, result);
 }
 
