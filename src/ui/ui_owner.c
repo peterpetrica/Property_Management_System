@@ -123,17 +123,20 @@ void show_total_fee(Database *db, const char *user_id)
     // system("clear||cls");
     printf("===== 缴费总金额 =====\n");
     double total = query_total_fee(db, user_id);
+    char username[100];
+    query_username_by_user_id(db, user_id, username);
+
     if (total < 0)
     {
         printf("❌ 查询失败: 请检查数据库或用户记录。\n");
     }
     else if (total == 0)
     {
-        printf("用户 %s 暂无缴费记录。\n", user_id);
+        printf("用户 %s 暂无缴费记录。\n", username);
     }
     else
     {
-        printf("用户 %s 的累计缴费总额：￥%.2f\n", user_id, total);
+        printf("用户 %s 的累计缴费总额：￥%.2f\n", username, total);
     }
 
     printf("\n按任意键返回...");
@@ -483,19 +486,22 @@ void query_service_staff_info(Database *db, const char *user_id)
         "   u.phone_number, "
         "   u.email "
         "FROM users u "
-        "WHERE u.role_id = 'role_staff' "  // 改为查询服务人员
+        "WHERE u.role_id = 'role_staff' " // 改为查询服务人员
         "ORDER BY u.name;";
 
     sqlite3_stmt *stmt;
-    if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) != SQLITE_OK)
+    {
         fprintf(stderr, "查询失败: %s\n", sqlite3_errmsg(db->db));
         return;
     }
 
     int found = 0;
-    while (sqlite3_step(stmt) == SQLITE_ROW) {
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
         found = 1;
-        if (!found) {
+        if (!found)
+        {
             printf("\n工号: %-20s\n", sqlite3_column_text(stmt, 0));
             printf("姓名: %-20s\n", sqlite3_column_text(stmt, 2));
             printf("联系电话: %-20s\n", sqlite3_column_text(stmt, 3));
@@ -504,7 +510,8 @@ void query_service_staff_info(Database *db, const char *user_id)
         }
     }
 
-    if (!found) {
+    if (!found)
+    {
         printf("\n⚠️ 暂无服务人员信息\n");
     }
 
@@ -613,11 +620,11 @@ void show_owner_personal_info_screen(Database *db, const char *user_id, UserType
 {
     char username[100];
     query_username_by_user_id(db, user_id, username);
-
-    printf("更改您的用户名---1    更改您的密码---2    退出---0\n");
-    int num;
     while (1)
     {
+        printf("更改您的用户名---1    更改您的密码---2    返回上一级---0\n");
+        int num;
+
         scanf("%d", &num);
         if (num == 1)
         {
@@ -631,7 +638,6 @@ void show_owner_personal_info_screen(Database *db, const char *user_id, UserType
             {
                 printf("用户名修改失败，请重试。\n");
             }
-            break;
         }
         else if (num == 2)
         {
@@ -639,7 +645,6 @@ void show_owner_personal_info_screen(Database *db, const char *user_id, UserType
         }
         else if (num == 0)
         {
-            printf("退出个人信息管理\n");
             break;
         }
         else
@@ -874,14 +879,15 @@ void query_owner_payment_info(Database *db, const char *user_id)
 {
     printf("\n===== 缴费记录查询 =====\n");
 
-    const char *query = 
+    const char *query =
         "SELECT CAST(transaction_id AS INTEGER) as id, "
         "fee_type, amount, payment_date, status "
         "FROM transactions WHERE user_id = ? "
         "ORDER BY payment_date DESC;";
-        
+
     sqlite3_stmt *stmt;
-    if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) != SQLITE_OK)
+    {
         printf("查询失败: %s\n", sqlite3_errmsg(db->db));
         return;
     }
@@ -892,14 +898,15 @@ void query_owner_payment_info(Database *db, const char *user_id)
            "单号", "费用类型", "金额", "支付日期", "状态");
     printf("----------------------------------------\n");
 
-    while (sqlite3_step(stmt) == SQLITE_ROW) {
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
         const char *status_text = sqlite3_column_int(stmt, 4) == 1 ? "已支付" : "未支付";
-        
+
         printf("%-6d %-10d %-10.2f %-12s %-8s\n",
                sqlite3_column_int(stmt, 0),
                sqlite3_column_int(stmt, 1),
                sqlite3_column_double(stmt, 2),
-               sqlite3_column_text(stmt, 3) ? (const char*)sqlite3_column_text(stmt, 3) : "未支付",
+               sqlite3_column_text(stmt, 3) ? (const char *)sqlite3_column_text(stmt, 3) : "未支付",
                status_text);
     }
 
