@@ -62,7 +62,6 @@ void show_admin_main_screen(Database *db, const char *user_id, UserType user_typ
         show_info_management_screen(db, user_id, user_type);
         break;
     case 2:
-        show_service_assignment_screen(db, user_id, user_type);
         break;
     case 3:
         show_info_query_screen(db, user_id, user_type);
