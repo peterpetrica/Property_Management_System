@@ -401,3 +401,79 @@ bool unassign_staff_from_building(Database *db, const char *user_id, UserType us
         return false;
     }
 }
+// ...existing code...
+
+bool get_unpaid_owners_count(Database *db, int *count)
+{
+    char sql[256];
+    snprintf(sql, sizeof(sql),
+             "SELECT COUNT(DISTINCT o.user_id) "
+             "FROM users o "
+             "LEFT JOIN payments p ON o.user_id = p.user_id AND p.status = 'paid' "
+             "WHERE o.role_id = 3 AND p.payment_id IS NULL");
+
+    QueryResult result;
+    if (!execute_query(db, sql, &result))
+    {
+        return false;
+    }
+
+    *count = atoi(result.rows[0].values[0]);
+    free_query_result(&result);
+    return true;
+}
+
+bool get_owners_count_by_payment_status(Database *db, int *paid_count, int *unpaid_count)
+{
+    char sql[512];
+    snprintf(sql, sizeof(sql),
+             "SELECT "
+             "(SELECT COUNT(DISTINCT user_id) FROM payments WHERE status = 'paid') as paid_count, "
+             "(SELECT COUNT(user_id) FROM users WHERE role_id = 3) - "
+             "(SELECT COUNT(DISTINCT user_id) FROM payments WHERE status = 'paid') as unpaid_count");
+
+    QueryResult result;
+    if (!execute_query(db, sql, &result))
+    {
+        return false;
+    }
+
+    *paid_count = atoi(result.rows[0].values[0]);
+    *unpaid_count = atoi(result.rows[0].values[1]);
+    free_query_result(&result);
+    return true;
+}
+
+bool get_unpaid_owners_by_year(Database *db, int year, QueryResult *result)
+{
+    char sql[512];
+    snprintf(sql, sizeof(sql),
+             "SELECT DISTINCT u.user_id, u.name, u.phone_number "
+             "FROM users u "
+             "LEFT JOIN payments p ON u.user_id = p.user_id "
+             "AND strftime('%%Y', p.payment_date) = '%d' "
+             "WHERE u.role_id = 3 AND p.payment_id IS NULL "
+             "ORDER BY u.name", year);
+
+    return execute_query(db, sql, result);
+}
+
+bool get_paid_owners_count_by_date(Database *db, const char *end_date, int *count)
+{
+    char sql[256];
+    snprintf(sql, sizeof(sql),
+             "SELECT COUNT(DISTINCT user_id) "
+             "FROM payments "
+             "WHERE status = 'paid' AND payment_date <= '%s'",
+             end_date);
+
+    QueryResult result;
+    if (!execute_query(db, sql, &result))
+    {
+        return false;
+    }
+
+    *count = atoi(result.rows[0].values[0]);
+    free_query_result(&result);
+    return true;
+}
