@@ -4,7 +4,7 @@
 
 ### 用户表 (users)
 
-- user_id (主键)(这是字符串(40位)，不是数字)
+- user_id (主键)(这是字符串(40 位)，不是数字)
 - username (登录名)
 - password_hash (密码哈希)
 - name (姓名)
@@ -97,6 +97,12 @@
 - room_id (房屋 ID，外键，物业费时有值)
 - parking_id (停车位 ID，外键，停车费时有值)
 - fee_type (费用类型)
+  1 "物业费"
+  2 "停车费"
+  3 "水费"
+  4 "电费"
+  5 "燃气费"
+  0 "其他费用"
 - amount (金额)
 - payment_date (支付日期)
 - due_date (截止日期)
