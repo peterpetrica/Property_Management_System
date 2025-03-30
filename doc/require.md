@@ -107,7 +107,7 @@
 - payment_date (支付日期)
 - due_date (截止日期)
 - payment_method (支付方式)
-- status (状态：已付、未付、逾期)
+- status (状态：已付1、未付0、逾期2)
 - period_start (账单开始日期)
 - period_end (账单结束日期)
 
