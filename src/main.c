@@ -26,7 +26,7 @@
 #include "ui/ui_staff.h"
 #include "ui/ui_owner.h"
 #include "utils/file_ops.h"
-#include "models/transaction.h"  // 添加此行
+#include "models/transaction.h" // 添加此行
 
 #define DB_FILENAME "property_management.db"
 
@@ -84,7 +84,7 @@ int main()
         return 1;
     }
 
-    // system("clear||cls");
+    system("clear||cls");
 
     LoginResult login_result = show_login_screen(&db);
 
@@ -95,15 +95,15 @@ int main()
         switch (login_result.user_type)
         {
         case USER_ADMIN:
-            // system("clear||cls");
+            system("clear||cls");
             show_admin_main_screen(&db, login_result.user_id, login_result.user_type);
             break;
         case USER_STAFF:
-            // system("clear||cls");
+            system("clear||cls");
             show_staff_main_screen(&db, login_result.user_id, login_result.user_type);
             break;
         case USER_OWNER:
-            // system("clear||cls");
+            system("clear||cls");
             show_owner_main_screen(&db, login_result.user_id, login_result.user_type);
             break;
         default:

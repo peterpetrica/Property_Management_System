@@ -475,7 +475,7 @@ void process_payment_screen(Database *db, const char *user_id)
 // 查询剩余费用
 void query_remaining_balance(Database *db, const char *user_id)
 {
-    // system("clear||cls");
+    system("clear||cls");
     printf("=====查询剩余费用=====\n");
     const char *query = "SELECT SUM(amount) FROM transactions WHERE user_id=?;";
     sqlite3_stmt *stmt;
@@ -547,7 +547,7 @@ void query_community_info(Database *db)
 // 查询收费信息
 void query_fee_info(Database *db, const char *user_id)
 {
-    // system("clear||cls");
+    system("clear||cls");
     printf("===== 物业费标准 =====\n");
 
     // 定义费用类型
@@ -786,7 +786,7 @@ void show_payment_management_screen(Database *db, const char *user_id, UserType 
     int choice;
     while (1)
     {
-        // system("clear||cls");
+        system("clear||cls");
         printf("\n===== 缴费管理 =====\n");
         printf("1. 查看缴费记录\n");
         printf("2. 缴纳费用\n");
@@ -1034,7 +1034,7 @@ void query_owner_payment_info(Database *db, const char *user_id)
 // 查询所有业主的缴费情况
 void query_all_owners_payment_info(Database *db)
 {
-    // system("clear||cls");
+    system("clear||cls");
     printf("===== 查询所有业主缴费情况 =====\n");
 
     const char *query = "SELECT u.user_id, u.name, SUM(t.amount) AS total_paid FROM users u "

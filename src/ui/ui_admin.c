@@ -1702,7 +1702,7 @@ void manage_fee_standards_screen(Database *db, const char *user_id, UserType use
     int choice;
     while (1)
     {
-        // system("clear||cls");
+        system("clear||cls");
         printf("\n===== 费用标准管理 =====\n");
         printf("1. 查看现有费用标准\n");
         printf("2. 修改费用标准\n");

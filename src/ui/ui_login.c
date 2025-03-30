@@ -38,7 +38,7 @@ LoginResult show_login_screen(Database *db)
     char password[64] = {0};
     int choice;
 
-    // system("clear||cls");
+    system("clear||cls");
 
     while (true)
     {
@@ -55,7 +55,7 @@ LoginResult show_login_screen(Database *db)
 
             printf("无效的输入，请重新选择\n");
 
-            // system("clear||cls");
+            system("clear||cls");
             continue;
         }
 
@@ -66,7 +66,7 @@ LoginResult show_login_screen(Database *db)
             return result;
 
         case 1:
-            // system("clear||cls");
+            system("clear||cls");
 
             printf("\n===== 用户登录 =====\n");
             printf("用户名: ");
@@ -88,15 +88,15 @@ LoginResult show_login_screen(Database *db)
                 switch (result.user_type)
                 {
                 case USER_ADMIN:
-                    // system("clear||cls");
+                    system("clear||cls");
                     show_admin_main_screen(db, result.user_id, result.user_type);
                     break;
                 case USER_STAFF:
-                    // system("clear||cls");
+                    system("clear||cls");
                     show_staff_main_screen(db, result.user_id, result.user_type);
                     break;
                 case USER_OWNER:
-                    // system("clear||cls");
+                    system("clear||cls");
                     show_owner_main_screen(db, result.user_id, result.user_type);
                     break;
                 default:
@@ -107,7 +107,7 @@ LoginResult show_login_screen(Database *db)
             }
             else
             {
-                // system("clear||cls");
+                system("clear||cls");
                 printf("\n登录失败：用户名或密码错误\n");
             }
             break;
@@ -150,7 +150,7 @@ bool show_registration_screen(Database *db)
     bool success = false;
     time_t current_time;
     char role_id[16] = {0};
-    // system("clear||cls");
+    system("clear||cls");
 
     printf("\n===== 用户注册 =====\n");
     // 选择角色
@@ -192,7 +192,7 @@ bool show_registration_screen(Database *db)
 
     if (db_prepare(db, query, &stmt) != SQLITE_OK)
     {
-        // system("clear||cls");
+        system("clear||cls");
         printf("数据库错误: %s\n", sqlite3_errmsg(db->db));
         return false;
     }
@@ -204,7 +204,7 @@ bool show_registration_screen(Database *db)
         int count = sqlite3_column_int(stmt, 0);
         if (count > 0)
         {
-            // system("clear||cls");
+            system("clear||cls");
             printf("用户名已存在，请选择其他用户名\n");
             sqlite3_finalize(stmt);
             return false;
@@ -225,7 +225,7 @@ bool show_registration_screen(Database *db)
     // 检查密码一致性
     if (strcmp(password, confirm_password) != 0)
     {
-        // system("clear||cls");
+        system("clear||cls");
         printf("两次输入的密码不匹配\n");
         return false;
     }
@@ -344,7 +344,7 @@ bool show_registration_screen(Database *db)
 
     if (db_prepare(db, query, &stmt) != SQLITE_OK)
     {
-        // system("clear||cls");
+        system("clear||cls");
         printf("数据库错误: %s\n", sqlite3_errmsg(db->db));
         return false;
     }
@@ -364,12 +364,12 @@ bool show_registration_screen(Database *db)
     }
     else
     {
-        // system("clear||cls");
+        system("clear||cls");
         strcpy(error_message, sqlite3_errmsg(db->db));
         printf("注册失败: %s\n", error_message);
     }
 
     sqlite3_finalize(stmt);
-    // system("clear||cls");
+    system("clear||cls");
     return success;
 }
