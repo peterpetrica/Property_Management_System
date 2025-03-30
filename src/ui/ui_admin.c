@@ -261,14 +261,13 @@ void manage_buildings(Database *db, const char *user_id)
         if (execute_query(db, sql, &result))
         {
             printf("\n=== 楼宇列表 ===\n");
-            printf("%-10s %-20s %-30s %-10s\n",
-                   "楼宇ID", "楼宇名称", "地址", "楼层数");
+            printf("%-20s %-30s %-10s\n",
+                   "楼宇名称", "地址", "楼层数");
             printf("--------------------------------------------------------\n");
 
             for (int i = 0; i < result.row_count; i++)
             {
-                printf("%-10s %-20s %-30s %-10s\n",
-                       result.rows[i].values[0],  // building_id
+                printf("%-20s %-30s %-10s\n",
                        result.rows[i].values[1],  // building_name
                        result.rows[i].values[2],  // address
                        result.rows[i].values[3]); // floors_count
@@ -315,9 +314,13 @@ void manage_apartments(Database *db, const char *user_id)
     {
     case 1: // 添加住户
     {
-        char building_name[41], owner_id[41];
+        char building_name[41], owner_username[41];
         int room_number, floor;
         float area_sqm;
+        char room_id[37]; // 用于存储UUID格式的房间ID
+
+        // 生成唯一的房间ID
+        generate_uuid(room_id);
 
         printf("请输入楼宇名称: ");
         fgets(building_name, sizeof(building_name), stdin);
@@ -333,9 +336,9 @@ void manage_apartments(Database *db, const char *user_id)
         printf("请输入房屋面积(平方米): ");
         scanf("%f", &area_sqm);
         getchar();
-        printf("请输入业主ID: ");
-        fgets(owner_id, sizeof(owner_id), stdin);
-        trim_newline(owner_id);
+        printf("请输入业主用户名: ");
+        fgets(owner_username, sizeof(owner_username), stdin);
+        trim_newline(owner_username);
 
         // 校验楼宇名称是否存在，并获取楼宇ID
         snprintf(sql, sizeof(sql),
@@ -351,51 +354,78 @@ void manage_apartments(Database *db, const char *user_id)
         strncpy(building_id, result.rows[0].values[0], sizeof(building_id));
         free_query_result(&result);
 
-        // 校验业主ID是否存在
+        // 通过用户名查询业主ID
         snprintf(sql, sizeof(sql),
-                 "SELECT COUNT(*) FROM owners WHERE owner_id = '%s';",
-                 owner_id);
-        if (!execute_query(db, sql, &result) || atoi(result.rows[0].values[0]) == 0)
+                 "SELECT user_id FROM users WHERE username = '%s';",
+                 owner_username);
+        if (!execute_query(db, sql, &result) || result.row_count == 0)
         {
-            printf("错误：业主ID不存在。\n");
+            printf("错误：业主用户名不存在。\n");
             free_query_result(&result);
             break;
         }
+        char owner_id[41];
+        strncpy(owner_id, result.rows[0].values[0], sizeof(owner_id));
         free_query_result(&result);
 
-        // 执行插入
+        // 执行插入，包含生成的room_id
         snprintf(sql, sizeof(sql),
-                 "INSERT INTO rooms (building_id, room_number, floor, area_sqm, owner_id, status) "
-                 "VALUES ('%s', %d, %d, %.2f, '%s', '已售');",
-                 building_id, room_number, floor, area_sqm, owner_id);
+                 "INSERT INTO rooms (room_id, building_id, room_number, floor, area_sqm, owner_id, status) "
+                 "VALUES ('%s', '%s', %d, %d, %.2f, '%s', '已售');",
+                 room_id, building_id, room_number, floor, area_sqm, owner_id);
 
         if (execute_update(db, sql))
-            printf("住户添加成功！\n");
+            printf("住户添加成功！房间ID: %s\n", room_id);
         else
             printf("住户添加失败。\n");
         break;
     }
     case 2: // 删除住户
     {
-        int room_id;
-        printf("请输入要删除的房间ID: ");
-        scanf("%d", &room_id);
-        getchar();
+        char building_name[41], room_number[20];
 
-        // 校验 room_id 是否存在
+        printf("请输入楼宇名称: ");
+        fgets(building_name, sizeof(building_name), stdin);
+        trim_newline(building_name);
+
+        printf("请输入房间号: ");
+        fgets(room_number, sizeof(room_number), stdin);
+        trim_newline(room_number);
+
+        // 先查询楼宇是否存在，并获取楼宇ID
         snprintf(sql, sizeof(sql),
-                 "SELECT COUNT(*) FROM rooms WHERE room_id = %d;", room_id);
-        if (!execute_query(db, sql, &result) || atoi(result.rows[0].values[0]) == 0)
+                 "SELECT building_id FROM buildings WHERE building_name = '%s';",
+                 building_name);
+        if (!execute_query(db, sql, &result) || result.row_count == 0)
         {
-            printf("错误：房间ID不存在，无法删除。\n");
+            printf("错误：楼宇名称不存在。\n");
             free_query_result(&result);
             break;
         }
+        char building_id[41];
+        strncpy(building_id, result.rows[0].values[0], sizeof(building_id));
+        free_query_result(&result);
+
+        // 根据楼宇ID和房间号查询房间ID
+        snprintf(sql, sizeof(sql),
+                 "SELECT room_id FROM rooms WHERE building_id = '%s' AND room_number = '%s';",
+                 building_id, room_number);
+        if (!execute_query(db, sql, &result) || result.row_count == 0)
+        {
+            printf("错误：指定楼宇中不存在该房间号，无法删除。\n");
+            free_query_result(&result);
+            break;
+        }
+
+        // 安全地处理room_id，使用字符串而非整数
+        char room_id_str[41];
+        strncpy(room_id_str, result.rows[0].values[0], sizeof(room_id_str) - 1);
+        room_id_str[sizeof(room_id_str) - 1] = '\0'; // 确保字符串正确终止
         free_query_result(&result);
 
         // 执行删除
         snprintf(sql, sizeof(sql),
-                 "DELETE FROM rooms WHERE room_id = %d;", room_id);
+                 "DELETE FROM rooms WHERE room_id = '%s';", room_id_str);
 
         if (execute_update(db, sql))
             printf("住户删除成功！\n");
@@ -452,27 +482,33 @@ void manage_apartments(Database *db, const char *user_id)
     case 4: // 查看所有住户
     {
         snprintf(sql, sizeof(sql),
-                 "SELECT room_id, building_id, room_number, floor, area_sqm, owner_id, status FROM rooms;");
+                 "SELECT r.room_id, b.building_name, r.room_number, r.floor, r.area_sqm, u.name AS owner_name, r.status "
+                 "FROM rooms r "
+                 "LEFT JOIN buildings b ON r.building_id = b.building_id "
+                 "LEFT JOIN users u ON r.owner_id = u.user_id "
+                 "ORDER BY b.building_name, r.floor, r.room_number;");
         if (execute_query(db, sql, &result))
         {
             printf("\n=== 住户列表 ===\n");
-            printf("%-10s %-40s %-10s %-10s %-10s %-40s %-10s\n",
-                   "房间ID", "楼宇ID", "房间号", "楼层", "面积(m²)", "业主ID", "状态");
-            printf("-----------------------------------------------------------------------------------------------\n");
+            printf("%-20s %-15s %-8s %-12s %-20s %-12s\n",
+                   "楼宇名称", "房间号", "楼层", "面积(m²)", "业主姓名", "状态");
+            printf("---------------------------------------------------------------------------------\n");
 
             for (int i = 0; i < result.row_count; i++)
             {
-                printf("%-10s %-40s %-10s %-10s %-10s %-40s %-10s\n",
-                       result.rows[i].values[0],  // room_id
-                       result.rows[i].values[1],  // building_id
-                       result.rows[i].values[2],  // room_number
-                       result.rows[i].values[3],  // floor
-                       result.rows[i].values[4],  // area_sqm
-                       result.rows[i].values[5],  // owner_id
-                       result.rows[i].values[6]); // status
+                int floor = atoi(result.rows[i].values[3]);
+                float area = atof(result.rows[i].values[4]);
+
+                printf("%-20s %-15s %-8d %-12.2f %-20s %-12s\n",
+                       result.rows[i].values[1],                                       // building_name
+                       result.rows[i].values[2],                                       // room_number
+                       floor,                                                          // floor (转为数字)
+                       area,                                                           // area_sqm (转为浮点数)
+                       result.rows[i].values[5] ? result.rows[i].values[5] : "未分配", // owner_name
+                       result.rows[i].values[6]);                                      // status
             }
 
-            printf("-----------------------------------------------------------------------------------------------\n");
+            printf("---------------------------------------------------------------------------------\n");
             printf("共 %d 条记录\n", result.row_count);
 
             free_query_result(&result);
@@ -516,7 +552,8 @@ void manage_users(Database *db, const char *user_id, UserType user_type)
     {
         char username[100], password[100], name[100], phone[20], email[100];
         char new_user_id[41];
-        int role_id;
+        int role_choice;
+        char role_id[20]; // 用于存储文本格式的角色ID
 
         generate_uuid(new_user_id);
 
@@ -540,13 +577,30 @@ void manage_users(Database *db, const char *user_id, UserType user_type)
         trim_newline(email);
 
         printf("请选择角色(1-管理员 2-物业人员 3-业主): ");
-        scanf("%d", &role_id);
+        scanf("%d", &role_choice);
         getchar();
 
+        // 将数字选择转换为相应的文本角色ID
+        switch (role_choice)
+        {
+        case 1:
+            strcpy(role_id, "role_admin");
+            break;
+        case 2:
+            strcpy(role_id, "role_staff");
+            break;
+        case 3:
+            strcpy(role_id, "role_owner");
+            break;
+        default:
+            printf("无效的角色选择\n");
+            return;
+        }
+
         snprintf(sql, sizeof(sql),
-                 "INSERT INTO users (user_id, username, password, name, "
+                 "INSERT INTO users (user_id, username, password_hash, name, "
                  "phone_number, email, role_id, status, registration_date) "
-                 "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', %d, 'active', datetime('now'));",
+                 "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', 'active', datetime('now'));",
                  new_user_id, username, password, name, phone, email, role_id);
 
         if (execute_update(db, sql))
@@ -557,21 +611,21 @@ void manage_users(Database *db, const char *user_id, UserType user_type)
     }
     case 2: // 删除用户
     {
-        char del_user_id[41];
-        printf("请输入要删除的用户ID: ");
-        fgets(del_user_id, sizeof(del_user_id), stdin);
-        trim_newline(del_user_id);
+        char username[100];
+        printf("请输入要删除的用户名: ");
+        fgets(username, sizeof(username), stdin);
+        trim_newline(username);
 
-        snprintf(sql, sizeof(sql), "SELECT COUNT(*) FROM users WHERE user_id = '%s';", del_user_id);
+        snprintf(sql, sizeof(sql), "SELECT COUNT(*) FROM users WHERE username = '%s';", username);
         if (!execute_query(db, sql, &result) || atoi(result.rows[0].values[0]) == 0)
         {
-            printf("错误：用户ID不存在，无法删除。\n");
+            printf("错误：用户名不存在，无法删除。\n");
             free_query_result(&result);
             break;
         }
         free_query_result(&result);
 
-        snprintf(sql, sizeof(sql), "DELETE FROM users WHERE user_id = '%s';", del_user_id);
+        snprintf(sql, sizeof(sql), "DELETE FROM users WHERE username = '%s';", username);
         if (execute_update(db, sql))
             printf("用户删除成功！\n");
         else
@@ -580,52 +634,238 @@ void manage_users(Database *db, const char *user_id, UserType user_type)
     }
     case 3: // 修改用户信息
     {
-        char modify_user_id[41], new_password[100];
+        char username[100], modify_user_id[41];
+        char new_password[100], new_name[100], new_phone[20], new_email[100];
+        int modify_choice;
 
-        printf("请输入要修改的用户ID: ");
-        fgets(modify_user_id, sizeof(modify_user_id), stdin);
-        trim_newline(modify_user_id);
+        printf("请输入要修改的用户名: ");
+        fgets(username, sizeof(username), stdin);
+        trim_newline(username);
 
-        snprintf(sql, sizeof(sql), "SELECT COUNT(*) FROM users WHERE user_id = '%s';", modify_user_id);
-        if (!execute_query(db, sql, &result) || atoi(result.rows[0].values[0]) == 0)
+        // 先查询用户是否存在并获取user_id
+        snprintf(sql, sizeof(sql), "SELECT user_id FROM users WHERE username = '%s';", username);
+        if (!execute_query(db, sql, &result) || result.row_count == 0)
         {
-            printf("错误：用户ID不存在，无法修改。\n");
+            printf("错误：用户名不存在，无法修改。\n");
             free_query_result(&result);
             break;
         }
+
+        // 保存user_id用于后续更新
+        strncpy(modify_user_id, result.rows[0].values[0], sizeof(modify_user_id) - 1);
         free_query_result(&result);
 
-        printf("请输入新密码: ");
-        read_password(new_password, sizeof(new_password));
-
+        // 查询当前用户信息并显示
         snprintf(sql, sizeof(sql),
-                 "UPDATE users SET password = '%s' WHERE user_id = '%s';",
-                 new_password, modify_user_id);
+                 "SELECT username, name, phone_number, email, role_id FROM users WHERE user_id = '%s';",
+                 modify_user_id);
 
-        if (execute_update(db, sql))
-            printf("用户密码更新成功！\n");
-        else
-            printf("更新失败。\n");
+        if (execute_query(db, sql, &result) && result.row_count > 0)
+        {
+            printf("\n当前用户信息：\n");
+            printf("用户名: %s\n", result.rows[0].values[0]);
+            printf("姓名: %s\n", result.rows[0].values[1]);
+            printf("电话: %s\n", result.rows[0].values[2]);
+            printf("邮箱: %s\n", result.rows[0].values[3]);
+            printf("角色: %s\n", result.rows[0].values[4]);
+            free_query_result(&result);
+        }
+
+        printf("\n请选择要修改的信息：\n");
+        printf("1. 密码\n");
+        printf("2. 姓名\n");
+        printf("3. 电话\n");
+        printf("4. 邮箱\n");
+        printf("请输入选项(1-4): ");
+        scanf("%d", &modify_choice);
+        getchar(); // 清除换行符
+
+        switch (modify_choice)
+        {
+        case 1: // 修改密码
+            printf("请输入新密码: ");
+            read_password(new_password, sizeof(new_password));
+
+            snprintf(sql, sizeof(sql),
+                     "UPDATE users SET password = '%s' WHERE user_id = '%s';",
+                     new_password, modify_user_id);
+
+            if (execute_update(db, sql))
+                printf("用户密码更新成功！\n");
+            else
+                printf("更新失败。\n");
+            break;
+
+        case 2: // 修改姓名
+            do
+            {
+                printf("请输入新姓名: ");
+                fgets(new_name, sizeof(new_name), stdin);
+                trim_newline(new_name);
+
+                bool valid = true;
+                if (strlen(new_name) > 20)
+                {
+                    valid = false;
+                    printf("不合法的名字，请重新输入\n");
+                }
+                for (int i = 0; new_name[i] != '\0'; i++)
+                {
+                    if (new_name[i] >= '0' && new_name[i] <= '9')
+                    {
+                        printf("不合法的名字，请重新输入\n");
+                        valid = false;
+                        break;
+                    }
+                }
+                if (valid)
+                    break;
+            } while (1);
+
+            snprintf(sql, sizeof(sql),
+                     "UPDATE users SET name = '%s' WHERE user_id = '%s';",
+                     new_name, modify_user_id);
+
+            if (execute_update(db, sql))
+                printf("用户姓名更新成功！\n");
+            else
+                printf("更新失败。\n");
+            break;
+
+        case 3: // 修改电话
+            do
+            {
+                printf("请输入新电话号码: ");
+                fgets(new_phone, sizeof(new_phone), stdin);
+                trim_newline(new_phone);
+
+                bool valid = true;
+                if (strlen(new_phone) != 11)
+                {
+                    valid = false;
+                    printf("不合法的电话号码，请重新输入\n");
+                }
+                else
+                {
+                    for (int i = 0; new_phone[i] != '\0'; i++)
+                    {
+                        if (new_phone[i] < '0' || new_phone[i] > '9')
+                        {
+                            valid = false;
+                            printf("不合法的电话号码，请重新输入\n");
+                            break;
+                        }
+                    }
+                }
+                if (valid)
+                    break;
+            } while (1);
+
+            snprintf(sql, sizeof(sql),
+                     "UPDATE users SET phone_number = '%s' WHERE user_id = '%s';",
+                     new_phone, modify_user_id);
+
+            if (execute_update(db, sql))
+                printf("用户电话更新成功！\n");
+            else
+                printf("更新失败。\n");
+            break;
+
+        case 4: // 修改邮箱
+            do
+            {
+                printf("请输入新邮箱: ");
+                fgets(new_email, sizeof(new_email), stdin);
+                trim_newline(new_email);
+
+                bool valid = true;
+                // 检查邮箱长度
+                if (strlen(new_email) < 6)
+                {
+                    printf("电子邮箱长度不能少于6个字符，请重新输入\n");
+                    valid = false;
+                    continue;
+                }
+                // 检查是否包含@符号
+                if (strchr(new_email, '@') == NULL)
+                {
+                    printf("不合法的邮箱地址，请重新输入\n");
+                    valid = false;
+                    continue;
+                }
+                // 检查是否包含数字
+                bool has_digit = false;
+                for (int i = 0; new_email[i] != '\0'; i++)
+                {
+                    if (new_email[i] >= '0' && new_email[i] <= '9')
+                    {
+                        has_digit = true;
+                        break;
+                    }
+                }
+                if (!has_digit)
+                {
+                    printf("电子邮箱地址必须包含至少一个数字，请重新输入\n");
+                    valid = false;
+                    continue;
+                }
+                if (valid)
+                    break;
+            } while (1);
+
+            snprintf(sql, sizeof(sql),
+                     "UPDATE users SET email = '%s' WHERE user_id = '%s';",
+                     new_email, modify_user_id);
+
+            if (execute_update(db, sql))
+                printf("用户邮箱更新成功！\n");
+            else
+                printf("更新失败。\n");
+            break;
+
+        default:
+            printf("无效选项，操作取消。\n");
+        }
         break;
     }
     case 4: // 查看所有用户
     {
-        snprintf(sql, sizeof(sql), "SELECT user_id, username, role_id, status FROM users;");
+        snprintf(sql, sizeof(sql), "SELECT username, name, phone_number, email, role_id, status, registration_date FROM users;");
         if (execute_query(db, sql, &result))
         {
             printf("\n=== 用户列表 ===\n");
-            printf("%-40s %-20s %-10s %-10s\n", "用户ID", "用户名", "角色ID", "状态");
-            printf("------------------------------------------------------------\n");
+            printf("%-15s %-15s %-15s %-25s %-12s %-10s %-20s\n",
+                   "用户名", "姓名", "电话", "邮箱", "角色ID", "状态", "注册日期");
+            printf("----------------------------------------------------------------------------------------------------------\n");
 
             for (int i = 0; i < result.row_count; i++)
             {
-                printf("%-40s %-20s %-10s %-10s\n",
-                       result.rows[i].values[0],  // user_id
-                       result.rows[i].values[1],  // username
-                       result.rows[i].values[2],  // role_id
-                       result.rows[i].values[3]); // status
+                char formatted_date[30] = {0};
+
+                // 解析数据库返回的日期字符串
+                time_t date_time = parse_time(result.rows[i].values[6]);
+
+                if (date_time != (time_t)-1)
+                {
+                    // 使用format_time函数格式化日期
+                    format_time(date_time, formatted_date, sizeof(formatted_date));
+                }
+                else
+                {
+                    // 解析失败时直接使用原始日期字符串
+                    strncpy(formatted_date, result.rows[i].values[6], sizeof(formatted_date) - 1);
+                }
+
+                printf("%-15s %-15s %-15s %-25s %-12s %-10s %-20s\n",
+                       result.rows[i].values[0], // username
+                       result.rows[i].values[1], // name
+                       result.rows[i].values[2], // phone_number
+                       result.rows[i].values[3], // email
+                       result.rows[i].values[4], // role_id
+                       result.rows[i].values[5], // status
+                       formatted_date);          // 格式化后的日期
             }
-            printf("------------------------------------------------------------\n");
+            printf("----------------------------------------------------------------------------------------------------------\n");
             printf("共 %d 条记录\n", result.row_count);
 
             free_query_result(&result);
@@ -768,7 +1008,7 @@ void show_service_assignment_screen(Database *db, const char *user_id, UserType 
 void show_info_query_screen(Database *db, const char *user_id, UserType user_type)
 {
     int choice;
-    char sql[1024]; // 添加 sql 变量声明并增加缓冲区大小
+    char sql[1024];
 
     do
     {
@@ -788,13 +1028,11 @@ void show_info_query_screen(Database *db, const char *user_id, UserType user_typ
         case 1:
         {
             QueryResult result;
-            // 这里的查询会先确认 buildings 表是否存在，如果存在才执行查询
             char check_sql[256];
             snprintf(check_sql, sizeof(check_sql),
                      "SELECT name FROM sqlite_master "
                      "WHERE type='table' AND name='buildings';");
 
-            // 检查 buildings 表是否存在
             if (!execute_query(db, check_sql, &result) || result.row_count == 0)
             {
                 printf("查询楼盘信息失败，'buildings' 表不存在。\n");
@@ -803,7 +1041,6 @@ void show_info_query_screen(Database *db, const char *user_id, UserType user_typ
             }
             free_query_result(&result);
 
-            // 如果表存在，则执行楼盘查询
             snprintf(sql, sizeof(sql),
                      "SELECT building_id, building_name, address, floors_count "
                      "FROM buildings ORDER BY building_id;");
@@ -811,20 +1048,19 @@ void show_info_query_screen(Database *db, const char *user_id, UserType user_typ
             if (execute_query(db, sql, &result))
             {
                 printf("\n=== 楼盘列表 ===\n");
-                printf("%-10s %-20s %-30s %-10s\n",
-                       "楼宇ID", "楼宇名称", "地址", "楼层数");
+                printf("%-20s %-30s %-10s\n",
+                       "楼宇名称", "地址", "楼层数");
                 printf("--------------------------------------------------------\n");
 
                 for (int i = 0; i < result.row_count; i++)
                 {
-                    printf("%-10s %-20s %-30s %-10s\n",
-                           result.rows[i].values[0],  // building_id
+                    printf("%-20s %-30s %-10s\n",
                            result.rows[i].values[1],  // building_name
                            result.rows[i].values[2],  // address
                            result.rows[i].values[3]); // floors_count
                 }
                 printf("--------------------------------------------------------\n");
-                printf("共 %d 条记录\n", result.row_count);
+                printf("共 %d 栋楼\n", result.row_count);
                 free_query_result(&result);
             }
             else
@@ -833,7 +1069,6 @@ void show_info_query_screen(Database *db, const char *user_id, UserType user_typ
             }
             break;
         }
-
         case 2:
         {
             char name[100];
@@ -841,13 +1076,16 @@ void show_info_query_screen(Database *db, const char *user_id, UserType user_typ
             fgets(name, sizeof(name), stdin);
             trim_newline(name);
 
+            QueryResult result;
+
+            // 修改查询，直接使用role_id进行过滤，不使用JOIN
             snprintf(sql, sizeof(sql),
                      "SELECT user_id, name, phone_number "
                      "FROM users "
-                     "WHERE role_id = 3 AND name LIKE '%%%s%%'",
+                     "WHERE role_id = 'role_owner' "
+                     "AND name LIKE '%%%s%%'",
                      name);
 
-            QueryResult result;
             if (execute_query(db, sql, &result))
             {
                 if (result.row_count > 0)
@@ -879,21 +1117,18 @@ void show_info_query_screen(Database *db, const char *user_id, UserType user_typ
             }
             break;
         }
-
         case 0:
             printf("返回主菜单...\n");
-            break;
+            return;
 
         default:
             printf("无效选项，请重新选择。\n");
+            break;
         }
 
-        if (choice != 0)
-        {
-            printf("\n按Enter键继续...");
-            getchar();
-        }
-    } while (choice != 0);
+        printf("\n按Enter键继续...");
+        getchar();
+    } while (1);
 }
 
 void show_info_sort_screen(Database *db, const char *user_id, UserType user_type)

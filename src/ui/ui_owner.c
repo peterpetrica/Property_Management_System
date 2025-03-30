@@ -409,7 +409,7 @@ void query_remaining_balance(Database *db, const char *user_id)
 
 // 查询小区基本信息
 // 查询小区基本信息
-void query_community_info(Database *db)  // 添加 Database *db 参数
+void query_community_info(Database *db)
 {
     printf("\n============= 小区基本信息 =============\n\n");
     printf("小区名称: 灰灰小区\n");
@@ -423,14 +423,13 @@ void query_community_info(Database *db)  // 添加 Database *db 参数
 
     if (execute_query(db, sql, &result))
     {
-        printf("%-10s %-20s %-30s %-10s\n",
-               "楼宇ID", "楼宇名称", "地址", "楼层数");
+        printf("%-20s %-30s %-10s\n",
+               "楼宇名称", "地址", "楼层数");
         printf("--------------------------------------------------------\n");
 
         for (int i = 0; i < result.row_count; i++)
         {
-            printf("%-10s %-20s %-30s %-10s\n",
-                   result.rows[i].values[0],  // building_id
+            printf("%-20s %-30s %-10s\n",
                    result.rows[i].values[1],  // building_name
                    result.rows[i].values[2],  // address
                    result.rows[i].values[3]); // floors_count
@@ -512,10 +511,8 @@ void query_fee_info(Database *db, const char *user_id)
 // 查询服务人员信息
 void query_service_staff_info(Database *db, const char *user_id)
 {
-    // system("clear||cls");
     printf("\n============= 服务人员信息 =============\n\n");
 
-    // 修改查询语句为查询服务人员信息
     const char *query =
         "SELECT "
         "   u.user_id, "
@@ -524,7 +521,7 @@ void query_service_staff_info(Database *db, const char *user_id)
         "   u.phone_number, "
         "   u.email "
         "FROM users u "
-        "WHERE u.role_id = 'role_staff' " // 改为查询服务人员
+        "WHERE u.role_id = 'role_staff' "
         "ORDER BY u.name;";
 
     sqlite3_stmt *stmt;
@@ -538,14 +535,12 @@ void query_service_staff_info(Database *db, const char *user_id)
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
         found = 1;
-        if (!found)
-        {
-            printf("\n工号: %-20s\n", sqlite3_column_text(stmt, 0));
-            printf("姓名: %-20s\n", sqlite3_column_text(stmt, 2));
-            printf("联系电话: %-20s\n", sqlite3_column_text(stmt, 3));
-            printf("电子邮箱: %-20s\n", sqlite3_column_text(stmt, 4));
-            printf("\n-------------------------------------\n");
-        }
+        // 移除了 if (!found) 判断，直接显示数据
+        printf("\n工号: %-20s\n", sqlite3_column_text(stmt, 0));
+        printf("姓名: %-20s\n", sqlite3_column_text(stmt, 2));
+        printf("联系电话: %-20s\n", sqlite3_column_text(stmt, 3));
+        printf("电子邮箱: %-20s\n", sqlite3_column_text(stmt, 4));
+        printf("\n-------------------------------------\n");
     }
 
     if (!found)
