@@ -137,7 +137,7 @@ bool get_current_fee_standard(Database *db, int fee_type, FeeStandard *standard)
  */
 /**
  * 添加交易记录（安全增强版）
- * 
+ *
  * 修改说明：
  * 1. 强制设置所有NOT NULL字段的默认值
  * 2. 增强字符串字段的安全性
@@ -147,43 +147,51 @@ bool add_transaction(Database *db, const char *user_id, UserType user_type, Tran
 {
     // ==================== 1. 字段默认值设置 ====================
     time_t now = time(NULL);
-    
+
     // 必填时间字段兜底（解决NOT NULL约束）
-    if (transaction->payment_date == 0) {
+    if (transaction->payment_date == 0)
+    {
         transaction->payment_date = now;
     }
-    if (transaction->period_start == 0) {
+    if (transaction->period_start == 0)
+    {
         transaction->period_start = now;
     }
-    if (transaction->period_end == 0) {
+    if (transaction->period_end == 0)
+    {
         transaction->period_end = now;
     }
-    
+
     // 交易状态兜底
-    if (transaction->status == 0) {
+    if (transaction->status == 0)
+    {
         transaction->status = TRANS_PAID; // 默认设为已支付
     }
 
     // ==================== 2. 必填字段校验 ====================
     // 交易ID生成
-    if (strlen(transaction->transaction_id) == 0) {
+    if (strlen(transaction->transaction_id) == 0)
+    {
         generate_uuid(transaction->transaction_id);
     }
 
     // 金额校验
-    if (transaction->amount <= 0) {
+    if (transaction->amount <= 0)
+    {
         fprintf(stderr, "[ERROR] 交易金额必须大于0\n");
         return false;
     }
 
     // 物业费必须关联房屋
-    if (transaction->fee_type == TRANS_PROPERTY_FEE && strlen(transaction->room_id) == 0) {
+    if (transaction->fee_type == TRANS_PROPERTY_FEE && strlen(transaction->room_id) == 0)
+    {
         fprintf(stderr, "[ERROR] 物业费必须指定房屋ID\n");
         return false;
     }
 
     // 停车费必须关联车位
-    if (transaction->fee_type == TRANS_PARKING_FEE && strlen(transaction->parking_id) == 0) {
+    if (transaction->fee_type == TRANS_PARKING_FEE && strlen(transaction->parking_id) == 0)
+    {
         fprintf(stderr, "[ERROR] 停车费必须指定停车位ID\n");
         return false;
     }
@@ -191,37 +199,37 @@ bool add_transaction(Database *db, const char *user_id, UserType user_type, Tran
     // ==================== 3. 安全生成SQL ====================
     char query[1024];
     snprintf(query, sizeof(query),
-        "INSERT INTO transactions ("
-        "transaction_id, user_id, room_id, parking_id, fee_type, "
-        "amount, payment_date, due_date, payment_method, status, "
-        "period_start, period_end"
-        ") VALUES ("
-        "'%s', '%s', '%s', '%s', %d, "    // 字符串字段
-        "%.2f, %ld, %ld, %d, %d, "        // 数值字段
-        "%ld, %ld)",                       // 时间字段
-        transaction->transaction_id,
-        transaction->user_id,
-        transaction->room_id[0] ? transaction->room_id : "",  // 处理空字符串
-        transaction->parking_id[0] ? transaction->parking_id : "",
-        transaction->fee_type,
-        transaction->amount,
-        (long)transaction->payment_date,
-        (long)transaction->due_date,
-        transaction->payment_method,
-        transaction->status,
-        (long)transaction->period_start,
-        (long)transaction->period_end
-    );
+             "INSERT INTO transactions ("
+             "transaction_id, user_id, room_id, parking_id, fee_type, "
+             "amount, payment_date, due_date, payment_method, status, "
+             "period_start, period_end"
+             ") VALUES ("
+             "'%s', '%s', '%s', '%s', %d, " // 字符串字段
+             "%.2f, %ld, %ld, %d, %d, "     // 数值字段
+             "%ld, %ld)",                   // 时间字段
+             transaction->transaction_id,
+             transaction->user_id,
+             transaction->room_id[0] ? transaction->room_id : "", // 处理空字符串
+             transaction->parking_id[0] ? transaction->parking_id : "",
+             transaction->fee_type,
+             transaction->amount,
+             (long)transaction->payment_date,
+             (long)transaction->due_date,
+             transaction->payment_method,
+             transaction->status,
+             (long)transaction->period_start,
+             (long)transaction->period_end);
 
     // ==================== 4. 执行并返回结果 ====================
-    if (!execute_query(db, query, NULL)) {
+    if (!execute_query(db, query, NULL))
+    {
         fprintf(stderr, "[ERROR] 添加交易记录失败 | SQL: %s\n", query);
         return false;
     }
 
     printf("[SUCCESS] 交易记录已添加 | 单号: %s | 用户: %s | 金额: ￥%.2f\n",
-           transaction->transaction_id, 
-           transaction->user_id, 
+           transaction->transaction_id,
+           transaction->user_id,
            transaction->amount);
     return true;
 }
@@ -530,80 +538,220 @@ bool process_payment(Database *db, const char *transaction_id, const char *user_
  * 生成物业费记录
  *
  * @param db 数据库连接
- * @param period_start 账单开始日期
- * @param period_end 账单结束日期
- * @param due_days 付款截止天数(从period_end开始计算)
- * @return 生成成功返回true，失败返回false
  */
-bool generate_property_fees(Database *db, time_t period_start, time_t period_end, int due_days)
+// 添加生成物业费账单的功能函数
+void generate_property_fees(Database *db, const char *user_id, UserType user_type)
 {
-    char query[1024];
-    QueryResult rooms;
-    FeeStandard fee_standard;
+    printf("\n===== 生成物业费账单 =====\n");
 
-    // 获取当前物业费标准
-    if (!get_current_fee_standard(db, TRANS_PROPERTY_FEE, &fee_standard))
+    // 获取当前年月
+    time_t now = time(NULL);
+    struct tm tm_now;
+    localtime_r(&now, &tm_now);
+
+    int year, month;
+    printf("请输入要生成的物业费年份 (如 2025): ");
+    scanf("%d", &year);
+    getchar();
+
+    printf("请输入要生成的物业费月份 (1-12): ");
+    scanf("%d", &month);
+    getchar();
+
+    if (month < 1 || month > 12)
     {
-        printf("获取物业费标准失败\n");
-        return false;
+        printf("无效的月份！\n");
+        printf("按任意键返回...");
+        getchar();
+        return;
+    }
+
+    // 确认操作
+    printf("\n将为 %d年%d月 生成物业费账单，确认操作？(y/n): ", year, month);
+    char confirm;
+    scanf("%c", &confirm);
+    getchar();
+
+    if (confirm != 'y' && confirm != 'Y')
+    {
+        printf("操作已取消\n");
+        printf("按任意键返回...");
+        getchar();
+        return;
+    }
+
+    // 获取费用标准
+    float property_fee_rate = 0.0;
+    QueryResult fee_result;
+    char query[512];
+
+    snprintf(query, sizeof(query),
+             "SELECT price_per_unit FROM fee_standards WHERE fee_type = %d AND "
+             "effective_date <= %ld AND (end_date >= %ld OR end_date = 0) "
+             "ORDER BY effective_date DESC LIMIT 1",
+             TRANS_PROPERTY_FEE, now, now);
+
+    if (!execute_query(db, query, &fee_result) || fee_result.row_count == 0)
+    {
+        printf("未找到有效的物业费标准！\n");
+        if (fee_result.row_count > 0)
+        {
+            free_query_result(&fee_result);
+        }
+        printf("按任意键返回...");
+        getchar();
+        return;
+    }
+
+    property_fee_rate = atof(fee_result.rows[0].values[0]);
+    free_query_result(&fee_result);
+
+    if (property_fee_rate <= 0)
+    {
+        printf("物业费费率无效！\n");
+        printf("按任意键返回...");
+        getchar();
+        return;
     }
 
     // 查询所有有业主的房屋
+    QueryResult rooms_result;
     snprintf(query, sizeof(query),
-             "SELECT r.room_id, r.owner_id, r.area_sqm FROM rooms r "
-             "WHERE r.owner_id IS NOT NULL AND r.owner_id != '' AND r.status = 1");
+             "SELECT r.room_id, r.owner_id, r.area_sqm, b.building_name, r.room_number "
+             "FROM rooms r "
+             "JOIN buildings b ON r.building_id = b.building_id "
+             "WHERE r.owner_id IS NOT NULL AND r.owner_id != ''");
 
-    if (!execute_query(db, query, &rooms))
+    if (!execute_query(db, query, &rooms_result) || rooms_result.row_count == 0)
     {
-        printf("查询房屋信息失败\n");
-        return false;
+        printf("未找到有业主的房屋！\n");
+        if (rooms_result.row_count > 0)
+        {
+            free_query_result(&rooms_result);
+        }
+        printf("按任意键返回...");
+        getchar();
+        return;
     }
 
-    time_t due_date = period_end + (due_days * 24 * 60 * 60); // 计算截止日期
+    // 设置账单起始和结束日期
+    struct tm period_start = {0};
+    period_start.tm_year = year - 1900;
+    period_start.tm_mon = month - 1;
+    period_start.tm_mday = 1;
 
-    // 更新计算物业费的SQL
-    snprintf(query, sizeof(query),
-        "INSERT INTO transactions (transaction_id, user_id, room_id, fee_type, amount, "
-        "payment_date, due_date, status, period_start, period_end) "
-        "SELECT LOWER(HEX(RANDOMBLOB(16))), r.owner_id, r.room_id, "
-        "1, r.area_sqm * fs.price_per_unit, " // 按房屋面积计算物业费
-        "0, ?, 0, ?, ? "
-        "FROM rooms r "
-        "JOIN fee_standards fs ON fs.fee_type = 1 "  // 物业费
-        "WHERE r.owner_id IS NOT NULL "
-        "AND (fs.end_date = 0 OR fs.end_date > ?)");
+    struct tm period_end = {0};
+    period_end.tm_year = year - 1900;
+    period_end.tm_mon = month;
+    period_end.tm_mday = 0; // 会自动调整为上个月的最后一天
+    mktime(&period_end);
 
-    // 为每个房屋生成物业费记录
-    for (int i = 0; i < rooms.row_count; i++)
+    // 设置截止日期（当月最后一天）
+    struct tm due_date = {0};
+    due_date.tm_year = year - 1900;
+    due_date.tm_mon = month - 1;
+    due_date.tm_mday = 28; // 先设为28日
+    mktime(&due_date);
+    // 算出当月最后一天
+    if (due_date.tm_mon == 1)
+    { // 2月特殊处理
+        due_date.tm_mday = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) ? 29 : 28;
+    }
+    else if (due_date.tm_mon == 3 || due_date.tm_mon == 5 ||
+             due_date.tm_mon == 8 || due_date.tm_mon == 10)
     {
-        char *room_id = rooms.rows[i].values[0];
-        char *owner_id = rooms.rows[i].values[1];
-        float area = atof(rooms.rows[i].values[2]);
+        due_date.tm_mday = 30;
+    }
+    else
+    {
+        due_date.tm_mday = 31;
+    }
+    mktime(&due_date);
+
+    // 开始事务
+    sqlite3_exec(db->db, "BEGIN TRANSACTION", 0, 0, 0);
+
+    int success_count = 0;
+    int fail_count = 0;
+
+    // 为每个房屋生成物业费账单
+    for (int i = 0; i < rooms_result.row_count; i++)
+    {
+        const char *room_id = rooms_result.rows[i].values[0];
+        const char *owner_id = rooms_result.rows[i].values[1];
+        float area = atof(rooms_result.rows[i].values[2]);
+        const char *building_name = rooms_result.rows[i].values[3];
+        const char *room_number = rooms_result.rows[i].values[4];
 
         // 计算物业费金额
-        float amount = area * fee_standard.price_per_unit;
+        float fee_amount = area * property_fee_rate;
 
-        // 创建交易记录
-        Transaction transaction;
-        generate_uuid(transaction.transaction_id);
-        strcpy(transaction.user_id, owner_id);
-        strcpy(transaction.room_id, room_id);
-        transaction.parking_id[0] = '\0'; // 物业费与停车位无关
-        transaction.fee_type = TRANS_PROPERTY_FEE;
-        transaction.amount = amount;
-        transaction.payment_date = 0; // 尚未支付
-        transaction.due_date = due_date;
-        transaction.payment_method = PAYMENT_NONE; // 尚未选择支付方式
-        transaction.status = TRANS_UNPAID;         // 未付款
-        transaction.period_start = period_start;
-        transaction.period_end = period_end;
+        // 检查是否已经存在相同时期的物业费账单
+        QueryResult check_result;
+        char check_query[512];
+        snprintf(check_query, sizeof(check_query),
+                 "SELECT COUNT(*) FROM transactions "
+                 "WHERE user_id = '%s' AND room_id = '%s' AND fee_type = %d "
+                 "AND period_start = %ld AND period_end = %ld",
+                 owner_id, room_id, TRANS_PROPERTY_FEE,
+                 mktime(&period_start), mktime(&period_end));
 
-        // 添加交易记录
-        add_transaction(db, "system", USER_ADMIN, &transaction);
+        if (execute_query(db, check_query, &check_result) &&
+            check_result.row_count > 0 &&
+            atoi(check_result.rows[0].values[0]) > 0)
+        {
+            free_query_result(&check_result);
+            printf("跳过 %s-%s，已存在该账单\n", building_name, room_number);
+            continue;
+        }
+
+        if (check_result.row_count > 0)
+        {
+            free_query_result(&check_result);
+        }
+
+        // 生成唯一的交易ID
+        char transaction_id[37];
+        generate_uuid(transaction_id);
+
+        // 插入交易记录
+        char insert_query[1024];
+        snprintf(insert_query, sizeof(insert_query),
+                 "INSERT INTO transactions "
+                 "(transaction_id, user_id, room_id, fee_type, amount, due_date, "
+                 "payment_date, status, period_start, period_end) VALUES "
+                 "('%s', '%s', '%s', %d, %.2f, %ld, "
+                 "0, 0, %ld, %ld)", // 添加了 payment_date 字段，设为 0
+                 transaction_id, owner_id, room_id, TRANS_PROPERTY_FEE, fee_amount,
+                 mktime(&due_date), mktime(&period_start), mktime(&period_end));
+
+        if (execute_update(db, insert_query))
+        {
+            success_count++;
+        }
+        else
+        {
+            fail_count++;
+            printf("生成 %s-%s 的账单失败\n", building_name, room_number);
+        }
     }
 
-    free_query_result(&rooms);
-    return true;
+    free_query_result(&rooms_result);
+
+    // 提交事务
+    if (fail_count == 0)
+    {
+        sqlite3_exec(db->db, "COMMIT", 0, 0, 0);
+        printf("\n✅ 物业费账单生成成功！共生成 %d 条账单记录\n", success_count);
+    }
+    else
+    {
+        sqlite3_exec(db->db, "ROLLBACK", 0, 0, 0);
+        printf("\n❌ 物业费账单生成失败！已回滚所有操作\n");
+    }
+
+    printf("\n按任意键返回...");
+    getchar();
 }
 
 /**
@@ -689,7 +837,7 @@ bool generate_utility_fees(Database *db, time_t period_start, time_t period_end,
     bool success = true;
 
     // 水费生成
-    const char *water_query = 
+    const char *water_query =
         "INSERT INTO transactions (transaction_id, user_id, room_id, fee_type, amount, "
         "payment_date, due_date, status, period_start, period_end) "
         "SELECT LOWER(HEX(RANDOMBLOB(16))), r.owner_id, r.room_id, "
@@ -703,7 +851,7 @@ bool generate_utility_fees(Database *db, time_t period_start, time_t period_end,
     success &= execute_parameterized_update(db, water_query, period_start, period_end, due_date);
 
     // 电费生成
-    const char *electricity_query = 
+    const char *electricity_query =
         "INSERT INTO transactions (transaction_id, user_id, room_id, fee_type, amount, "
         "payment_date, due_date, status, period_start, period_end) "
         "SELECT LOWER(HEX(RANDOMBLOB(16))), r.owner_id, r.room_id, "
@@ -717,7 +865,7 @@ bool generate_utility_fees(Database *db, time_t period_start, time_t period_end,
     success &= execute_parameterized_update(db, electricity_query, period_start, period_end, due_date);
 
     // 燃气费生成
-    const char *gas_query = 
+    const char *gas_query =
         "INSERT INTO transactions (transaction_id, user_id, room_id, fee_type, amount, "
         "payment_date, due_date, status, period_start, period_end) "
         "SELECT LOWER(HEX(RANDOMBLOB(16))), r.owner_id, r.room_id, "
