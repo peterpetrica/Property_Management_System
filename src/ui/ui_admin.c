@@ -886,7 +886,7 @@ void manage_users(Database *db, const char *user_id, UserType user_type)
     manage_users(db, user_id, user_type);
 }
 
-void show_service_assignment_screen(Database *db, const char *user_id, UserType user_type)
+void show_service_assignment_screen(Database *db, const char *user_id, UserType user_type) 
 {
     while (1)
     {
@@ -906,49 +906,155 @@ void show_service_assignment_screen(Database *db, const char *user_id, UserType 
         {
         case 1: // 分配服务人员
         {
-            char staff_id[41];
-            char building_id[41];
+            char building_name[100]; // 楼宇名称
+            char staff_name[100];    // 服务人员姓名
 
-            printf("\n请输入服务人员ID: ");
-            fgets(staff_id, sizeof(staff_id), stdin);
-            trim_newline(staff_id);
+            printf("\n请输入楼宇名称: ");
+            fgets(building_name, sizeof(building_name), stdin);
+            trim_newline(building_name);  // 去除换行符
 
-            printf("请输入楼宇ID: ");
-            fgets(building_id, sizeof(building_id), stdin);
-            trim_newline(building_id);
+            // 根据楼宇名称查询楼宇ID
+            QueryResult result;
+            char sql[512];
+            snprintf(sql, sizeof(sql),
+                     "SELECT building_id FROM buildings WHERE building_name = '%s'", building_name);
 
-            if (assign_staff_to_building(db, user_id, user_type, staff_id, building_id))
+            if (execute_query(db, sql, &result))
             {
-                printf("服务人员分配成功！\n");
+                if (result.row_count == 0)
+                {
+                    printf("未找到该楼宇名称。\n");
+                    free_query_result(&result);
+                    break;
+                }
+
+                // 获取楼宇ID
+                char building_id[41];
+                strcpy(building_id, result.rows[0].values[0]);
+                free_query_result(&result);
+
+                // 获取服务人员姓名
+                printf("\n请输入服务人员姓名: ");
+                fgets(staff_name, sizeof(staff_name), stdin);
+                trim_newline(staff_name);
+
+                // 根据服务人员姓名查询用户ID
+                snprintf(sql, sizeof(sql),
+                         "SELECT user_id FROM users WHERE name = '%s' AND role_id = 'role_staff'", staff_name);
+
+                if (execute_query(db, sql, &result))
+                {
+                    if (result.row_count == 0)
+                    {
+                        printf("未找到该服务人员。\n");
+                        free_query_result(&result);
+                        break;
+                    }
+
+                    // 获取服务人员的 user_id
+                    char staff_user_id[41];
+                    strcpy(staff_user_id, result.rows[0].values[0]);
+                    free_query_result(&result);
+
+                    // 分配服务人员到楼宇
+                    if (assign_staff_to_building(db, user_id, user_type, staff_user_id, building_id))
+                    {
+                        printf("服务人员分配成功！\n");
+                    }
+                    else
+                    {
+                        printf("服务人员分配失败。\n");
+                    }
+                }
+                else
+                {
+                    printf("查询失败。\n");
+                }
             }
             else
             {
-                printf("服务人员分配失败。\n");
+                printf("查询失败。\n");
             }
+
             break;
         }
 
         case 2: // 取消分配
         {
-            char staff_id[41];
-            char building_id[41];
+            char building_name[100]; // 增加缓冲区大小
+            char staff_name[100];    // 服务人员姓名
 
-            printf("\n请输入服务人员ID: ");
-            fgets(staff_id, sizeof(staff_id), stdin);
-            trim_newline(staff_id);
+            printf("\n请输入楼宇名称: ");
+            fgets(building_name, sizeof(building_name), stdin);
+            trim_newline(building_name);
 
-            printf("请输入楼宇ID: ");
-            fgets(building_id, sizeof(building_id), stdin);
-            trim_newline(building_id);
+            // 根据楼宇名称查询楼宇ID
+            QueryResult result;
+            char sql[512];
+            snprintf(sql, sizeof(sql),
+                     "SELECT building_id FROM buildings WHERE building_name = '%s'", building_name);
 
-            if (unassign_staff_from_building(db, user_id, user_type, staff_id, building_id))
+            if (execute_query(db, sql, &result))
             {
-                printf("取消分配成功！\n");
+                if (result.row_count == 0)
+                {
+                    printf("未找到该楼宇名称。\n");
+                    free_query_result(&result);
+                    break;
+                }
+
+                // 获取楼宇ID
+                char building_id[41];
+                strcpy(building_id, result.rows[0].values[0]);
+                free_query_result(&result);
+
+                // 获取服务人员姓名
+                printf("\n请输入服务人员姓名: ");
+                fgets(staff_name, sizeof(staff_name), stdin);
+                trim_newline(staff_name);
+
+                // 根据姓名查询服务人员ID，且服务人员必须已分配到该楼宇
+                snprintf(sql, sizeof(sql),
+                         "SELECT sa.staff_id, u.name as staff_name "
+                         "FROM service_areas sa "
+                         "JOIN staff s ON sa.staff_id = s.staff_id "
+                         "JOIN users u ON s.user_id = u.user_id "
+                         "WHERE u.name = '%s' AND sa.building_id = '%s'", staff_name, building_id);
+
+                if (execute_query(db, sql, &result))
+                {
+                    if (result.row_count == 0)
+                    {
+                        printf("该楼宇没有分配该服务人员。\n");
+                        free_query_result(&result);
+                        break;
+                    }
+
+                    // 获取服务人员ID
+                    char staff_id[41];
+                    strcpy(staff_id, result.rows[0].values[0]);
+                    free_query_result(&result);
+
+                    // 取消分配
+                    if (unassign_staff_from_building(db, user_id, user_type, staff_id, building_id))
+                    {
+                        printf("取消分配成功！\n");
+                    }
+                    else
+                    {
+                        printf("取消分配失败。\n");
+                    }
+                }
+                else
+                {
+                    printf("查询失败。\n");
+                }
             }
             else
             {
-                printf("取消分配失败。\n");
+                printf("查询失败。\n");
             }
+
             break;
         }
 
@@ -958,31 +1064,28 @@ void show_service_assignment_screen(Database *db, const char *user_id, UserType 
             char sql[512];
 
             snprintf(sql, sizeof(sql),
-                     "SELECT s.staff_id, u.name as staff_name, "
-                     "b.building_id, b.building_name, sa.assignment_date "
+                     "SELECT u.name as staff_name, b.building_name "
                      "FROM service_areas sa "
-                     "JOIN users u ON sa.staff_id = u.user_id "
+                     "JOIN staff s ON sa.staff_id = s.staff_id "
+                     "JOIN users u ON s.user_id = u.user_id "
                      "JOIN buildings b ON sa.building_id = b.building_id "
                      "ORDER BY b.building_name, u.name");
 
             if (execute_query(db, sql, &result))
             {
                 printf("\n=== 服务人员分配情况 ===\n");
-                printf("%-20s %-15s %-20s %-20s %-20s\n",
-                       "服务人员ID", "姓名", "楼宇ID", "楼宇名称", "分配日期");
-                printf("--------------------------------------------------------------------------------\n");
+                printf("%-20s %-20s\n",
+                       "服务人员姓名", "楼宇名称");
+                printf("----------------------------------------\n");
 
                 for (int i = 0; i < result.row_count; i++)
                 {
-                    printf("%-20s %-15s %-20s %-20s %-20s\n",
+                    printf("%-20s %-20s\n",
                            result.rows[i].values[0],
-                           result.rows[i].values[1],
-                           result.rows[i].values[2],
-                           result.rows[i].values[3],
-                           result.rows[i].values[4]);
+                           result.rows[i].values[1]);
                 }
 
-                printf("--------------------------------------------------------------------------------\n");
+                printf("----------------------------------------\n");
                 printf("共 %d 条记录\n", result.row_count);
                 free_query_result(&result);
             }
@@ -1004,6 +1107,8 @@ void show_service_assignment_screen(Database *db, const char *user_id, UserType 
         getchar();
     }
 }
+
+
 
 void show_info_query_screen(Database *db, const char *user_id, UserType user_type)
 {
