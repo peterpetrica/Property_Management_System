@@ -34,12 +34,29 @@
 // 显示缴费记录
 void show_payment_history(Database *db, const char *user_id)
 {
-    // system("clear||cls");
-    printf("=====缴费记录=====\n");
+    clear_screen();
+    printf("\n====== 缴费记录 ======\n");
 
-    const char *query = "SELECT transaction_id, amount, payment_date FROM transactions WHERE user_id=?";
+    const char *query = 
+        "SELECT t.transaction_id, "
+        "CASE t.fee_type "
+        "WHEN 1 THEN '物业费' "
+        "WHEN 2 THEN '停车费' "
+        "WHEN 3 THEN '水费' "
+        "WHEN 4 THEN '电费' "
+        "WHEN 5 THEN '燃气费' "
+        "ELSE '其他' END as fee_type, "
+        "t.amount, "
+        "t.payment_date "
+        "FROM transactions t "
+        "WHERE t.user_id = ? "
+        "AND t.payment_date IS NOT NULL "
+        "AND t.payment_date > 0 "
+        "AND t.status = 1 "
+        "AND t.amount > 0 "  // 确保金额为正数
+        "ORDER BY t.payment_date DESC";
+
     sqlite3_stmt *stmt;
-
     if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) != SQLITE_OK)
     {
         printf("SQL错误: %s\n", sqlite3_errmsg(db->db));
@@ -48,41 +65,57 @@ void show_payment_history(Database *db, const char *user_id)
 
     sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
 
-    printf("交易ID\t\t金额\t\t日期\n");
-    printf("--------------------------------\n");
+    printf("\n%-20s %-10s %-15s %-15s\n",
+           "交易编号", "费用类型", "缴费金额", "缴费日期");
+    printf("----------------------------------------------------------------------\n");
 
     int found = 0;
+    double total_paid = 0.0;
+    
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        found = 1;
-
-        // 交易ID
         const unsigned char *transaction_id = sqlite3_column_text(stmt, 0);
+        const unsigned char *fee_type = sqlite3_column_text(stmt, 1);
+        double amount = sqlite3_column_double(stmt, 2);
+        time_t pay_date = sqlite3_column_int64(stmt, 3);
+        
+        // 验证日期的有效性
+        if (pay_date > 0)
+        {
+            found = 1;
+            char date_buf[20];
+            strftime(date_buf, sizeof(date_buf), "%Y-%m-%d", localtime(&pay_date));
 
-        // 金额
-        double amount = sqlite3_column_double(stmt, 1);
+            // 缩短交易ID的显示长度
+            char short_id[9] = {0};
+            strncpy(short_id, (const char *)transaction_id, 8);
 
-        // 日期处理（假设存的是时间戳）
-        time_t pay_date = sqlite3_column_int64(stmt, 2);
-        char date_buf[20];
-        strftime(date_buf, sizeof(date_buf), "%Y-%m-%d", localtime(&pay_date));
-
-        printf("%-16s￥%-10.2f%s\n",
-               transaction_id ? (const char *)transaction_id : "NULL",
-               amount,
-               date_buf);
+            printf("%-20s %-10s ￥%-14.2f %s\n",
+                   short_id,
+                   fee_type,
+                   amount,
+                   date_buf);
+                   
+            total_paid += amount;
+        }
     }
+
+    sqlite3_finalize(stmt);
 
     if (!found)
     {
         printf("\n⚠️ 当前用户暂无缴费记录。\n");
     }
+    else
+    {
+        printf("----------------------------------------------------------------------\n");
+        printf("累计已缴金额: ￥%.2f\n", total_paid);
+    }
 
-    sqlite3_finalize(stmt);
-    printf("\n按任意键返回...");
-    clear_input_buffer();
+    printf("\n说明：显示所有已完成的缴费记录\n");
+    printf("\n按Enter键返回...");
+    getchar();
 }
-
 double query_total_fee(Database *db, const char *user_id)
 {
     // 1. 定义所有变量
@@ -144,50 +177,43 @@ void show_total_fee(Database *db, const char *user_id)
 }
 void process_payment_screen(Database *db, const char *user_id)
 {
-    char trans_id[25] = {0};
+    clear_screen();
+    printf("\n============= 费用缴纳 =============\n\n");
 
-    // 清屏并显示标题
-    // system("clear||cls");
-    printf("======== 费用缴纳 ========\n\n");
-
-    // 费用类型配置
     const char *fee_types[] = {"物业费", "水电费", "停车费", "维修基金"};
     const int valid_days[] = {365, 30, 30, 365};
 
-    // 费用类型选择
     printf("请选择费用类型:\n");
     for (int i = 0; i < sizeof(fee_types) / sizeof(fee_types[0]); i++)
     {
         printf("%d. %s\n", i + 1, fee_types[i]);
     }
-    printf("选择(1-%d): ", (int)(sizeof(fee_types) / sizeof(fee_types[0])));
+    printf("\n选择(1-%d): ", (int)(sizeof(fee_types) / sizeof(fee_types[0])));
 
     int fee_type;
     if (scanf("%d", &fee_type) != 1 || fee_type < 1 || fee_type > (int)(sizeof(fee_types) / sizeof(fee_types[0])))
     {
-        printf("! 无效选择\n");
+        printf("❌ 无效选择\n");
         clear_input_buffer();
         return;
     }
     clear_input_buffer();
 
-    // 查询未支付记录
     const char *query_unpaid =
         "SELECT transaction_id, amount, due_date "
         "FROM transactions "
-        "WHERE user_id = ? AND fee_type = ? AND status != 1 "
+        "WHERE user_id = ? AND fee_type = ? AND status = 0 "
         "ORDER BY due_date ASC";
 
     sqlite3_stmt *stmt_unpaid;
     if (sqlite3_prepare_v2(db->db, query_unpaid, -1, &stmt_unpaid, NULL) == SQLITE_OK)
     {
         sqlite3_bind_text(stmt_unpaid, 1, user_id, -1, SQLITE_STATIC);
-        sqlite3_bind_text(stmt_unpaid, 2, fee_types[fee_type - 1], -1, SQLITE_STATIC);
+        sqlite3_bind_int(stmt_unpaid, 2, fee_type);
 
-        // 收集未支付记录
         struct UnpaidRecord
         {
-            char transaction_id[25];
+            char transaction_id[37];
             double amount;
             time_t due_date;
         } unpaid_records[100];
@@ -196,35 +222,52 @@ void process_payment_screen(Database *db, const char *user_id)
 
         while (sqlite3_step(stmt_unpaid) == SQLITE_ROW && record_count < 100)
         {
-            strncpy(unpaid_records[record_count].transaction_id,
-                    (const char *)sqlite3_column_text(stmt_unpaid, 0),
-                    sizeof(unpaid_records[record_count].transaction_id) - 1);
-            unpaid_records[record_count].amount = sqlite3_column_double(stmt_unpaid, 1);
-            unpaid_records[record_count].due_date = sqlite3_column_int64(stmt_unpaid, 2);
-            total_unpaid += unpaid_records[record_count].amount;
-            record_count++;
+            const char *trans_id = (const char *)sqlite3_column_text(stmt_unpaid, 0);
+            if (trans_id) {
+                strncpy(unpaid_records[record_count].transaction_id,
+                        trans_id,
+                        sizeof(unpaid_records[record_count].transaction_id) - 1);
+                unpaid_records[record_count].transaction_id[sizeof(unpaid_records[record_count].transaction_id) - 1] = '\0';
+                
+                unpaid_records[record_count].amount = sqlite3_column_double(stmt_unpaid, 1);
+                unpaid_records[record_count].due_date = sqlite3_column_int64(stmt_unpaid, 2);
+                total_unpaid += unpaid_records[record_count].amount;
+                record_count++;
+            }
         }
         sqlite3_finalize(stmt_unpaid);
 
         if (record_count > 0)
         {
-            printf("\n您有%d笔未支付的%s, 总计: ￥%.2f\n",
-                   record_count, fee_types[fee_type - 1], total_unpaid);
-            printf("是否一次性缴清所有欠费? (1-是/0-否): ");
+            printf("\n=== 未缴%s记录 ===\n", fee_types[fee_type - 1]);
+            printf("交易编号\t\t金额\t\t到期日期\n");
+            printf("--------------------------------------------------\n");
+            
+            for (int i = 0; i < record_count; i++)
+            {
+                char date_str[20];
+                strftime(date_str, sizeof(date_str), "%Y-%m-%d", 
+                        localtime(&unpaid_records[i].due_date));
+                printf("%-24s ￥%-10.2f %s\n",
+                       unpaid_records[i].transaction_id,
+                       unpaid_records[i].amount,
+                       date_str);
+            }
+            printf("--------------------------------------------------\n");
+            printf("总计: %d笔待缴费用，共计￥%.2f\n", record_count, total_unpaid);
 
+            printf("\n是否一次性缴清所有欠费? (1-是/0-否): ");
             int choice;
             scanf("%d", &choice);
             clear_input_buffer();
 
+            time_t now = time(NULL);
+            
             if (choice == 1)
             {
-                // 开始事务
                 sqlite3_exec(db->db, "BEGIN TRANSACTION", 0, 0, 0);
-                time_t now = time(NULL);
-                bool success = true;
 
-                // 更新所有未支付记录
-                for (int i = 0; i < record_count && success; i++)
+                for (int i = 0; i < record_count; i++)
                 {
                     const char *update_query =
                         "UPDATE transactions "
@@ -236,147 +279,147 @@ void process_payment_screen(Database *db, const char *user_id)
                     {
                         sqlite3_bind_int64(update_stmt, 1, (sqlite3_int64)now);
                         sqlite3_bind_text(update_stmt, 2, unpaid_records[i].transaction_id, -1, SQLITE_STATIC);
-
-                        success = (sqlite3_step(update_stmt) == SQLITE_DONE);
+                        sqlite3_step(update_stmt);
                         sqlite3_finalize(update_stmt);
                     }
-                    else
-                    {
-                        success = false;
-                    }
                 }
 
-                if (success)
-                {
-                    sqlite3_exec(db->db, "COMMIT", 0, 0, 0);
+                sqlite3_exec(db->db, "COMMIT", 0, 0, 0);
+                char display_date[20];
+                strftime(display_date, sizeof(display_date), "%Y-%m-%d", localtime(&now));
 
-                    char display_date[20];
-                    strftime(display_date, sizeof(display_date), "%Y-%m-%d", localtime(&now));
-
-                    printf("\n════════════════════════\n");
-                    printf("✅ 批量缴费成功\n");
-                    printf("────────────────────────\n");
-                    printf("用户ID: %s\n", user_id);
-                    printf("费用类型: %s\n", fee_types[fee_type - 1]);
-                    printf("缴费总额: ￥%.2f\n", total_unpaid);
-                    printf("缴费日期: %s\n", display_date);
-                    printf("缴费笔数: %d\n", record_count);
-                }
-                else
-                {
-                    sqlite3_exec(db->db, "ROLLBACK", 0, 0, 0);
-                    printf("\n❌ 缴费失败，请稍后重试\n");
-                }
-                printf("════════════════════════\n");
-                printf("\n按任意键返回主菜单...");
-                getchar();
-                return;
+                printf("\n════════════════════════\n");
+                printf("✅ 批量缴费成功\n");
+                printf("────────────────────────\n");
+                printf("用户ID: %s\n", user_id);
+                printf("费用类型: %s\n", fee_types[fee_type - 1]);
+                printf("缴费总额: ￥%.2f\n", total_unpaid);
+                printf("缴费日期: %s\n", display_date);
+                printf("缴费笔数: %d\n", record_count);
             }
-            else
+           // process_payment_screen 部分缴费部分的修改代码
+else
+{
+    double amount;
+    do
+    {
+        printf("\n请输入缴费金额（最大￥%.2f）: ", total_unpaid);
+        if (scanf("%lf", &amount) != 1)
+        {
+            printf("❌ 请输入有效数字\n");
+            clear_input_buffer();
+            continue;
+        }
+
+        if (amount <= 0)
+        {
+            printf("❌ 金额必须大于0\n");
+        }
+        else if (amount > 100000)
+        {
+            printf("❌ 单笔缴费不得超过10万元\n");
+        }
+        else if (amount > total_unpaid)
+        {
+            printf("❌ 缴费金额不能超过应缴总额\n");
+        }
+        else
+        {
+            break;
+        }
+        clear_input_buffer();
+    } while (1);
+
+    sqlite3_exec(db->db, "BEGIN TRANSACTION", 0, 0, 0);
+    double remaining_amount = amount;
+
+    // 首先创建一条已支付记录
+    char new_transaction_id[37];
+    generate_uuid(new_transaction_id);
+    
+    const char *insert_query = 
+        "INSERT INTO transactions "
+        "(transaction_id, user_id, fee_type, amount, status, payment_date) "
+        "VALUES (?, ?, ?, ?, 1, ?)";
+
+    sqlite3_stmt *insert_stmt;
+    if (sqlite3_prepare_v2(db->db, insert_query, -1, &insert_stmt, NULL) == SQLITE_OK)
+    {
+        sqlite3_bind_text(insert_stmt, 1, new_transaction_id, -1, SQLITE_STATIC);
+        sqlite3_bind_text(insert_stmt, 2, user_id, -1, SQLITE_STATIC);
+        sqlite3_bind_int(insert_stmt, 3, fee_type);
+        sqlite3_bind_double(insert_stmt, 4, amount);
+        sqlite3_bind_int64(insert_stmt, 5, (sqlite3_int64)now);
+        sqlite3_step(insert_stmt);
+        sqlite3_finalize(insert_stmt);
+    }
+
+    // 更新原始未支付记录
+    for (int i = 0; i < record_count && remaining_amount > 0; i++)
+    {
+        double current_payment = (remaining_amount >= unpaid_records[i].amount)
+                                   ? unpaid_records[i].amount
+                                   : remaining_amount;
+
+        if (current_payment >= unpaid_records[i].amount)
+        {
+            // 如果完全支付了这条记录
+            const char *update_query =
+                "UPDATE transactions "
+                "SET status = 1, payment_date = ? "
+                "WHERE transaction_id = ?";
+
+            sqlite3_stmt *update_stmt;
+            if (sqlite3_prepare_v2(db->db, update_query, -1, &update_stmt, NULL) == SQLITE_OK)
             {
-                // 部分缴费流程
-                double amount;
-                do
-                {
-                    printf("\n请输入缴费金额（最大%.2f元）: ", total_unpaid);
-                    if (scanf("%lf", &amount) != 1)
-                    {
-                        printf("! 请输入有效数字\n");
-                        clear_input_buffer();
-                        continue;
-                    }
-
-                    if (amount <= 0)
-                    {
-                        printf("! 金额必须大于0\n");
-                    }
-                    else if (amount > 100000)
-                    {
-                        printf("! 单笔缴费不得超过10万元\n");
-                    }
-                    else
-                    {
-                        break;
-                    }
-                    clear_input_buffer();
-                } while (1);
-
-                // 开始事务
-                sqlite3_exec(db->db, "BEGIN TRANSACTION", 0, 0, 0);
-                time_t now = time(NULL);
-                double remaining_amount = amount;
-                bool success = true;
-
-                // 逐条处理未支付记录
-                for (int i = 0; i < record_count && remaining_amount > 0 && success; i++)
-                {
-                    double current_payment = (remaining_amount >= unpaid_records[i].amount)
-                                                 ? unpaid_records[i].amount
-                                                 : remaining_amount;
-
-                    const char *update_query = (current_payment >= unpaid_records[i].amount)
-                                                   ? "UPDATE transactions SET status = 1, payment_date = ? WHERE transaction_id = ?"
-                                                   : "UPDATE transactions SET amount = amount - ? WHERE transaction_id = ?";
-
-                    sqlite3_stmt *update_stmt;
-                    if (sqlite3_prepare_v2(db->db, update_query, -1, &update_stmt, NULL) == SQLITE_OK)
-                    {
-                        if (current_payment >= unpaid_records[i].amount)
-                        {
-                            sqlite3_bind_int64(update_stmt, 1, (sqlite3_int64)now);
-                        }
-                        else
-                        {
-                            sqlite3_bind_double(update_stmt, 1, current_payment);
-                        }
-                        sqlite3_bind_text(update_stmt, 2, unpaid_records[i].transaction_id, -1, SQLITE_STATIC);
-
-                        success = (sqlite3_step(update_stmt) == SQLITE_DONE);
-                        sqlite3_finalize(update_stmt);
-                    }
-                    else
-                    {
-                        success = false;
-                    }
-
-                    if (success)
-                    {
-                        remaining_amount -= current_payment;
-                    }
-                }
-
-                if (success)
-                {
-                    sqlite3_exec(db->db, "COMMIT", 0, 0, 0);
-
-                    char display_date[20];
-                    strftime(display_date, sizeof(display_date), "%Y-%m-%d", localtime(&now));
-
-                    printf("\n════════════════════════\n");
-                    printf("✅ 缴费成功\n");
-                    printf("────────────────────────\n");
-                    printf("用户ID: %s\n", user_id);
-                    printf("费用类型: %s\n", fee_types[fee_type - 1]);
-                    printf("缴费金额: ￥%.2f\n", amount);
-                    printf("缴费日期: %s\n", display_date);
-                    printf("剩余未缴: ￥%.2f\n", total_unpaid - amount);
-                }
-                else
-                {
-                    sqlite3_exec(db->db, "ROLLBACK", 0, 0, 0);
-                    printf("\n❌ 缴费失败，请稍后重试\n");
-                }
-                printf("════════════════════════\n");
+                sqlite3_bind_int64(update_stmt, 1, (sqlite3_int64)now);
+                sqlite3_bind_text(update_stmt, 2, unpaid_records[i].transaction_id, -1, SQLITE_STATIC);
+                sqlite3_step(update_stmt);
+                sqlite3_finalize(update_stmt);
             }
         }
         else
         {
-            printf("\n当前无未支付的%s。\n", fee_types[fee_type - 1]);
+            // 如果是部分支付
+            const char *update_query =
+                "UPDATE transactions "
+                "SET amount = amount - ? "
+                "WHERE transaction_id = ?";
+
+            sqlite3_stmt *update_stmt;
+            if (sqlite3_prepare_v2(db->db, update_query, -1, &update_stmt, NULL) == SQLITE_OK)
+            {
+                sqlite3_bind_double(update_stmt, 1, current_payment);
+                sqlite3_bind_text(update_stmt, 2, unpaid_records[i].transaction_id, -1, SQLITE_STATIC);
+                sqlite3_step(update_stmt);
+                sqlite3_finalize(update_stmt);
+            }
+        }
+        remaining_amount -= current_payment;
+    }
+
+    sqlite3_exec(db->db, "COMMIT", 0, 0, 0);
+    char display_date[20];
+    strftime(display_date, sizeof(display_date), "%Y-%m-%d", localtime(&now));
+
+    printf("\n════════════════════════\n");
+    printf("✅ 缴费成功\n");
+    printf("────────────────────────\n");
+    printf("用户ID: %s\n", user_id);
+    printf("费用类型: %s\n", fee_types[fee_type - 1]);
+    printf("缴费金额: ￥%.2f\n", amount);
+    printf("缴费日期: %s\n", display_date);
+    printf("剩余未缴: ￥%.2f\n", total_unpaid - amount);
+}
+            printf("════════════════════════\n");
+        }
+        else
+        {
+            printf("\n✓ 当前无未支付的%s。\n", fee_types[fee_type - 1]);
         }
     }
 
-    printf("\n按任意键返回主菜单...");
-    clear_input_buffer();
+    printf("\n按Enter键返回主菜单...");
     getchar();
 }
 // 查询剩余费用
