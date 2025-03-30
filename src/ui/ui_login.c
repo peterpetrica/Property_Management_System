@@ -77,22 +77,6 @@ LoginResult show_login_screen(Database *db)
             while (getchar() != '\n')
                 ;
             read_password(password, sizeof(password));
-            // 这是一个测试账户，功能做好以后善良这段就行
-            //  测试账户登录处理
-            if (strcmp(username, "123") == 0 && strcmp(password, "123") == 0)
-            {
-                result.success = true;
-                result.user_type = USER_OWNER;               // 普通用户权限
-                strcpy(result.user_id, "default_owner_001"); // 修改为有效的用户ID格式
-                printf("\n登录成功！欢迎使用测试账号\n");
-                printf("您的身份是: 业主\n");
-
-                // 根据用户类型跳转到对应的主界面
-                show_owner_main_screen(db, result.user_id, result.user_type);
-                return result;
-            }
-            // 测试结束
-            //  ...existing code...
             //  验证账号密码
             result = authenticate_user(db, username, password);
 
