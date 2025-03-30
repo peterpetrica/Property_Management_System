@@ -77,22 +77,23 @@ LoginResult show_login_screen(Database *db)
             while (getchar() != '\n')
                 ;
             read_password(password, sizeof(password));
-            //这是一个测试账户，功能做好以后善良这段就行
-            // 测试账户登录处理
-            if (strcmp(username, "123") == 0 && strcmp(password, "123") == 0) {
+            // 这是一个测试账户，功能做好以后善良这段就行
+            //  测试账户登录处理
+            if (strcmp(username, "123") == 0 && strcmp(password, "123") == 0)
+            {
                 result.success = true;
-                result.user_type = USER_OWNER;  // 普通用户权限
-                strcpy(result.user_id, "default_owner_001");  // 修改为有效的用户ID格式
+                result.user_type = USER_OWNER;               // 普通用户权限
+                strcpy(result.user_id, "default_owner_001"); // 修改为有效的用户ID格式
                 printf("\n登录成功！欢迎使用测试账号\n");
                 printf("您的身份是: 业主\n");
-                
+
                 // 根据用户类型跳转到对应的主界面
                 show_owner_main_screen(db, result.user_id, result.user_type);
                 return result;
             }
-            //测试结束
-            // ...existing code...
-            // 验证账号密码
+            // 测试结束
+            //  ...existing code...
+            //  验证账号密码
             result = authenticate_user(db, username, password);
 
             if (result.success)
@@ -169,21 +170,21 @@ bool show_registration_screen(Database *db)
 
     printf("\n===== 用户注册 =====\n");
     // 选择角色
-    int role_choice = 0;
+    int role_choice = 1;
     do
     {
-        printf("请选择注册角色:\n");
-        printf("1. 普通用户 (业主)\n");
-        printf("2. 服务人员\n");
-        printf("3. 管理员\n");
-        printf("请输入对应的数字 (1-3): ");
-        if (scanf("%d", &role_choice) != 1 || role_choice < 1 || role_choice > 3)
-        {
-            printf("无效的选择，请重新输入\n");
-            while (getchar() != '\n')
-                ; // 清空缓冲区
-            continue;
-        }
+        // printf("请选择注册角色:\n");
+        // printf("1. 普通用户 (业主)\n");
+        // printf("2. 服务人员\n");
+        // printf("3. 管理员\n");
+        // printf("请输入对应的数字 (1-3): ");
+        // if (scanf("%d", &role_choice) != 1 || role_choice < 1 || role_choice > 3)
+        // {
+        //     printf("无效的选择，请重新输入\n");
+        //     while (getchar() != '\n')
+        //         ; // 清空缓冲区
+        //     continue;
+        // }
 
         switch (role_choice)
         {
