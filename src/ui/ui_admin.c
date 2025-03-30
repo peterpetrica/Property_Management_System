@@ -762,7 +762,7 @@ void show_service_assignment_screen(Database *db, const char *user_id, UserType 
 void show_info_query_screen(Database *db, const char *user_id, UserType user_type) 
 {
     int choice;
-    char sql[1024];  // 添加 sql 变量声明并增加缓冲区大小
+    char sql[1024];
     
     do {
         clear_screen();
@@ -779,13 +779,11 @@ void show_info_query_screen(Database *db, const char *user_id, UserType user_typ
         switch (choice) {
             case 1: {
                 QueryResult result;
-                // 这里的查询会先确认 buildings 表是否存在，如果存在才执行查询
                 char check_sql[256];
                 snprintf(check_sql, sizeof(check_sql),
                         "SELECT name FROM sqlite_master "
                         "WHERE type='table' AND name='buildings';");
 
-                // 检查 buildings 表是否存在
                 if (!execute_query(db, check_sql, &result) || result.row_count == 0) {
                     printf("查询楼盘信息失败，'buildings' 表不存在。\n");
                     free_query_result(&result);
@@ -793,53 +791,53 @@ void show_info_query_screen(Database *db, const char *user_id, UserType user_typ
                 }
                 free_query_result(&result);
 
-                // 如果表存在，则执行楼盘查询
                 snprintf(sql, sizeof(sql),
                         "SELECT building_id, building_name, address, floors_count "
                         "FROM buildings ORDER BY building_id;");
 
                 if (execute_query(db, sql, &result)) {
                     printf("\n=== 楼盘列表 ===\n");
-                    printf("%-10s %-20s %-30s %-10s\n",
-                           "楼宇ID", "楼宇名称", "地址", "楼层数");
+                    printf("%-20s %-30s %-10s\n",
+                           "楼宇名称", "地址", "楼层数");
                     printf("--------------------------------------------------------\n");
 
                     for (int i = 0; i < result.row_count; i++) {
-                        printf("%-10s %-20s %-30s %-10s\n",
-                               result.rows[i].values[0],  // building_id
+                        printf("%-20s %-30s %-10s\n",
                                result.rows[i].values[1],  // building_name
                                result.rows[i].values[2],  // address
                                result.rows[i].values[3]); // floors_count
                     }
                     printf("--------------------------------------------------------\n");
-                    printf("共 %d 条记录\n", result.row_count);
+                    printf("共 %d 栋楼\n", result.row_count);
                     free_query_result(&result);
                 } else {
                     printf("查询楼盘信息失败。\n");
                 }
                 break;
             }
-            
             case 2: {
                 char name[100];
                 printf("请输入业主姓名（支持模糊查询）: ");
                 fgets(name, sizeof(name), stdin);
                 trim_newline(name);
-
-                snprintf(sql, sizeof(sql),
-                        "SELECT user_id, name, phone_number "
-                        "FROM users "
-                        "WHERE role_id = 3 AND name LIKE '%%%s%%'",
-                        name);
-
+            
                 QueryResult result;
+                // 修改 SQL 查询语句：
+                // 1. 修改 role_id 的判断方式
+                // 2. 增加 LIKE 语句的通配符
+                snprintf(sql, sizeof(sql),
+                         "SELECT u.user_id, u.name, u.phone_number "
+                         "FROM users u "
+                         "WHERE u.role_id = 'role_owner' AND u.name LIKE '%%%s%%'",
+                         name);
+            
                 if (execute_query(db, sql, &result)) {
                     if (result.row_count > 0) {
                         printf("\n=== 查询结果 ===\n");
                         printf("%-20s %-20s %-15s\n",
                                "用户ID", "姓名", "联系电话");
                         printf("------------------------------------------------\n");
-
+            
                         for (int i = 0; i < result.row_count; i++) {
                             printf("%-20s %-20s %-15s\n",
                                    result.rows[i].values[0],
@@ -857,20 +855,18 @@ void show_info_query_screen(Database *db, const char *user_id, UserType user_typ
                 }
                 break;
             }
-            
             case 0:
                 printf("返回主菜单...\n");
-                break;
+                return;
                 
             default:
                 printf("无效选项，请重新选择。\n");
+                break;
         }
 
-        if (choice != 0) {
-            printf("\n按Enter键继续...");
-            getchar();
-        }
-    } while (choice != 0);
+        printf("\n按Enter键继续...");
+        getchar();
+    } while (1);
 }
 
 
