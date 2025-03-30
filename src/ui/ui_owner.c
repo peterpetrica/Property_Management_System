@@ -409,22 +409,49 @@ void query_remaining_balance(Database *db, const char *user_id)
 
 // 查询小区基本信息
 // 查询小区基本信息
-void query_community_info()
+void query_community_info(Database *db)  // 添加 Database *db 参数
 {
     printf("\n============= 小区基本信息 =============\n\n");
     printf("小区名称: 灰灰小区\n");
-    printf("建筑信息: 共有6栋楼\n");
-    printf("楼层信息: 每栋楼6层，4个单元\n");
-    printf("住户情况: 目前总住户578人\n");
+    printf("\n楼盘信息:\n");
+
+    // 使用 QueryResult 结构体存储查询结果
+    QueryResult result;
+    const char *sql = 
+        "SELECT building_id, building_name, address, floors_count "
+        "FROM buildings ORDER BY building_id;";
+
+    if (execute_query(db, sql, &result))
+    {
+        printf("%-10s %-20s %-30s %-10s\n",
+               "楼宇ID", "楼宇名称", "地址", "楼层数");
+        printf("--------------------------------------------------------\n");
+
+        for (int i = 0; i < result.row_count; i++)
+        {
+            printf("%-10s %-20s %-30s %-10s\n",
+                   result.rows[i].values[0],  // building_id
+                   result.rows[i].values[1],  // building_name
+                   result.rows[i].values[2],  // address
+                   result.rows[i].values[3]); // floors_count
+        }
+
+        printf("--------------------------------------------------------\n");
+        printf("共 %d 栋楼\n", result.row_count);
+
+        free_query_result(&result);
+    }
+
+    printf("\n住户情况: 目前总住户578人\n");
     printf("配套设施: 健身房、游泳池、儿童乐园\n");
     printf("物业服务: 24小时物业服务中心\n");
     printf("当前状态: 一切正常\n");
     printf("\n=======================================\n");
+    
     printf("\n按任意键返回...");
     clear_input_buffer();
     getchar();
 }
-
 // 查询收费信息
 void query_fee_info(Database *db, const char *user_id)
 {
@@ -676,8 +703,7 @@ void show_payment_management_screen(Database *db, const char *user_id, UserType 
         printf("1. 查看缴费记录\n");
         printf("2. 缴纳费用\n");
         printf("3. 查询应缴费用\n");
-        printf("4. 查询物业费标准\n");
-        printf("5.查询缴费总金额\n");
+        printf("4.查询缴费总金额\n");
         printf("0. 返回上一级\n");
         printf("请输入您的选择: ");
         scanf("%d", &choice);
@@ -695,9 +721,6 @@ void show_payment_management_screen(Database *db, const char *user_id, UserType 
             query_due_payments(db, user_id);
             break;
         case 4:
-            query_fee_info(db, user_id);
-            break;
-        case 5:
             show_total_fee(db, user_id);
             break;
         case 0:
@@ -737,7 +760,7 @@ void show_owner_query_screen(Database *db, const char *user_id, UserType user_ty
         case 1:
             // 用户选择查询小区基本信息
             {
-                query_community_info();
+                query_community_info(db);
                 break;
             } // 退出当前 case，继续循环显示菜单
 
