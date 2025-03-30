@@ -347,7 +347,7 @@ void manage_apartments(Database *db, const char *user_id)
 
         // 校验业主ID是否存在
         snprintf(sql, sizeof(sql),
-                 "SELECT COUNT(*) FROM owners WHERE owner_id = '%s';",
+                 "SELECT COUNT(*) FROM users WHERE user_id = '%s';",
                  owner_id);
         if (!execute_query(db, sql, &result) || atoi(result.rows[0].values[0]) == 0)
         {
