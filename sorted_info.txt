@@ -1,2 +1,0 @@
-Owner Name               Payment Amount     Payment Date
----------------------------------------------------------
