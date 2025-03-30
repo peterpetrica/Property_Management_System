@@ -31,6 +31,21 @@
 #include <time.h>
 #include <sys/time.h>
 
+// 定义缴费记录链表结构
+typedef struct PaymentRecord
+{
+    char transaction_id[37];
+    char fee_type[20];
+    double amount;
+    time_t payment_date;
+    struct PaymentRecord *next;
+} PaymentRecord;
+
+// 函数原型声明
+PaymentRecord *create_payment_record_list(Database *db, const char *user_id);
+void export_payment_records_to_file(PaymentRecord *head);
+void free_payment_record_list(PaymentRecord *head);
+
 // 显示缴费记录
 void show_payment_history(Database *db, const char *user_id)
 {
@@ -113,9 +128,173 @@ void show_payment_history(Database *db, const char *user_id)
     }
 
     printf("\n说明：显示所有已完成的缴费记录\n");
+
+    // 询问用户是否要导出缴费记录到文件
+    printf("\n是否导出缴费记录到文件？(1-是/0-否): ");
+    int choice;
+    scanf("%d", &choice);
+    clear_input_buffer();
+
+    if (choice == 1 && found)
+    {
+        // 将缴费记录转换为链表并导出到文件
+        PaymentRecord *records = create_payment_record_list(db, user_id);
+        if (records)
+        {
+            export_payment_records_to_file(records);
+            free_payment_record_list(records);
+        }
+        else
+        {
+            printf("⚠️ 导出失败：无法创建缴费记录列表。\n");
+        }
+    }
+
     printf("\n按Enter键返回...");
     getchar();
 }
+
+// 创建缴费记录链表
+PaymentRecord *create_payment_record_list(Database *db, const char *user_id)
+{
+    const char *query =
+        "SELECT t.transaction_id, "
+        "CASE t.fee_type "
+        "WHEN 1 THEN '物业费' "
+        "WHEN 2 THEN '停车费' "
+        "WHEN 3 THEN '水费' "
+        "WHEN 4 THEN '电费' "
+        "WHEN 5 THEN '燃气费' "
+        "ELSE '其他' END as fee_type, "
+        "t.amount, "
+        "t.payment_date "
+        "FROM transactions t "
+        "WHERE t.user_id = ? "
+        "AND t.payment_date IS NOT NULL "
+        "AND t.payment_date > 0 "
+        "AND t.status = 1 "
+        "AND t.amount > 0 "
+        "ORDER BY t.payment_date DESC";
+
+    sqlite3_stmt *stmt;
+    if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) != SQLITE_OK)
+    {
+        fprintf(stderr, "SQL错误: %s\n", sqlite3_errmsg(db->db));
+        return NULL;
+    }
+
+    sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
+
+    // 链表的头指针和尾指针
+    PaymentRecord *head = NULL;
+    PaymentRecord *tail = NULL;
+
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        // 创建新节点
+        PaymentRecord *record = (PaymentRecord *)malloc(sizeof(PaymentRecord));
+        if (!record)
+        {
+            fprintf(stderr, "内存分配失败\n");
+            // 释放已分配的节点
+            free_payment_record_list(head);
+            sqlite3_finalize(stmt);
+            return NULL;
+        }
+
+        // 复制数据
+        strncpy(record->transaction_id, (const char *)sqlite3_column_text(stmt, 0), 36);
+        record->transaction_id[36] = '\0';
+
+        strncpy(record->fee_type, (const char *)sqlite3_column_text(stmt, 1), 19);
+        record->fee_type[19] = '\0';
+
+        record->amount = sqlite3_column_double(stmt, 2);
+        record->payment_date = sqlite3_column_int64(stmt, 3);
+        record->next = NULL;
+
+        // 添加到链表
+        if (!head)
+        {
+            head = record;
+            tail = record;
+        }
+        else
+        {
+            tail->next = record;
+            tail = record;
+        }
+    }
+
+    sqlite3_finalize(stmt);
+    return head;
+}
+
+// 导出缴费记录到文件
+void export_payment_records_to_file(PaymentRecord *head)
+{
+    // 生成带时间戳的文件名
+    char filename[100];
+    time_t now = time(NULL);
+    struct tm *t = localtime(&now);
+    strftime(filename, sizeof(filename), "payment_history_%Y%m%d_%H%M%S.txt", t);
+
+    FILE *file = fopen(filename, "w");
+    if (!file)
+    {
+        fprintf(stderr, "无法创建文件：%s\n", filename);
+        return;
+    }
+
+    // 写入表头
+    fprintf(file, "%-20s %-10s %-15s %-15s\n", "交易编号", "费用类型", "缴费金额", "缴费日期");
+    fprintf(file, "----------------------------------------------------------------------\n");
+
+    // 写入数据
+    PaymentRecord *current = head;
+    double total_paid = 0.0;
+
+    while (current)
+    {
+        char date_buf[20];
+        strftime(date_buf, sizeof(date_buf), "%Y-%m-%d", localtime(&current->payment_date));
+
+        fprintf(file, "%-20s %-10s ￥%-14.2f %s\n",
+                current->transaction_id,
+                current->fee_type,
+                current->amount,
+                date_buf);
+
+        total_paid += current->amount;
+        current = current->next;
+    }
+
+    // 写入合计
+    fprintf(file, "----------------------------------------------------------------------\n");
+    fprintf(file, "累计已缴金额: ￥%.2f\n", total_paid);
+    fprintf(file, "导出时间: ");
+
+    // 写入当前时间
+    char time_buf[30];
+    strftime(time_buf, sizeof(time_buf), "%Y-%m-%d %H:%M:%S", localtime(&now));
+    fprintf(file, "%s\n", time_buf);
+
+    fclose(file);
+    printf("✅ 缴费记录已导出到文件：%s\n", filename);
+}
+
+// 释放链表内存
+void free_payment_record_list(PaymentRecord *head)
+{
+    PaymentRecord *current = head;
+    while (current)
+    {
+        PaymentRecord *next = current->next;
+        free(current);
+        current = next;
+    }
+}
+
 double query_total_fee(Database *db, const char *user_id)
 {
     // 1. 定义所有变量
@@ -611,7 +790,7 @@ void show_payment_management_screen(Database *db, const char *user_id, UserType 
         printf("\n===== 缴费管理 =====\n");
         printf("1. 查看缴费记录\n");
         printf("2. 缴纳费用\n");
-        printf("3. 查询应缴费用\n");   
+        printf("3. 查询应缴费用\n");
         printf("0. 返回上一级\n");
         printf("请输入您的选择: ");
         scanf("%d", &choice);
