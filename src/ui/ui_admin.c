@@ -10,7 +10,7 @@
  * - 信息排序界面
  * - 信息统计界面
  * - 系统维护界面
- * - 测试功能界面
+ * - 费用管理界面
  */
 
 #include "ui/ui_admin.h"
@@ -51,7 +51,8 @@ void show_admin_main_screen(Database *db, const char *user_id, UserType user_typ
         printf("4. 信息排序界面\n");
         printf("5. 信息统计界面\n");
         printf("6. 系统维护界面\n");
-        printf("7. 退出系统\n");
+        printf("7. 费用管理界面\n");
+        printf("8. 退出系统\n");
         printf("请输入选项: ");
 
         int choice;
@@ -79,6 +80,9 @@ void show_admin_main_screen(Database *db, const char *user_id, UserType user_typ
             show_system_maintenance_screen(db, user_id, user_type);
             break;
         case 7:
+            manage_fee_standards_screen(db, user_id, user_type);
+            break;
+        case 8:
             printf("退出系统。\n");
             return; // 直接返回而不是exit(0)
         default:
@@ -93,7 +97,9 @@ void manage_buildings(Database *db, const char *user_id);
 void manage_apartments(Database *db, const char *user_id);
 void manage_users(Database *db, const char *user_id, UserType user_type);
 void manage_services(Database *db, const char *user_id);
-
+void manage_fee_standards_screen(Database *db, const char *user_id, UserType user_type);
+void generate_periodic_fees_screen(Database *db, const char *user_id, UserType user_type);
+bool update_fee_standard(Database *db, const char *user_id, UserType user_type, FeeStandard *standard);
 void show_info_management_screen(Database *db, const char *user_id, UserType user_type)
 {
     while (1)
@@ -759,12 +765,13 @@ void show_service_assignment_screen(Database *db, const char *user_id, UserType 
     }
 }
 
-void show_info_query_screen(Database *db, const char *user_id, UserType user_type) 
+void show_info_query_screen(Database *db, const char *user_id, UserType user_type)
 {
     int choice;
-    char sql[1024];  // 添加 sql 变量声明并增加缓冲区大小
-    
-    do {
+    char sql[1024]; // 添加 sql 变量声明并增加缓冲区大小
+
+    do
+    {
         clear_screen();
         printf("========================\n");
         printf("  信息查询\n");
@@ -776,103 +783,118 @@ void show_info_query_screen(Database *db, const char *user_id, UserType user_typ
         scanf("%d", &choice);
         getchar();
 
-        switch (choice) {
-            case 1: {
-                QueryResult result;
-                // 这里的查询会先确认 buildings 表是否存在，如果存在才执行查询
-                char check_sql[256];
-                snprintf(check_sql, sizeof(check_sql),
-                        "SELECT name FROM sqlite_master "
-                        "WHERE type='table' AND name='buildings';");
+        switch (choice)
+        {
+        case 1:
+        {
+            QueryResult result;
+            // 这里的查询会先确认 buildings 表是否存在，如果存在才执行查询
+            char check_sql[256];
+            snprintf(check_sql, sizeof(check_sql),
+                     "SELECT name FROM sqlite_master "
+                     "WHERE type='table' AND name='buildings';");
 
-                // 检查 buildings 表是否存在
-                if (!execute_query(db, check_sql, &result) || result.row_count == 0) {
-                    printf("查询楼盘信息失败，'buildings' 表不存在。\n");
-                    free_query_result(&result);
-                    break;
-                }
+            // 检查 buildings 表是否存在
+            if (!execute_query(db, check_sql, &result) || result.row_count == 0)
+            {
+                printf("查询楼盘信息失败，'buildings' 表不存在。\n");
                 free_query_result(&result);
+                break;
+            }
+            free_query_result(&result);
 
-                // 如果表存在，则执行楼盘查询
-                snprintf(sql, sizeof(sql),
-                        "SELECT building_id, building_name, address, floors_count "
-                        "FROM buildings ORDER BY building_id;");
+            // 如果表存在，则执行楼盘查询
+            snprintf(sql, sizeof(sql),
+                     "SELECT building_id, building_name, address, floors_count "
+                     "FROM buildings ORDER BY building_id;");
 
-                if (execute_query(db, sql, &result)) {
-                    printf("\n=== 楼盘列表 ===\n");
+            if (execute_query(db, sql, &result))
+            {
+                printf("\n=== 楼盘列表 ===\n");
+                printf("%-10s %-20s %-30s %-10s\n",
+                       "楼宇ID", "楼宇名称", "地址", "楼层数");
+                printf("--------------------------------------------------------\n");
+
+                for (int i = 0; i < result.row_count; i++)
+                {
                     printf("%-10s %-20s %-30s %-10s\n",
-                           "楼宇ID", "楼宇名称", "地址", "楼层数");
-                    printf("--------------------------------------------------------\n");
-
-                    for (int i = 0; i < result.row_count; i++) {
-                        printf("%-10s %-20s %-30s %-10s\n",
-                               result.rows[i].values[0],  // building_id
-                               result.rows[i].values[1],  // building_name
-                               result.rows[i].values[2],  // address
-                               result.rows[i].values[3]); // floors_count
-                    }
-                    printf("--------------------------------------------------------\n");
-                    printf("共 %d 条记录\n", result.row_count);
-                    free_query_result(&result);
-                } else {
-                    printf("查询楼盘信息失败。\n");
+                           result.rows[i].values[0],  // building_id
+                           result.rows[i].values[1],  // building_name
+                           result.rows[i].values[2],  // address
+                           result.rows[i].values[3]); // floors_count
                 }
-                break;
+                printf("--------------------------------------------------------\n");
+                printf("共 %d 条记录\n", result.row_count);
+                free_query_result(&result);
             }
-            
-            case 2: {
-                char name[100];
-                printf("请输入业主姓名（支持模糊查询）: ");
-                fgets(name, sizeof(name), stdin);
-                trim_newline(name);
-
-                snprintf(sql, sizeof(sql),
-                        "SELECT user_id, name, phone_number "
-                        "FROM users "
-                        "WHERE role_id = 3 AND name LIKE '%%%s%%'",
-                        name);
-
-                QueryResult result;
-                if (execute_query(db, sql, &result)) {
-                    if (result.row_count > 0) {
-                        printf("\n=== 查询结果 ===\n");
-                        printf("%-20s %-20s %-15s\n",
-                               "用户ID", "姓名", "联系电话");
-                        printf("------------------------------------------------\n");
-
-                        for (int i = 0; i < result.row_count; i++) {
-                            printf("%-20s %-20s %-15s\n",
-                                   result.rows[i].values[0],
-                                   result.rows[i].values[1],
-                                   result.rows[i].values[2]);
-                        }
-                        printf("------------------------------------------------\n");
-                        printf("共找到 %d 条记录\n", result.row_count);
-                    } else {
-                        printf("\n未找到符合条件的业主。\n");
-                    }
-                    free_query_result(&result);
-                } else {
-                    printf("查询失败。\n");
-                }
-                break;
+            else
+            {
+                printf("查询楼盘信息失败。\n");
             }
-            
-            case 0:
-                printf("返回主菜单...\n");
-                break;
-                
-            default:
-                printf("无效选项，请重新选择。\n");
+            break;
         }
 
-        if (choice != 0) {
+        case 2:
+        {
+            char name[100];
+            printf("请输入业主姓名（支持模糊查询）: ");
+            fgets(name, sizeof(name), stdin);
+            trim_newline(name);
+
+            snprintf(sql, sizeof(sql),
+                     "SELECT user_id, name, phone_number "
+                     "FROM users "
+                     "WHERE role_id = 3 AND name LIKE '%%%s%%'",
+                     name);
+
+            QueryResult result;
+            if (execute_query(db, sql, &result))
+            {
+                if (result.row_count > 0)
+                {
+                    printf("\n=== 查询结果 ===\n");
+                    printf("%-20s %-20s %-15s\n",
+                           "用户ID", "姓名", "联系电话");
+                    printf("------------------------------------------------\n");
+
+                    for (int i = 0; i < result.row_count; i++)
+                    {
+                        printf("%-20s %-20s %-15s\n",
+                               result.rows[i].values[0],
+                               result.rows[i].values[1],
+                               result.rows[i].values[2]);
+                    }
+                    printf("------------------------------------------------\n");
+                    printf("共找到 %d 条记录\n", result.row_count);
+                }
+                else
+                {
+                    printf("\n未找到符合条件的业主。\n");
+                }
+                free_query_result(&result);
+            }
+            else
+            {
+                printf("查询失败。\n");
+            }
+            break;
+        }
+
+        case 0:
+            printf("返回主菜单...\n");
+            break;
+
+        default:
+            printf("无效选项，请重新选择。\n");
+        }
+
+        if (choice != 0)
+        {
             printf("\n按Enter键继续...");
             getchar();
         }
     } while (choice != 0);
 }
-
 
 void show_info_sort_screen(Database *db, const char *user_id, UserType user_type)
 {
@@ -1250,414 +1272,6 @@ void show_system_maintenance_screen(Database *db, const char *user_id, UserType 
     }
 }
 
-////////////////////////////////////////////////
-// 以下是各种功能测试的界面及其示例调用，请不要改动   //
-//                                            //
-//                                            //
-//                                            //
-//                                            //
-////////////////////////////////////////////////
-
-/**
- * @brief 显示房屋管理测试界面
- *
- * 提供添加、更新、删除、查询房屋信息等功能，用于测试
- *
- * @param db 数据库连接指针
- * @param user_id 当前登录用户的ID
- * @param user_type 当前登录用户的类型
- */
-void show_apartment_test_screen(Database *db, const char *user_id, UserType user_type)
-{
-    while (1)
-    {
-        clear_screen();
-        printf("\n=== 房屋管理功能测试 ===\n");
-        printf("1. 添加房屋\n");
-        printf("2. 更新房屋信息\n");
-        printf("3. 删除房屋\n");
-        printf("4. 获取房屋信息\n");
-        printf("5. 查询特定楼宇的所有房屋\n");
-        printf("6. 查询业主的所有房屋\n");
-        printf("0. 返回主菜单\n");
-        printf("请输入选项: ");
-
-        int choice;
-        scanf("%d", &choice);
-        getchar();
-
-        if (choice == 0)
-        {
-            show_admin_main_screen(db, user_id, user_type);
-            return;
-        }
-
-        switch (choice)
-        {
-        case 1: // 添加房屋
-        {
-            Room room;
-            memset(&room, 0, sizeof(Room));
-
-            char building_name[64];
-            printf("请输入楼宇名: ");
-            scanf("%s", building_name);
-            // 根据楼宇名查询楼宇ID
-            if (!get_building_id_by_name(db, building_name, room.building_id))
-            {
-                printf("未找到此楼宇名！\n");
-                getchar();
-                break;
-            }
-            getchar();
-
-            printf("请输入房间号: ");
-            scanf("%s", room.room_number);
-            getchar();
-
-            printf("请输入楼层: ");
-            scanf("%d", &room.floor);
-            getchar();
-
-            printf("请输入面积(平方米): ");
-            scanf("%f", &room.area_sqm);
-            getchar();
-
-            printf("请输入业主ID(如果没有业主请直接回车): ");
-            fgets(room.owner_id, sizeof(room.owner_id), stdin);
-            room.owner_id[strcspn(room.owner_id, "\n")] = 0;
-
-            printf("请输入状态(如 '已售', '在售', '空置'): ");
-            scanf("%63s", room.status); // 修正格式指定符和使用数组大小限制
-            getchar();
-
-            if (add_room(db, user_id, user_type, &room))
-            {
-                printf("添加房屋成功！房屋ID: %s\n", room.room_id);
-            }
-            else
-            {
-                printf("添加房屋失败！\n");
-            }
-        }
-        break;
-
-        case 2: // 更新房屋信息
-        {
-            Room room;
-            memset(&room, 0, sizeof(Room));
-
-            printf("请输入要更新的房屋ID: ");
-            scanf("%s", room.room_id);
-            getchar();
-
-            // 获取原房屋信息
-            if (!get_room(db, room.room_id, &room))
-            {
-                printf("未找到此房屋ID！\n");
-                break;
-            }
-
-            printf("当前房屋信息：\n");
-            printf("楼宇ID: %s\n", room.building_id);
-            printf("房间号: %s\n", room.room_number);
-            printf("楼层: %d\n", room.floor);
-            printf("面积: %.2f平方米\n", room.area_sqm);
-            printf("业主ID: %s\n", room.owner_id[0] ? room.owner_id : "无");
-            printf("状态: %s\n", room.status);
-
-            printf("\n请输入新的房屋信息（直接回车保持不变）：\n");
-
-            char buffer[256];
-            printf("楼宇ID [%s]: ", room.building_id);
-            fgets(buffer, sizeof(buffer), stdin);
-            buffer[strcspn(buffer, "\n")] = 0;
-            if (buffer[0] != '\0')
-                strncpy(room.building_id, buffer, sizeof(room.building_id) - 1);
-
-            printf("房间号 [%s]: ", room.room_number);
-            fgets(buffer, sizeof(buffer), stdin);
-            buffer[strcspn(buffer, "\n")] = 0;
-            if (buffer[0] != '\0')
-                strncpy(room.room_number, buffer, sizeof(room.room_number) - 1);
-
-            printf("楼层 [%d]: ", room.floor);
-            fgets(buffer, sizeof(buffer), stdin);
-            buffer[strcspn(buffer, "\n")] = 0;
-            if (buffer[0] != '\0')
-                room.floor = atoi(buffer);
-
-            printf("面积(平方米) [%.2f]: ", room.area_sqm);
-            fgets(buffer, sizeof(buffer), stdin);
-            buffer[strcspn(buffer, "\n")] = 0;
-            if (buffer[0] != '\0')
-                room.area_sqm = atof(buffer);
-
-            printf("业主ID [%s]: ", room.owner_id[0] ? room.owner_id : "无");
-            fgets(buffer, sizeof(buffer), stdin);
-            buffer[strcspn(buffer, "\n")] = 0;
-            if (buffer[0] != '\0')
-                strncpy(room.owner_id, buffer, sizeof(room.owner_id) - 1);
-
-            printf("状态 [%s]: ", room.status);
-            fgets(buffer, sizeof(buffer), stdin);
-            buffer[strcspn(buffer, "\n")] = 0;
-            if (buffer[0] != '\0')
-                strncpy(room.status, buffer, sizeof(room.status) - 1);
-            if (update_room(db, user_id, user_type, &room))
-            {
-                printf("更新房屋信息成功！\n");
-            }
-            else
-            {
-                printf("更新房屋信息失败！\n");
-            }
-        }
-        break;
-
-        case 3: // 删除房屋
-        {
-            char room_id[64];
-            printf("请输入要删除的房屋ID: ");
-            scanf("%s", room_id);
-            getchar();
-
-            if (delete_room(db, user_id, user_type, room_id))
-            {
-                printf("删除房屋成功！\n");
-            }
-            else
-            {
-                printf("删除房屋失败！\n");
-            }
-        }
-        break;
-
-        case 4: // 获取房屋信息
-        {
-            char room_id[64];
-            printf("请输入房屋ID: ");
-            scanf("%s", room_id);
-            getchar();
-
-            Room room;
-            if (get_room(db, room_id, &room))
-            {
-                printf("\n房屋信息：\n");
-                printf("---------------------------------------\n");
-                printf("房屋ID: %s\n", room.room_id);
-                printf("楼宇ID: %s\n", room.building_id);
-                printf("房间号: %s\n", room.room_number);
-                printf("楼层: %d\n", room.floor);
-                printf("面积: %.2f平方米\n", room.area_sqm);
-                printf("业主ID: %s\n", room.owner_id[0] ? room.owner_id : "无");
-                printf("状态: %s\n", room.status);
-                printf("---------------------------------------\n");
-            }
-            else
-            {
-                printf("获取房屋信息失败！\n");
-            }
-        }
-        break;
-
-        case 5: // 获取特定楼宇的所有房屋
-        {
-            char building_name[64];
-            printf("请输入楼宇名: ");
-            scanf("%s", building_name);
-            // 根据楼宇名查询楼宇ID
-            char building_id[40];
-            if (!get_building_id_by_name(db, building_name, building_id))
-            {
-                printf("未找到此楼宇名！\n");
-                break;
-            }
-            getchar();
-
-            QueryResult result;
-            if (list_rooms_by_building(db, user_id, user_type, building_id, &result))
-            {
-                printf("\n该楼宇下的所有房屋：\n");
-                printf("---------------------------------------\n");
-                printf("%-10s %-10s %-10s %-5s %-8s %-20s %-10s\n",
-                       "房屋ID", "楼宇ID", "房间号", "楼层", "面积", "业主ID/姓名", "状态");
-
-                for (int i = 0; i < result.row_count; i++)
-                {
-                    printf("%-10s %-10s %-10s %-5s %-8s %-20s %-10s\n",
-                           result.rows[i].values[0],                                                       // room_id
-                           result.rows[i].values[1],                                                       // building_id
-                           result.rows[i].values[2],                                                       // room_number
-                           result.rows[i].values[3],                                                       // floor
-                           result.rows[i].values[4],                                                       // area_sqm
-                           result.rows[i].values[6] ? result.rows[i].values[6] : result.rows[i].values[5], // owner_name 或 owner_id
-                           result.rows[i].values[7]);                                                      // status
-                }
-                printf("---------------------------------------\n");
-                printf("共 %d 条记录\n", result.row_count);
-                free_query_result(&result);
-            }
-            else
-            {
-                printf("查询楼宇房屋失败！\n");
-            }
-        }
-        break;
-
-        case 6: // 获取业主的所有房屋
-        {
-            char owner_id[64];
-            printf("请输入业主ID: ");
-            scanf("%s", owner_id);
-            getchar();
-
-            QueryResult result;
-            if (get_owner_rooms(db, user_id, user_type, owner_id, &result))
-            {
-                printf("\n该业主拥有的所有房屋：\n");
-                printf("---------------------------------------\n");
-                printf("%-10s %-10s %-15s %-10s %-5s %-8s %-10s\n",
-                       "房屋ID", "楼宇ID", "楼宇名称", "房间号", "楼层", "面积", "状态");
-
-                for (int i = 0; i < result.row_count; i++)
-                {
-                    printf("%-10s %-10s %-15s %-10s %-5s %-8s %-10s\n",
-                           result.rows[i].values[0],  // room_id
-                           result.rows[i].values[1],  // building_id
-                           result.rows[i].values[2],  // building_name
-                           result.rows[i].values[3],  // room_number
-                           result.rows[i].values[4],  // floor
-                           result.rows[i].values[5],  // area_sqm
-                           result.rows[i].values[6]); // status
-                }
-                printf("---------------------------------------\n");
-                printf("共 %d 条记录\n", result.row_count);
-                free_query_result(&result);
-            }
-            else
-            {
-                printf("查询业主房屋失败！\n");
-            }
-        }
-        break;
-
-        default:
-            printf("无效选项，请重新输入。\n");
-        }
-
-        printf("\n按Enter键继续...");
-        getchar();
-    }
-}
-
-/**
- * @brief 显示楼宇管理测试界面
- *
- * 提供添加、修改、删除、查询楼宇信息等功能，用于测试
- *
- * @param db 数据库连接指针
- * @param user_id 当前登录用户的ID
- * @param user_type 当前登录用户的类型
- */
-void show_building_test_screen(Database *db, const char *user_id, UserType user_type);
-
-/**
- * @brief 生成周期性费用界面
- *
- * 按年月生成物业费、停车费等周期性费用的界面
- *
- * @param db 数据库连接指针
- * @param user_id 当前登录用户的ID
- * @param user_type 当前登录用户的类型
- */
-void generate_periodic_fees_screen(Database *db, const char *user_id, UserType user_type)
-{
-    if (user_type != USER_ADMIN)
-    {
-        printf("权限不足，无法访问此功能\n");
-        return;
-    }
-
-    int year, month, fee_type, due_days;
-
-    // system("clear||cls");
-    printf("\n===== 生成周期性费用 =====\n");
-    printf("请输入年份: ");
-    scanf("%d", &year);
-    getchar(); // 清除输入缓冲区
-
-    printf("请输入月份(1-12): ");
-    scanf("%d", &month);
-    getchar(); // 清除输入缓冲区
-
-    if (month < 1 || month > 12)
-    {
-        printf("无效的月份\n");
-        printf("按任意键返回...");
-        getchar();
-        return;
-    }
-
-    printf("请选择费用类型:\n");
-    printf("1. 物业费\n");
-    printf("2. 停车费\n");
-    printf("3. 全部\n");
-    printf("请输入(1-3): ");
-    scanf("%d", &fee_type);
-    getchar(); // 清除输入缓冲区
-
-    printf("请输入付款截止天数(从月底开始计算): ");
-    scanf("%d", &due_days);
-    getchar(); // 清除输入缓冲区
-
-    // 计算账单开始和结束日期
-    struct tm start_tm = {0}, end_tm = {0};
-    start_tm.tm_year = year - 1900;
-    start_tm.tm_mon = month - 1;
-    start_tm.tm_mday = 1;
-
-    end_tm.tm_year = year - 1900;
-    end_tm.tm_mon = month;
-    end_tm.tm_mday = 0; // 这会自动调整为上个月的最后一天
-
-    time_t period_start = mktime(&start_tm);
-    time_t period_end = mktime(&end_tm);
-
-    bool success = true;
-
-    if (fee_type == 1 || fee_type == 3)
-    {
-        success &= generate_property_fees(db, period_start, period_end, due_days);
-    }
-
-    if (fee_type == 2 || fee_type == 3)
-    {
-        success &= generate_parking_fees(db, period_start, period_end, due_days);
-    }
-
-    if (success)
-    {
-        printf("成功生成%d年%d月的费用账单\n", year, month);
-    }
-    else
-    {
-        printf("生成费用账单时发生错误\n");
-    }
-
-    printf("按任意键返回...");
-    getchar();
-}
-
-/**
- * @brief 费用标准管理界面
- *
- * 提供查看、添加费用标准和生成周期性费用的功能
- *
- * @param db 数据库连接指针
- * @param user_id 当前登录用户的ID
- * @param user_type 当前登录用户的类型
- */
 void manage_fee_standards_screen(Database *db, const char *user_id, UserType user_type)
 {
     if (user_type != USER_ADMIN)
@@ -1672,8 +1286,7 @@ void manage_fee_standards_screen(Database *db, const char *user_id, UserType use
         // system("clear||cls");
         printf("\n===== 费用标准管理 =====\n");
         printf("1. 查看现有费用标准\n");
-        printf("2. 添加新费用标准\n");
-        printf("3. 生成周期性费用\n");
+        printf("2. 修改费用标准\n");
         printf("0. 返回上一级\n");
         printf("请输入您的选择: ");
         scanf("%d", &choice);
@@ -1684,7 +1297,6 @@ void manage_fee_standards_screen(Database *db, const char *user_id, UserType use
         case 1:
             // 查看费用标准实现
             {
-                // system("clear||cls");
                 printf("\n===== 现有费用标准 =====\n");
 
                 char query[512];
@@ -1776,106 +1388,120 @@ void manage_fee_standards_screen(Database *db, const char *user_id, UserType use
                 getchar();
             }
             break;
-        case 2:
-            // 添加费用标准实现
+
+            case 2:
+            // 修改费用标准
             {
-                // system("clear||cls");
-                printf("\n===== 添加新费用标准 =====\n");
+                printf("\n===== 修改费用标准 =====\n");
 
-                FeeStandard standard;
-                memset(&standard, 0, sizeof(FeeStandard));
-
-                generate_uuid(standard.standard_id);
-
-                printf("请选择费用类型:\n");
+                int fee_type_choice;
+                printf("请选择要修改的费用类型:\n");
                 printf("1. 物业费\n");
                 printf("2. 停车费\n");
                 printf("3. 水费\n");
                 printf("4. 电费\n");
                 printf("5. 燃气费\n");
-                printf("99. 其他费用\n");
-                printf("请输入: ");
-                scanf("%d", &standard.fee_type);
+                printf("请输入(1-5): ");
+                scanf("%d", &fee_type_choice);
                 getchar(); // 清除输入缓冲区
 
-                printf("请输入单价: ");
-                scanf("%f", &standard.price_per_unit);
-                getchar(); // 清除输入缓冲区
+                FeeStandard standard;
+                memset(&standard, 0, sizeof(FeeStandard));
 
-                printf("请输入计费单位(如元/平方米/月、元/个/月): ");
-                scanf("%15s", standard.unit);
-                getchar(); // 清除输入缓冲区
-
-                printf("请输入生效日期(格式: YYYY-MM-DD): ");
-                char date_str[20];
-                scanf("%19s", date_str);
-                getchar(); // 清除输入缓冲区
-
-                // 解析日期
-                struct tm tm_info = {0};
-                if (sscanf(date_str, "%d-%d-%d", &tm_info.tm_year, &tm_info.tm_mon, &tm_info.tm_mday) == 3)
+                // 根据选择的费用类型查询费用标准
+                switch (fee_type_choice)
                 {
-                    tm_info.tm_year -= 1900; // 年份需要减去1900
-                    tm_info.tm_mon -= 1;     // 月份是从0开始的
-                    standard.effective_date = mktime(&tm_info);
+                case 1:
+                    standard.fee_type = TRANS_PROPERTY_FEE;
+                    break;
+                case 2:
+                    standard.fee_type = TRANS_PARKING_FEE;
+                    break;
+                case 3:
+                    standard.fee_type = TRANS_WATER_FEE;
+                    break;
+                case 4:
+                    standard.fee_type = TRANS_ELECTRICITY_FEE;
+                    break;
+                case 5:
+                    standard.fee_type = TRANS_GAS_FEE;
+                    break;
+                default:
+                    printf("无效选择\n");
+                    printf("按任意键返回...");
+                    getchar();
+                    continue;
                 }
-                else
+
+                // 查询现有费用标准
+                char query[512];
+                QueryResult result;
+
+                snprintf(query, sizeof(query),
+                         "SELECT standard_id, fee_type, price_per_unit, unit "
+                         "FROM fee_standards WHERE fee_type = %d", standard.fee_type);
+
+                if (!execute_query(db, query, &result) || result.row_count == 0)
                 {
-                    printf("日期格式错误\n");
+                    printf("未找到该费用类型的费用标准\n");
                     printf("按任意键返回...");
                     getchar();
                     break;
                 }
 
-                printf("是否设置终止日期? (1-是, 0-无限期): ");
-                int has_end_date;
-                scanf("%d", &has_end_date);
+                // 假设只有一个费用标准
+                strcpy(standard.standard_id, result.rows[0].values[0]);
+                standard.price_per_unit = atof(result.rows[0].values[2]);
+                strcpy(standard.unit, result.rows[0].values[3]);
+
+                // 修改费用标准（只修改单价）
+                printf("当前费用类型: ");
+                switch (standard.fee_type)
+                {
+                case TRANS_PROPERTY_FEE:
+                    printf("物业费\n");
+                    break;
+                case TRANS_PARKING_FEE:
+                    printf("停车费\n");
+                    break;
+                case TRANS_WATER_FEE:
+                    printf("水费\n");
+                    break;
+                case TRANS_ELECTRICITY_FEE:
+                    printf("电费\n");
+                    break;
+                case TRANS_GAS_FEE:
+                    printf("燃气费\n");
+                    break;
+                default:
+                    printf("其他费用\n");
+                    break;
+                }
+
+                printf("当前单价: %.2f %s\n", standard.price_per_unit, standard.unit);
+                printf("请输入新的单价: ");
+                scanf("%f", &standard.price_per_unit);
                 getchar(); // 清除输入缓冲区
 
-                if (has_end_date)
-                {
-                    printf("请输入终止日期(格式: YYYY-MM-DD): ");
-                    scanf("%19s", date_str);
-                    getchar(); // 清除输入缓冲区
+                // 更新费用标准
+                snprintf(query, sizeof(query),
+                         "UPDATE fee_standards SET price_per_unit = %.2f, unit = '%s' WHERE standard_id = '%s'",
+                         standard.price_per_unit, standard.unit, standard.standard_id);
 
-                    // 解析日期
-                    struct tm end_tm = {0};
-                    if (sscanf(date_str, "%d-%d-%d", &end_tm.tm_year, &end_tm.tm_mon, &end_tm.tm_mday) == 3)
-                    {
-                        end_tm.tm_year -= 1900; // 年份需要减去1900
-                        end_tm.tm_mon -= 1;     // 月份是从0开始的
-                        standard.end_date = mktime(&end_tm);
-                    }
-                    else
-                    {
-                        printf("日期格式错误\n");
-                        printf("按任意键返回...");
-                        getchar();
-                        break;
-                    }
+                if (execute_update(db, query))
+                {
+                    printf("费用标准更新成功\n");
                 }
                 else
                 {
-                    standard.end_date = 0; // 无限期
-                }
-
-                // 添加费用标准
-                if (add_fee_standard(db, user_id, user_type, &standard))
-                {
-                    printf("成功添加费用标准\n");
-                }
-                else
-                {
-                    printf("添加费用标准失败\n");
+                    printf("费用标准更新失败\n");
                 }
 
                 printf("按任意键返回...");
                 getchar();
             }
             break;
-        case 3:
-            generate_periodic_fees_screen(db, user_id, user_type);
-            break;
+
         case 0:
             return;
         default:
@@ -1886,96 +1512,434 @@ void manage_fee_standards_screen(Database *db, const char *user_id, UserType use
         }
     }
 }
-
-/**
- * @brief 显示房屋分配管理界面
- *
- * 提供房屋分配给业主的功能
- *
- * @param db 数据库连接指针
- * @param admin_id 当前登录管理员的ID
- */
-void show_room_assignment_screen(Database *db, const char *admin_id)
+bool update_fee_standard(Database *db, const char *user_id, UserType user_type, FeeStandard *standard)
 {
-    clear_screen();
-    printf("\n=== 房屋分配管理 ===\n");
+    char query[1024];
 
-    // 1. 显示未分配房屋的业主列表
-    const char *unassigned_query =
-        "SELECT u.user_id, u.name, u.phone_number "
-        "FROM users u "
-        "LEFT JOIN rooms r ON u.user_id = r.owner_id "
-        "WHERE u.role_id = 'role_owner' AND r.room_id IS NULL "
-        "ORDER BY u.user_id";
+    snprintf(query, sizeof(query),
+             "UPDATE fee_standards SET fee_type = %d, price_per_unit = %.2f, unit = '%s', "
+             "effective_date = %ld, end_date = %ld WHERE standard_id = '%s'",
+             standard->fee_type, standard->price_per_unit, standard->unit,
+             standard->effective_date, standard->end_date, standard->standard_id);
 
-    printf("\n待分配房屋的业主:\n");
-    printf("%-8s %-12s %-15s\n", "用户ID", "姓名", "电话");
-    printf("--------------------------------\n");
-
-    sqlite3_stmt *stmt;
-    if (sqlite3_prepare_v2(db->db, unassigned_query, -1, &stmt, NULL) == SQLITE_OK)
+    if (execute_update(db, query))
     {
-        while (sqlite3_step(stmt) == SQLITE_ROW)
-        {
-            printf("%-8d %-12s %-15s\n",
-                   sqlite3_column_int(stmt, 0),
-                   sqlite3_column_text(stmt, 1),
-                   sqlite3_column_text(stmt, 2));
-        }
-        sqlite3_finalize(stmt);
+        return true;
     }
-
-    // 2. 显示可用房屋
-    const char *available_query =
-        "SELECT r.room_id, b.building_name, r.room_number, r.floor, r.area_sqm "
-        "FROM rooms r "
-        "JOIN buildings b ON r.building_id = b.building_id "
-        "WHERE r.owner_id IS NULL AND r.status = 0 "
-        "ORDER BY b.building_name, r.floor, r.room_number";
-
-    printf("\n可用房屋:\n");
-    printf("%-8s %-8s %-8s %-6s %-8s\n",
-           "房屋ID", "楼号", "房号", "楼层", "面积");
-    printf("----------------------------------------\n");
-
-    if (sqlite3_prepare_v2(db->db, available_query, -1, &stmt, NULL) == SQLITE_OK)
-    {
-        while (sqlite3_step(stmt) == SQLITE_ROW)
-        {
-            printf("%-8s %-8s %-8s %-6d %-8.2f\n",
-                   sqlite3_column_text(stmt, 0),
-                   sqlite3_column_text(stmt, 1),
-                   sqlite3_column_text(stmt, 2),
-                   sqlite3_column_int(stmt, 3),
-                   sqlite3_column_double(stmt, 4));
-        }
-        sqlite3_finalize(stmt);
-    }
-
-    // 3. 执行分配
-    int user_id;
-    char room_id[10];
-    printf("\n请输入要分配的业主ID: ");
-    scanf("%d", &user_id);
-    printf("请输入要分配的房屋ID: ");
-    scanf("%s", room_id);
-
-    char update_query[256];
-    snprintf(update_query, sizeof(update_query),
-             "UPDATE rooms SET owner_id = %d, status = 1 "
-             "WHERE room_id = '%s' AND owner_id IS NULL",
-             user_id, room_id);
-
-    if (execute_update(db, update_query))
-    {
-        printf("\n✓ 房屋分配成功!\n");
-    }
-    else
-    {
-        printf("\n✗ 房屋分配失败,请检查输入信息\n");
-    }
-
-    printf("\n按Enter键继续...");
-    getchar();
-    getchar();
+    return false;
 }
+
+                    ////////////////////////////////////////////////
+                    // 以下是各种功能测试的界面及其示例调用，请不要改动   //
+                    //                                            //
+                    //                                            //
+                    //                                            //
+                    //                                            //
+                    ////////////////////////////////////////////////
+
+                    /**
+                     * @brief 显示房屋管理测试界面
+                     *
+                     * 提供添加、更新、删除、查询房屋信息等功能，用于测试
+                     *
+                     * @param db 数据库连接指针
+                     * @param user_id 当前登录用户的ID
+                     * @param user_type 当前登录用户的类型
+                     */
+                    void show_apartment_test_screen(Database * db, const char *user_id, UserType user_type)
+                    {
+                        while (1)
+                        {
+                            clear_screen();
+                            printf("\n=== 房屋管理功能测试 ===\n");
+                            printf("1. 添加房屋\n");
+                            printf("2. 更新房屋信息\n");
+                            printf("3. 删除房屋\n");
+                            printf("4. 获取房屋信息\n");
+                            printf("5. 查询特定楼宇的所有房屋\n");
+                            printf("6. 查询业主的所有房屋\n");
+                            printf("0. 返回主菜单\n");
+                            printf("请输入选项: ");
+
+                            int choice;
+                            scanf("%d", &choice);
+                            getchar();
+
+                            if (choice == 0)
+                            {
+                                show_admin_main_screen(db, user_id, user_type);
+                                return;
+                            }
+
+                            switch (choice)
+                            {
+                            case 1: // 添加房屋
+                            {
+                                Room room;
+                                memset(&room, 0, sizeof(Room));
+
+                                char building_name[64];
+                                printf("请输入楼宇名: ");
+                                scanf("%s", building_name);
+                                // 根据楼宇名查询楼宇ID
+                                if (!get_building_id_by_name(db, building_name, room.building_id))
+                                {
+                                    printf("未找到此楼宇名！\n");
+                                    getchar();
+                                    break;
+                                }
+                                getchar();
+
+                                printf("请输入房间号: ");
+                                scanf("%s", room.room_number);
+                                getchar();
+
+                                printf("请输入楼层: ");
+                                scanf("%d", &room.floor);
+                                getchar();
+
+                                printf("请输入面积(平方米): ");
+                                scanf("%f", &room.area_sqm);
+                                getchar();
+
+                                printf("请输入业主ID(如果没有业主请直接回车): ");
+                                fgets(room.owner_id, sizeof(room.owner_id), stdin);
+                                room.owner_id[strcspn(room.owner_id, "\n")] = 0;
+
+                                printf("请输入状态(如 '已售', '在售', '空置'): ");
+                                scanf("%63s", room.status); // 修正格式指定符和使用数组大小限制
+                                getchar();
+
+                                if (add_room(db, user_id, user_type, &room))
+                                {
+                                    printf("添加房屋成功！房屋ID: %s\n", room.room_id);
+                                }
+                                else
+                                {
+                                    printf("添加房屋失败！\n");
+                                }
+                            }
+                            break;
+
+                            case 2: // 更新房屋信息
+                            {
+                                Room room;
+                                memset(&room, 0, sizeof(Room));
+
+                                printf("请输入要更新的房屋ID: ");
+                                scanf("%s", room.room_id);
+                                getchar();
+
+                                // 获取原房屋信息
+                                if (!get_room(db, room.room_id, &room))
+                                {
+                                    printf("未找到此房屋ID！\n");
+                                    break;
+                                }
+
+                                printf("当前房屋信息：\n");
+                                printf("楼宇ID: %s\n", room.building_id);
+                                printf("房间号: %s\n", room.room_number);
+                                printf("楼层: %d\n", room.floor);
+                                printf("面积: %.2f平方米\n", room.area_sqm);
+                                printf("业主ID: %s\n", room.owner_id[0] ? room.owner_id : "无");
+                                printf("状态: %s\n", room.status);
+
+                                printf("\n请输入新的房屋信息（直接回车保持不变）：\n");
+
+                                char buffer[256];
+                                printf("楼宇ID [%s]: ", room.building_id);
+                                fgets(buffer, sizeof(buffer), stdin);
+                                buffer[strcspn(buffer, "\n")] = 0;
+                                if (buffer[0] != '\0')
+                                    strncpy(room.building_id, buffer, sizeof(room.building_id) - 1);
+
+                                printf("房间号 [%s]: ", room.room_number);
+                                fgets(buffer, sizeof(buffer), stdin);
+                                buffer[strcspn(buffer, "\n")] = 0;
+                                if (buffer[0] != '\0')
+                                    strncpy(room.room_number, buffer, sizeof(room.room_number) - 1);
+
+                                printf("楼层 [%d]: ", room.floor);
+                                fgets(buffer, sizeof(buffer), stdin);
+                                buffer[strcspn(buffer, "\n")] = 0;
+                                if (buffer[0] != '\0')
+                                    room.floor = atoi(buffer);
+
+                                printf("面积(平方米) [%.2f]: ", room.area_sqm);
+                                fgets(buffer, sizeof(buffer), stdin);
+                                buffer[strcspn(buffer, "\n")] = 0;
+                                if (buffer[0] != '\0')
+                                    room.area_sqm = atof(buffer);
+
+                                printf("业主ID [%s]: ", room.owner_id[0] ? room.owner_id : "无");
+                                fgets(buffer, sizeof(buffer), stdin);
+                                buffer[strcspn(buffer, "\n")] = 0;
+                                if (buffer[0] != '\0')
+                                    strncpy(room.owner_id, buffer, sizeof(room.owner_id) - 1);
+
+                                printf("状态 [%s]: ", room.status);
+                                fgets(buffer, sizeof(buffer), stdin);
+                                buffer[strcspn(buffer, "\n")] = 0;
+                                if (buffer[0] != '\0')
+                                    strncpy(room.status, buffer, sizeof(room.status) - 1);
+                                if (update_room(db, user_id, user_type, &room))
+                                {
+                                    printf("更新房屋信息成功！\n");
+                                }
+                                else
+                                {
+                                    printf("更新房屋信息失败！\n");
+                                }
+                            }
+                            break;
+
+                            case 3: // 删除房屋
+                            {
+                                char room_id[64];
+                                printf("请输入要删除的房屋ID: ");
+                                scanf("%s", room_id);
+                                getchar();
+
+                                if (delete_room(db, user_id, user_type, room_id))
+                                {
+                                    printf("删除房屋成功！\n");
+                                }
+                                else
+                                {
+                                    printf("删除房屋失败！\n");
+                                }
+                            }
+                            break;
+
+                            case 4: // 获取房屋信息
+                            {
+                                char room_id[64];
+                                printf("请输入房屋ID: ");
+                                scanf("%s", room_id);
+                                getchar();
+
+                                Room room;
+                                if (get_room(db, room_id, &room))
+                                {
+                                    printf("\n房屋信息：\n");
+                                    printf("---------------------------------------\n");
+                                    printf("房屋ID: %s\n", room.room_id);
+                                    printf("楼宇ID: %s\n", room.building_id);
+                                    printf("房间号: %s\n", room.room_number);
+                                    printf("楼层: %d\n", room.floor);
+                                    printf("面积: %.2f平方米\n", room.area_sqm);
+                                    printf("业主ID: %s\n", room.owner_id[0] ? room.owner_id : "无");
+                                    printf("状态: %s\n", room.status);
+                                    printf("---------------------------------------\n");
+                                }
+                                else
+                                {
+                                    printf("获取房屋信息失败！\n");
+                                }
+                            }
+                            break;
+
+                            case 5: // 获取特定楼宇的所有房屋
+                            {
+                                char building_name[64];
+                                printf("请输入楼宇名: ");
+                                scanf("%s", building_name);
+                                // 根据楼宇名查询楼宇ID
+                                char building_id[40];
+                                if (!get_building_id_by_name(db, building_name, building_id))
+                                {
+                                    printf("未找到此楼宇名！\n");
+                                    break;
+                                }
+                                getchar();
+
+                                QueryResult result;
+                                if (list_rooms_by_building(db, user_id, user_type, building_id, &result))
+                                {
+                                    printf("\n该楼宇下的所有房屋：\n");
+                                    printf("---------------------------------------\n");
+                                    printf("%-10s %-10s %-10s %-5s %-8s %-20s %-10s\n",
+                                           "房屋ID", "楼宇ID", "房间号", "楼层", "面积", "业主ID/姓名", "状态");
+
+                                    for (int i = 0; i < result.row_count; i++)
+                                    {
+                                        printf("%-10s %-10s %-10s %-5s %-8s %-20s %-10s\n",
+                                               result.rows[i].values[0],                                                       // room_id
+                                               result.rows[i].values[1],                                                       // building_id
+                                               result.rows[i].values[2],                                                       // room_number
+                                               result.rows[i].values[3],                                                       // floor
+                                               result.rows[i].values[4],                                                       // area_sqm
+                                               result.rows[i].values[6] ? result.rows[i].values[6] : result.rows[i].values[5], // owner_name 或 owner_id
+                                               result.rows[i].values[7]);                                                      // status
+                                    }
+                                    printf("---------------------------------------\n");
+                                    printf("共 %d 条记录\n", result.row_count);
+                                    free_query_result(&result);
+                                }
+                                else
+                                {
+                                    printf("查询楼宇房屋失败！\n");
+                                }
+                            }
+                            break;
+
+                            case 6: // 获取业主的所有房屋
+                            {
+                                char owner_id[64];
+                                printf("请输入业主ID: ");
+                                scanf("%s", owner_id);
+                                getchar();
+
+                                QueryResult result;
+                                if (get_owner_rooms(db, user_id, user_type, owner_id, &result))
+                                {
+                                    printf("\n该业主拥有的所有房屋：\n");
+                                    printf("---------------------------------------\n");
+                                    printf("%-10s %-10s %-15s %-10s %-5s %-8s %-10s\n",
+                                           "房屋ID", "楼宇ID", "楼宇名称", "房间号", "楼层", "面积", "状态");
+
+                                    for (int i = 0; i < result.row_count; i++)
+                                    {
+                                        printf("%-10s %-10s %-15s %-10s %-5s %-8s %-10s\n",
+                                               result.rows[i].values[0],  // room_id
+                                               result.rows[i].values[1],  // building_id
+                                               result.rows[i].values[2],  // building_name
+                                               result.rows[i].values[3],  // room_number
+                                               result.rows[i].values[4],  // floor
+                                               result.rows[i].values[5],  // area_sqm
+                                               result.rows[i].values[6]); // status
+                                    }
+                                    printf("---------------------------------------\n");
+                                    printf("共 %d 条记录\n", result.row_count);
+                                    free_query_result(&result);
+                                }
+                                else
+                                {
+                                    printf("查询业主房屋失败！\n");
+                                }
+                            }
+                            break;
+
+                            default:
+                                printf("无效选项，请重新输入。\n");
+                            }
+
+                            printf("\n按Enter键继续...");
+                            getchar();
+                        }
+                    }
+
+                    /**
+                     * @brief 显示楼宇管理测试界面
+                     *
+                     * 提供添加、修改、删除、查询楼宇信息等功能，用于测试
+                     *
+                     * @param db 数据库连接指针
+                     * @param user_id 当前登录用户的ID
+                     * @param user_type 当前登录用户的类型
+                     */
+                    void show_building_test_screen(Database * db, const char *user_id, UserType user_type);
+
+                    /**
+                     * @brief 生成周期性费用界面
+                     *
+                     * 按年月生成物业费、停车费等周期性费用的界面
+                     *
+                     * @param db 数据库连接指针
+                     * @param user_id 当前登录用户的ID
+                     * @param user_type 当前登录用户的类型
+                     */
+
+                    /**
+                     * @brief 显示房屋分配管理界面
+                     *
+                     * 提供房屋分配给业主的功能
+                     *
+                     * @param db 数据库连接指针
+                     * @param admin_id 当前登录管理员的ID
+                     */
+                    void show_room_assignment_screen(Database * db, const char *admin_id)
+                    {
+                        clear_screen();
+                        printf("\n=== 房屋分配管理 ===\n");
+
+                        // 1. 显示未分配房屋的业主列表
+                        const char *unassigned_query =
+                            "SELECT u.user_id, u.name, u.phone_number "
+                            "FROM users u "
+                            "LEFT JOIN rooms r ON u.user_id = r.owner_id "
+                            "WHERE u.role_id = 'role_owner' AND r.room_id IS NULL "
+                            "ORDER BY u.user_id";
+
+                        printf("\n待分配房屋的业主:\n");
+                        printf("%-8s %-12s %-15s\n", "用户ID", "姓名", "电话");
+                        printf("--------------------------------\n");
+
+                        sqlite3_stmt *stmt;
+                        if (sqlite3_prepare_v2(db->db, unassigned_query, -1, &stmt, NULL) == SQLITE_OK)
+                        {
+                            while (sqlite3_step(stmt) == SQLITE_ROW)
+                            {
+                                printf("%-8d %-12s %-15s\n",
+                                       sqlite3_column_int(stmt, 0),
+                                       sqlite3_column_text(stmt, 1),
+                                       sqlite3_column_text(stmt, 2));
+                            }
+                            sqlite3_finalize(stmt);
+                        }
+
+                        // 2. 显示可用房屋
+                        const char *available_query =
+                            "SELECT r.room_id, b.building_name, r.room_number, r.floor, r.area_sqm "
+                            "FROM rooms r "
+                            "JOIN buildings b ON r.building_id = b.building_id "
+                            "WHERE r.owner_id IS NULL AND r.status = 0 "
+                            "ORDER BY b.building_name, r.floor, r.room_number";
+
+                        printf("\n可用房屋:\n");
+                        printf("%-8s %-8s %-8s %-6s %-8s\n",
+                               "房屋ID", "楼号", "房号", "楼层", "面积");
+                        printf("----------------------------------------\n");
+
+                        if (sqlite3_prepare_v2(db->db, available_query, -1, &stmt, NULL) == SQLITE_OK)
+                        {
+                            while (sqlite3_step(stmt) == SQLITE_ROW)
+                            {
+                                printf("%-8s %-8s %-8s %-6d %-8.2f\n",
+                                       sqlite3_column_text(stmt, 0),
+                                       sqlite3_column_text(stmt, 1),
+                                       sqlite3_column_text(stmt, 2),
+                                       sqlite3_column_int(stmt, 3),
+                                       sqlite3_column_double(stmt, 4));
+                            }
+                            sqlite3_finalize(stmt);
+                        }
+
+                        // 3. 执行分配
+                        int user_id;
+                        char room_id[10];
+                        printf("\n请输入要分配的业主ID: ");
+                        scanf("%d", &user_id);
+                        printf("请输入要分配的房屋ID: ");
+                        scanf("%s", room_id);
+
+                        char update_query[256];
+                        snprintf(update_query, sizeof(update_query),
+                                 "UPDATE rooms SET owner_id = %d, status = 1 "
+                                 "WHERE room_id = '%s' AND owner_id IS NULL",
+                                 user_id, room_id);
+
+                        if (execute_update(db, update_query))
+                        {
+                            printf("\n✓ 房屋分配成功!\n");
+                        }
+                        else
+                        {
+                            printf("\n✗ 房屋分配失败,请检查输入信息\n");
+                        }
+
+                        printf("\n按Enter键继续...");
+                        getchar();
+                        getchar();
+                    }
