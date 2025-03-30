@@ -309,13 +309,15 @@ void manage_apartments(Database *db, const char *user_id)
     {
     case 1: // 添加住户
     {
-        char building_id[41], owner_id[41];
+        char building_name[41], owner_id[41];
         int room_number, floor;
         float area_sqm;
 
-        printf("请输入楼宇ID: ");
-        fgets(building_id, sizeof(building_id), stdin);
-        trim_newline(building_id);
+        printf("请输入楼宇名称: ");
+        fgets(building_name, sizeof(building_name), stdin);
+        trim_newline(building_name);
+
+        // 输入其他房屋信息
         printf("请输入房间号: ");
         scanf("%d", &room_number);
         getchar();
@@ -329,19 +331,21 @@ void manage_apartments(Database *db, const char *user_id)
         fgets(owner_id, sizeof(owner_id), stdin);
         trim_newline(owner_id);
 
-        // 校验 building_id 是否存在
+        // 校验楼宇名称是否存在，并获取楼宇ID
         snprintf(sql, sizeof(sql),
-                 "SELECT COUNT(*) FROM buildings WHERE building_id = '%s';",
-                 building_id);
-        if (!execute_query(db, sql, &result) || atoi(result.rows[0].values[0]) == 0)
+                 "SELECT building_id FROM buildings WHERE building_name = '%s';",
+                 building_name);
+        if (!execute_query(db, sql, &result) || result.row_count == 0)
         {
-            printf("错误：楼宇ID不存在。\n");
+            printf("错误：楼宇名称不存在。\n");
             free_query_result(&result);
             break;
         }
+        char building_id[41];
+        strncpy(building_id, result.rows[0].values[0], sizeof(building_id));
         free_query_result(&result);
 
-        // 校验 owner_id 是否存在
+        // 校验业主ID是否存在
         snprintf(sql, sizeof(sql),
                  "SELECT COUNT(*) FROM owners WHERE owner_id = '%s';",
                  owner_id);
@@ -482,6 +486,7 @@ void manage_apartments(Database *db, const char *user_id)
     pause_console();
     manage_apartments(db, user_id);
 }
+
 void manage_users(Database *db, const char *user_id, UserType user_type)
 {
     int choice;
