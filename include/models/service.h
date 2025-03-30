@@ -44,6 +44,8 @@ typedef struct
     char target_id[40]; // 目标ID：楼宇ID或房屋ID
 } ServiceRecord;
 
+bool assign_staff_to_building(Database *db, const char *admin_user_id, UserType admin_type, const char *staff_user_id, const char *building_id);
+
 // 添加服务类型
 bool add_service_type(Database *db, const char *user_id, UserType user_type, ServiceType *type);
 

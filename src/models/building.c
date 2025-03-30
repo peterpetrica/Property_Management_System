@@ -271,83 +271,149 @@ bool list_buildings(Database *db, const char *user_id, UserType user_type, Query
  * @param building_id 楼宇ID
  * @return 分配成功返回true，失败返回false
  */
-bool assign_staff_to_building(Database *db, const char *user_id, UserType user_type, const char *staff_id, const char *building_id)
+bool assign_staff_to_building(Database *db, const char *admin_user_id, UserType admin_type, const char *staff_user_id, const char *building_id)
 {
-    if (!validate_permission(db, user_id, user_type, 1))
+    // 验证权限
+    if (admin_type != USER_ADMIN)
     {
         printf("权限不足，无法分配服务人员。\n");
         return false;
     }
 
-    char check_staff_sql[256];
-    snprintf(check_staff_sql, sizeof(check_staff_sql),
-             "SELECT staff_id FROM staff WHERE staff_id = '%s'",
-             staff_id);
-
-    QueryResult check_staff_result;
-    if (!execute_query(db, check_staff_sql, &check_staff_result) || check_staff_result.row_count == 0)
-    {
-        if (check_staff_result.row_count > 0)
-            free_query_result(&check_staff_result);
-        printf("服务人员不存在。\n");
-        return false;
-    }
-    free_query_result(&check_staff_result);
-
-    char check_building_sql[256];
-    snprintf(check_building_sql, sizeof(check_building_sql),
-             "SELECT building_id FROM buildings WHERE building_id = '%s'",
-             building_id);
-
-    QueryResult check_building_result;
-    if (!execute_query(db, check_building_sql, &check_building_result) || check_building_result.row_count == 0)
-    {
-        if (check_building_result.row_count > 0)
-            free_query_result(&check_building_result);
-        printf("楼宇不存在。\n");
-        return false;
-    }
-    free_query_result(&check_building_result);
-
-    char check_assign_sql[256];
-    snprintf(check_assign_sql, sizeof(check_assign_sql),
-             "SELECT area_id FROM service_areas WHERE staff_id = '%s' AND building_id = '%s'",
-             staff_id, building_id);
-
-    QueryResult check_assign_result;
-    if (execute_query(db, check_assign_sql, &check_assign_result) && check_assign_result.row_count > 0)
-    {
-        free_query_result(&check_assign_result);
-        printf("该服务人员已分配到此楼宇。\n");
-        return false;
-    }
-    if (check_assign_result.row_count > 0)
-        free_query_result(&check_assign_result);
-
-    char area_id[37];
-    generate_uuid(area_id);
-
-    time_t now = time(NULL);
-    struct tm *timeinfo = localtime(&now);
-    char date_str[11];
-    strftime(date_str, sizeof(date_str), "%Y-%m-%d", timeinfo);
-
     char sql[512];
-    snprintf(sql, sizeof(sql),
-             "INSERT INTO service_areas (area_id, staff_id, building_id, assignment_date) "
-             "VALUES ('%s', '%s', '%s', '%s')",
-             area_id, staff_id, building_id, date_str);
+    QueryResult result;
+    char staff_id[41] = {0};
+    char staff_type_id[41] = {0}; // 添加这行，声明staff_type_id变量
 
-    if (execute_update(db, sql))
+    // 检查该用户是否已经在staff表中有记录
+    snprintf(sql, sizeof(sql),
+             "SELECT staff_id FROM staff WHERE user_id = '%s'",
+             staff_user_id);
+
+    if (!execute_query(db, sql, &result))
     {
-        printf("服务人员成功分配到楼宇。\n");
-        return true;
+        printf("查询staff表失败。\n");
+        return false;
+    }
+
+    // 如果staff表中没有该用户的记录，则创建一个
+    if (result.row_count == 0)
+    {
+        free_query_result(&result);
+
+        // 生成一个新的staff_id
+        char new_staff_id[41];
+        generate_uuid(new_staff_id);
+
+        // 获取一个默认的staff_type_id，假设有一个通用的服务人员类型
+        snprintf(sql, sizeof(sql),
+                 "SELECT staff_type_id FROM staff_types LIMIT 1");
+
+        if (!execute_query(db, sql, &result))
+        {
+            printf("查询staff_types表失败。\n");
+
+            // 如果没有查到任何staff_type，尝试创建一个默认的
+            snprintf(sql, sizeof(sql),
+                     "INSERT INTO staff_types (staff_type_id, type_name, description) "
+                     "VALUES ('default_type', '普通服务人员', '默认服务人员类型')");
+
+            if (!execute_update(db, sql))
+            {
+                printf("创建默认staff_type失败。\n");
+                return false;
+            }
+
+            strcpy(staff_type_id, "default_type");
+        }
+        else
+        {
+            if (result.row_count > 0)
+            {
+                strcpy(staff_type_id, result.rows[0].values[0]);
+                free_query_result(&result);
+            }
+            else
+            {
+                free_query_result(&result);
+                // 如果没有任何staff_type，创建一个默认的
+                char default_type_id[41];
+                generate_uuid(default_type_id);
+
+                snprintf(sql, sizeof(sql),
+                         "INSERT INTO staff_types (staff_type_id, type_name, description) "
+                         "VALUES ('%s', '普通服务人员', '默认服务人员类型')",
+                         default_type_id);
+
+                if (!execute_update(db, sql))
+                {
+                    printf("创建默认staff_type失败。\n");
+                    return false;
+                }
+
+                strcpy(staff_type_id, default_type_id);
+            }
+        }
+
+        // 将用户添加到staff表
+        snprintf(sql, sizeof(sql),
+                 "INSERT INTO staff (staff_id, user_id, staff_type_id, hire_date, status) "
+                 "VALUES ('%s', '%s', '%s', datetime('now'), 'active')",
+                 new_staff_id, staff_user_id, staff_type_id);
+
+        if (!execute_update(db, sql))
+        {
+            printf("创建staff记录失败。\n");
+            return false;
+        }
+
+        // 使用新创建的staff_id
+        strcpy(staff_id, new_staff_id);
     }
     else
     {
-        printf("服务人员分配失败。\n");
+        // 使用已存在的staff_id
+        strcpy(staff_id, result.rows[0].values[0]);
+        free_query_result(&result);
+    }
+
+    // 检查该服务人员是否已经被分配到这个楼宇
+    snprintf(sql, sizeof(sql),
+             "SELECT area_id FROM service_areas "
+             "WHERE staff_id = '%s' AND building_id = '%s'",
+             staff_id, building_id);
+
+    if (!execute_query(db, sql, &result))
+    {
+        printf("查询service_areas表失败。\n");
         return false;
     }
+
+    if (result.row_count > 0)
+    {
+        printf("该服务人员已经分配到这个楼宇。\n");
+        free_query_result(&result);
+        return false;
+    }
+    free_query_result(&result);
+
+    // 生成一个服务区域ID
+    char area_id[41];
+    generate_uuid(area_id);
+
+    // 添加服务区域分配记录
+    snprintf(sql, sizeof(sql),
+             "INSERT INTO service_areas (area_id, staff_id, building_id, assignment_date) "
+             "VALUES ('%s', '%s', '%s', datetime('now'))",
+             area_id, staff_id, building_id);
+
+    if (!execute_update(db, sql))
+    {
+        printf("分配服务区域失败。\n");
+        return false;
+    }
+
+    return true;
 }
 
 /**
@@ -453,7 +519,8 @@ bool get_unpaid_owners_by_year(Database *db, int year, QueryResult *result)
              "LEFT JOIN payments p ON u.user_id = p.user_id "
              "AND strftime('%%Y', p.payment_date) = '%d' "
              "WHERE u.role_id = 3 AND p.payment_id IS NULL "
-             "ORDER BY u.name", year);
+             "ORDER BY u.name",
+             year);
 
     return execute_query(db, sql, result);
 }
