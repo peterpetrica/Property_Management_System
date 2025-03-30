@@ -1688,6 +1688,7 @@ void manage_fee_standards_screen(Database *db, const char *user_id, UserType use
         printf("\n===== 费用标准管理 =====\n");
         printf("1. 查看现有费用标准\n");
         printf("2. 修改费用标准\n");
+        printf("3. 生成物业费账单\n");
         printf("0. 返回上一级\n");
         printf("请输入您的选择: ");
         scanf("%d", &choice);
@@ -1903,7 +1904,9 @@ void manage_fee_standards_screen(Database *db, const char *user_id, UserType use
                 getchar();
             }
             break;
-
+        case 3:
+            generate_property_fees(db, user_id, user_type);
+            break;
         case 0:
             return;
         default:
