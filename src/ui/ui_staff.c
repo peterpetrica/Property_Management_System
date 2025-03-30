@@ -86,7 +86,7 @@ void send_bulk_payment_reminders(Database *db)
             const char *username = (const char *)sqlite3_column_text(stmt, 1);
             double amount = sqlite3_column_double(stmt, 2);
 
-            send_payment_reminder(db, user_id, amount, "");
+            // send_payment_reminder(db, user_id, amount, "");
             count++;
         }
         printf("\n✓ 已成功发送%d条提醒\n", count);
@@ -1663,40 +1663,40 @@ void send_payment_reminder_screen(Database *db, const char *user_id)
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
     {
-        sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
-        printf("┌ 未缴费详情 ───────────────────────────────────────┐\n");
-        double total_amount = 0;
-        char fee_types[256] = "";
+        // sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
+        // printf("┌ 未缴费详情 ───────────────────────────────────────┐\n");
+        // double total_amount = 0;
+        // char fee_types[256] = "";
 
-        while (sqlite3_step(stmt) == SQLITE_ROW)
-        {
-            const char *name = (const char *)sqlite3_column_text(stmt, 0);
-            const char *phone = (const char *)sqlite3_column_text(stmt, 1);
-            double amount = sqlite3_column_double(stmt, 2);
-            time_t due_date = sqlite3_column_int64(stmt, 3);
-            const char *fee_type = (const char *)sqlite3_column_text(stmt, 4);
+        // while (sqlite3_step(stmt) == SQLITE_ROW)
+        // {
+        //     const char *name = (const char *)sqlite3_column_text(stmt, 0);
+        //     const char *phone = (const char *)sqlite3_column_text(stmt, 1);
+        //     double amount = sqlite3_column_double(stmt, 2);
+        //     time_t due_date = sqlite3_column_int64(stmt, 3);
+        //     const char *fee_type = (const char *)sqlite3_column_text(stmt, 4);
 
-            total_amount += amount;
-            if (strlen(fee_types) > 0)
-            {
-                strcat(fee_types, "、");
-            }
-            strcat(fee_types, fee_type);
+        //     total_amount += amount;
+        //     if (strlen(fee_types) > 0)
+        //     {
+        //         strcat(fee_types, "、");
+        //     }
+        //     strcat(fee_types, fee_type);
 
-            char due_date_str[20];
-            strftime(due_date_str, sizeof(due_date_str), "%Y-%m-%d", localtime(&due_date));
+        //     char due_date_str[20];
+        //     strftime(due_date_str, sizeof(due_date_str), "%Y-%m-%d", localtime(&due_date));
 
-            printf("│ 费用类型: %-10s  金额: %-8.2f  到期: %-10s │\n",
-                   fee_type, amount, due_date_str);
-        }
-        printf("└──────────────────────────────────────────────────┘\n");
+        //     printf("│ 费用类型: %-10s  金额: %-8.2f  到期: %-10s │\n",
+        //            fee_type, amount, due_date_str);
+        // }
+        // printf("└──────────────────────────────────────────────────┘\n");
         printf("\n是否发送缴费提醒？(Y/N): ");
         char choice;
         scanf(" %c", &choice);
 
         if (toupper(choice) == 'Y')
         {
-            send_payment_reminder(db, user_id, total_amount, fee_types);
+            // send_payment_reminder(db, user_id, total_amount, fee_types);
             printf("\n✓ 提醒已发送\n");
         }
 
@@ -2259,7 +2259,7 @@ void show_reminder_management_menu(Database *db)
         case 1:
         {
             char user_id[37];
-            printf("请输入业主ID: ");
+            printf("请输入业主姓名: ");
             scanf("%s", user_id);
             send_payment_reminder_screen(db, user_id);
             break;
