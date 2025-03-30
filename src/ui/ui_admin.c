@@ -1131,11 +1131,68 @@ void show_info_query_screen(Database *db, const char *user_id, UserType user_typ
     } while (1);
 }
 
-void show_info_sort_screen(Database *db, const char *user_id, UserType user_type)
-{
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// 定义链表节点结构
+typedef struct Node {
+    char owner_name[100];
+    char payment_amount[100];
+    char payment_date[100];
+    struct Node *next;
+} Node;
+
+// 函数：创建链表节点
+Node* create_node(const char *owner_name, const char *payment_amount, const char *payment_date) {
+    Node *new_node = (Node*)malloc(sizeof(Node));
+    if (new_node) {
+        strcpy(new_node->owner_name, owner_name);
+        strcpy(new_node->payment_amount, payment_amount);
+        strcpy(new_node->payment_date, payment_date);
+        new_node->next = NULL;
+    }
+    return new_node;
+}
+
+// 函数：将链表保存到txt文件
+void save_to_file(Node *head, const char *filename) {
+    FILE *file = fopen(filename, "w");
+    if (!file) {
+        printf("无法打开文件进行写入\n");
+        return;
+    }
+
+    fprintf(file, "Owner Name               Payment Amount     Payment Date\n");
+    fprintf(file, "---------------------------------------------------------\n");
+
+    Node *current = head;
+    while (current) {
+        fprintf(file, "%-25s %-18s %-15s\n", current->owner_name, current->payment_amount, current->payment_date);
+        current = current->next;
+    }
+
+    fclose(file);
+    printf("数据已成功保存到 %s\n", filename);
+}
+
+// 函数：释放链表内存
+void free_linked_list(Node *head) {
+    Node *current = head;
+    while (current) {
+        Node *temp = current;
+        current = current->next;
+        free(temp);
+    }
+}
+
+// 信息排序界面函数
+void show_info_sort_screen(Database *db, const char *user_id, UserType user_type) {
     int choice;
-    do
-    {
+    Node *head = NULL;
+    Node *tail = NULL;
+
+    do {
         clear_screen();
         printf("========================\n");
         printf("  信息排序\n");
@@ -1151,8 +1208,7 @@ void show_info_sort_screen(Database *db, const char *user_id, UserType user_type
         char sql[1024]; // 增加缓冲区大小
         QueryResult result;
 
-        switch (choice)
-        {
+        switch (choice) {
         case 1:
             snprintf(sql, sizeof(sql),
                      "SELECT u.name AS owner_name, "
@@ -1185,6 +1241,7 @@ void show_info_sort_screen(Database *db, const char *user_id, UserType user_type
 
         case 0:
             printf("返回主菜单...\n");
+            free_linked_list(head);  // 释放链表内存
             return;
 
         default:
@@ -1192,35 +1249,36 @@ void show_info_sort_screen(Database *db, const char *user_id, UserType user_type
             continue;
         }
 
-        if (execute_query(db, sql, &result))
-        {
+        if (execute_query(db, sql, &result)) {
             printf("\n查询结果：\n");
             printf("----------------------------------------\n");
 
             // 打印表头
-            for (int i = 0; i < result.column_count; i++)
-            {
+            for (int i = 0; i < result.column_count; i++) {
                 printf("%-20s", result.column_names[i]);
             }
             printf("\n");
             printf("----------------------------------------\n");
 
-            // 打印数据
-            for (int i = 0; i < result.row_count; i++)
-            {
-                for (int j = 0; j < result.column_count; j++)
-                {
-                    printf("%-20s", result.rows[i].values[j]);
+            // 将数据添加到链表
+            for (int i = 0; i < result.row_count; i++) {
+                Node *new_node = create_node(result.rows[i].values[0], result.rows[i].values[1], result.rows[i].values[2]);
+                if (tail == NULL) {
+                    head = new_node;  // 如果是第一个节点
+                    tail = head;
+                } else {
+                    tail->next = new_node;  // 将新节点添加到链表尾部
+                    tail = new_node;
                 }
-                printf("\n");
             }
 
             printf("----------------------------------------\n");
             printf("共 %d 条记录\n", result.row_count);
             free_query_result(&result);
-        }
-        else
-        {
+
+            // 保存链表到文件
+            save_to_file(head, "sorted_info.txt");
+        } else {
             printf("查询失败。\n");
         }
 
@@ -1228,7 +1286,10 @@ void show_info_sort_screen(Database *db, const char *user_id, UserType user_type
         getchar();
 
     } while (choice != 0);
+
+    free_linked_list(head);  // 释放链表内存
 }
+
 
 void show_info_statistics_screen(Database *db, const char *user_id, UserType user_type)
 {
