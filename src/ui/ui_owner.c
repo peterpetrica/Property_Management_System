@@ -151,30 +151,6 @@ double query_total_fee(Database *db, const char *user_id)
     return total_fee;
 }
 
-void show_total_fee(Database *db, const char *user_id)
-{
-    // system("clear||cls");
-    printf("===== 缴费总金额 =====\n");
-    double total = query_total_fee(db, user_id);
-    char username[100];
-    query_username_by_user_id(db, user_id, username);
-
-    if (total < 0)
-    {
-        printf("❌ 查询失败: 请检查数据库或用户记录。\n");
-    }
-    else if (total == 0)
-    {
-        printf("用户 %s 暂无缴费记录。\n", username);
-    }
-    else
-    {
-        printf("用户 %s 的累计缴费总额：￥%.2f\n", username, total);
-    }
-
-    printf("\n按任意键返回...");
-    clear_input_buffer();
-}
 void process_payment_screen(Database *db, const char *user_id)
 {
     clear_screen();
@@ -635,8 +611,7 @@ void show_payment_management_screen(Database *db, const char *user_id, UserType 
         printf("\n===== 缴费管理 =====\n");
         printf("1. 查看缴费记录\n");
         printf("2. 缴纳费用\n");
-        printf("3. 查询应缴费用\n");
-        printf("4.查询缴费总金额\n");
+        printf("3. 查询应缴费用\n");   
         printf("0. 返回上一级\n");
         printf("请输入您的选择: ");
         scanf("%d", &choice);
@@ -652,9 +627,6 @@ void show_payment_management_screen(Database *db, const char *user_id, UserType 
             break;
         case 3:
             query_due_payments(db, user_id);
-            break;
-        case 4:
-            show_total_fee(db, user_id);
             break;
         case 0:
             return;
