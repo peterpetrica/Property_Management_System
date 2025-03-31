@@ -30,6 +30,12 @@ if(UNIX AND NOT APPLE)
   set(PLATFORM_LIBS ${LIBUUID_LIBRARY})
 endif()
 
+if(MSVC)
+  add_compile_options(/w0)
+else()
+  add_compile_options(-w)
+endif()
+
 set(SOURCE_FILES
     src/main.c
     src/db/database.c
