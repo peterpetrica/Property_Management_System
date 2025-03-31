@@ -1,9 +1,8 @@
-/*
- * 文件名: ui_staff.c
- * 功能: 实现物业管理系统中服务人员相关的用户界面
+/**
+ * @file ui_staff.c
+ * @brief 实现物业管理系统中服务人员相关的用户界面
  *
- * 描述:
- * 本文件负责物业服务人员界面的所有交互功能，包括:
+ * @details 本文件负责物业服务人员界面的所有交互功能，包括:
  * - 服务人员主界面
  * - 物业服务管理（创建、更新、删除服务请求等）
  * - 服务人员信息查询（按各种条件查找）
@@ -12,6 +11,9 @@
  * - 系统维护功能
  *
  * 每个界面函数负责显示菜单、接收用户输入并调用相应的业务逻辑函数
+ *
+ * @author 物业管理系统团队
+ * @date 2023
  */
 
 #include "ui/ui_staff.h"
@@ -19,7 +21,7 @@
 #include "models/building.h"
 #include "models/apartment.h"
 #include "models/user.h"
-#include "models/transaction.h" // 添加此行
+#include "models/transaction.h"
 #include "models/service.h"
 #include "db/db_query.h"
 #include "utils/utils.h"
@@ -27,19 +29,72 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <ctype.h> // 添加这行
+#include <ctype.h>
 
 // 静态函数声明
+/**
+ * @brief 等待用户按键后继续
+ */
 static void wait_for_key(void);
+
+/**
+ * @brief 获取费用类型的名称
+ *
+ * @param fee_type 费用类型ID
+ * @return const char* 费用类型名称
+ */
 static const char *get_fee_type_name(int fee_type);
+
+/**
+ * @brief 打印用户表格表头
+ */
 static void print_user_table_header();
+
+/**
+ * @brief 打印单个用户信息
+ *
+ * @param stmt SQLite查询结果
+ */
 static void print_user_info(sqlite3_stmt *stmt);
+
 // 函数前向声明
+/**
+ * @brief 显示个人提醒菜单
+ *
+ * @param db 数据库连接
+ */
 void show_individual_reminder_menu(Database *db);
+
+/**
+ * @brief 显示提醒历史记录
+ *
+ * @param db 数据库连接
+ */
 void show_reminder_history(Database *db);
+
+/**
+ * @brief 按姓名发送提醒
+ *
+ * @param db 数据库连接
+ */
 void send_reminder_by_name(Database *db);
+
+/**
+ * @brief 显示支付详情
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param status 支付状态
+ */
 void show_payment_details(Database *db, const char *user_id, int status);
+
 // 实现静态函数
+/**
+ * @brief 根据费用类型ID获取费用类型名称
+ *
+ * @param fee_type 费用类型ID
+ * @return const char* 费用类型名称
+ */
 static const char *get_fee_type_name(int fee_type)
 {
     switch (fee_type)
@@ -59,6 +114,9 @@ static const char *get_fee_type_name(int fee_type)
     }
 }
 
+/**
+ * @brief 等待用户按键后继续
+ */
 void wait_for_key()
 {
     printf("\n按任意键继续...");
@@ -66,7 +124,11 @@ void wait_for_key()
     getchar();
 }
 
-// 批量发送提醒函数声明
+/**
+ * @brief 批量发送缴费提醒
+ *
+ * @param db 数据库连接
+ */
 void send_bulk_payment_reminders(Database *db)
 {
     const char *query =
@@ -86,7 +148,6 @@ void send_bulk_payment_reminders(Database *db)
             const char *username = (const char *)sqlite3_column_text(stmt, 1);
             double amount = sqlite3_column_double(stmt, 2);
 
-            // send_payment_reminder(db, user_id, amount, "");
             count++;
         }
         printf("\n✓ 已成功发送%d条提醒\n", count);
@@ -95,7 +156,9 @@ void send_bulk_payment_reminders(Database *db)
     wait_for_key();
 }
 
-// 清屏函数
+/**
+ * @brief 清除服务人员界面
+ */
 void clear_staff_screen()
 {
 #ifdef _WIN32
@@ -105,16 +168,25 @@ void clear_staff_screen()
 #endif
 }
 
-// 等待用户按键返回
+/**
+ * @brief 等待用户任意键返回
+ *
+ * @return int 返回0
+ */
 int wait_for_user()
 {
     printf("按任意键返回主菜单...\n");
     getchar();
-    getchar(); // 等待用户输入
-    return 0;  // Return an integer as per the declaration
+    getchar();
+    return 0;
 }
-// 添加区域管理菜单
-// 简化后的区域管理菜单
+
+/**
+ * @brief 显示区域管理菜单
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ */
 void show_area_management_menu(Database *db, const char *user_id)
 {
     int choice;
@@ -155,7 +227,12 @@ void show_area_management_menu(Database *db, const char *user_id)
     } while (choice != 0);
 }
 
-// 整合后的负责区域显示函数
+/**
+ * @brief 显示服务人员负责的区域信息
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ */
 void show_staff_areas(Database *db, const char *user_id)
 {
     clear_staff_screen();
@@ -208,7 +285,6 @@ void show_staff_areas(Database *db, const char *user_id)
         }
         else
         {
-            // 显示服务类型
             printf("\n您的服务类型: %s\n",
                    sqlite3_column_text(stmt, 5) ? (const char *)sqlite3_column_text(stmt, 5) : "一般服务人员");
         }
@@ -221,10 +297,16 @@ void show_staff_areas(Database *db, const char *user_id)
     }
 }
 
-// 添加缺失的get_current_fee_standards_info函数实现
+/**
+ * @brief 获取当前费用标准信息
+ *
+ * @param db 数据库连接
+ * @param buffer 存储信息的缓冲区
+ * @param buffer_size 缓冲区大小
+ */
 void get_current_fee_standards_info(Database *db, char *buffer, size_t buffer_size)
 {
-    buffer[0] = '\0'; // 初始化为空字符串
+    buffer[0] = '\0';
 
     const char *query =
         "SELECT fee_type, "
@@ -246,28 +328,31 @@ void get_current_fee_standards_info(Database *db, char *buffer, size_t buffer_si
         {
             const char *type_name = (const char *)sqlite3_column_text(stmt, 1);
 
-            // 如果已有内容，添加分隔符
             if (buffer[0] != '\0')
             {
                 strncat(buffer, "、", buffer_size - strlen(buffer) - 1);
             }
 
-            // 追加费用类型名称
             strncat(buffer, type_name, buffer_size - strlen(buffer) - 1);
         }
 
         sqlite3_finalize(stmt);
     }
 
-    // 如果没有找到任何费用类型，提供一个默认消息
     if (buffer[0] == '\0')
     {
         strncpy(buffer, "物业费、水电费等", buffer_size - 1);
     }
 
-    buffer[buffer_size - 1] = '\0'; // 确保字符串以null结尾
+    buffer[buffer_size - 1] = '\0';
 }
-// 添加缺失的区域业主信息查询函数
+
+/**
+ * @brief 显示区域内业主信息
+ *
+ * @param db 数据库连接
+ * @param user_id 服务人员ID
+ */
 void show_area_owners(Database *db, const char *user_id)
 {
     clear_staff_screen();
@@ -321,8 +406,14 @@ void show_area_owners(Database *db, const char *user_id)
         printf("查询失败: %s\n", sqlite3_errmsg(db->db));
     }
 }
-// 显示服务人员主界面
-// 在show_staff_main_screen函数中，确保正确调用各个菜单
+
+/**
+ * @brief 显示服务人员主界面
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ */
 void show_staff_main_screen(Database *db, const char *user_id, UserType user_type)
 {
     while (1)
@@ -351,16 +442,16 @@ void show_staff_main_screen(Database *db, const char *user_id, UserType user_typ
             show_area_management_menu(db, user_id);
             break;
         case 2:
-            show_payment_management_menu(db); // 缴费查询菜单
+            show_payment_management_menu(db);
             break;
         case 3:
-            show_reminder_management_menu(db); // 缴费提醒菜单
+            show_reminder_management_menu(db);
             break;
         case 4:
-            show_sorted_owners_menu(db); // 业主排序菜单
+            show_sorted_owners_menu(db);
             break;
         case 5:
-            show_statistics_menu(db); // 统计分析菜单
+            show_statistics_menu(db);
             break;
         case 6:
             modify_personal_info_screen(db, user_id, user_type);
@@ -375,7 +466,13 @@ void show_staff_main_screen(Database *db, const char *user_id, UserType user_typ
         }
     }
 }
-// 实现支持多种排序方式的函数
+
+/**
+ * @brief 按不同排序方式显示业主
+ *
+ * @param db 数据库连接
+ * @param sort_criteria 排序条件
+ */
 void show_sorted_owners_by(Database *db, const char *sort_criteria)
 {
     clear_staff_screen();
@@ -408,19 +505,25 @@ void show_sorted_owners_by(Database *db, const char *sort_criteria)
             strftime(date_str, sizeof(date_str), "%Y-%m-%d", localtime(&reg_date));
 
             printf("│ %-8s│ %-12s│ %-8s│ %-8s│ %8.2f│ %-12s│ %8d │\n",
-                   sqlite3_column_text(stmt, 2),   // name
-                   sqlite3_column_text(stmt, 3),   // phone
-                   sqlite3_column_text(stmt, 6),   // building
-                   sqlite3_column_text(stmt, 7),   // room
-                   sqlite3_column_double(stmt, 8), // area
-                   date_str,                       // registration_date
-                   sqlite3_column_int(stmt, 9));   // unpaid_count
+                   sqlite3_column_text(stmt, 2),
+                   sqlite3_column_text(stmt, 3),
+                   sqlite3_column_text(stmt, 6),
+                   sqlite3_column_text(stmt, 7),
+                   sqlite3_column_double(stmt, 8),
+                   date_str,
+                   sqlite3_column_int(stmt, 9));
         }
         printf("└──────────────────────────────────────────────────────────────────────┘\n");
         sqlite3_finalize(stmt);
     }
     wait_for_key();
 }
+
+/**
+ * @brief 显示业主排序菜单
+ *
+ * @param db 数据库连接
+ */
 void show_sorted_owners_menu(Database *db)
 {
     int choice;
@@ -463,7 +566,13 @@ void show_sorted_owners_menu(Database *db)
         }
     } while (choice != 0);
 }
-// 显示工作人员负责的区域信息
+
+/**
+ * @brief 显示服务人员负责的区域信息
+ *
+ * @param db 数据库连接
+ * @param staff_id 服务人员ID
+ */
 void show_assigned_areas(Database *db, const char *staff_id)
 {
     printf("\n=== 负责区域信息 ===\n");
@@ -502,7 +611,6 @@ void show_assigned_areas(Database *db, const char *staff_id)
             int floors_count = sqlite3_column_int(stmt, 3);
             int units_per_floor = sqlite3_column_int(stmt, 4);
 
-            // 转换日期显示
             char date_str[20] = "未知";
             time_t assign_date = sqlite3_column_int64(stmt, 5);
             if (assign_date > 0)
@@ -528,7 +636,6 @@ void show_assigned_areas(Database *db, const char *staff_id)
         }
         else
         {
-            // 服务类型信息
             sqlite3_reset(stmt);
             sqlite3_step(stmt);
             const char *service_type = (const char *)sqlite3_column_text(stmt, 6);
@@ -543,7 +650,11 @@ void show_assigned_areas(Database *db, const char *staff_id)
     }
 }
 
-// 查询业主缴费情况
+/**
+ * @brief 显示业主缴费状态
+ *
+ * @param db 数据库连接
+ */
 void show_owner_payment_status(Database *db)
 {
     printf("\n=== 业主缴费情况查询 ===\n");
@@ -587,7 +698,11 @@ void show_owner_payment_status(Database *db)
     sqlite3_finalize(stmt);
 }
 
-// 发送缴费提醒
+/**
+ * @brief 发送缴费提醒
+ *
+ * @param db 数据库连接
+ */
 void send_payment_reminders(Database *db)
 {
     printf("\n=== 发送缴费提醒 ===\n");
@@ -597,7 +712,7 @@ void send_payment_reminders(Database *db)
         "SUM(t.amount) as total_due "
         "FROM users u "
         "JOIN transactions t ON u.user_id = t.user_id "
-        "WHERE t.status IN (0, 2) " // 未付款或逾期
+        "WHERE t.status IN (0, 2) "
         "GROUP BY u.user_id;";
 
     sqlite3_stmt *stmt;
@@ -637,7 +752,13 @@ void send_payment_reminders(Database *db)
     }
 }
 
-// 修改个人信息界面
+/**
+ * @brief 修改个人信息界面
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ */
 void modify_personal_info_screen(Database *db, const char *user_id, UserType user_type)
 {
     clear_staff_screen();
@@ -665,7 +786,7 @@ void modify_personal_info_screen(Database *db, const char *user_id, UserType use
         if (scanf("%d", &choice) != 1)
         {
             printf("输入错误，请重试\n");
-            clear_input_buffer(); // 清空缓冲区
+            clear_input_buffer();
             continue;
         }
         switch (choice)
@@ -751,7 +872,6 @@ void modify_personal_info_screen(Database *db, const char *user_id, UserType use
             break;
         }
     } while (choice != 0);
-    // 更新信息
     if (update_staff(db, user_id, user_type, &staff))
     {
         printf("个人信息更新成功\n");
@@ -769,7 +889,13 @@ void modify_personal_info_screen(Database *db, const char *user_id, UserType use
     wait_for_user();
 }
 
-// 服务人员信息查询界面
+/**
+ * @brief 显示服务人员信息查询界面
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ */
 void show_staff_query_screen(Database *db, const char *user_id, UserType user_type)
 {
     int choice;
@@ -803,8 +929,8 @@ void show_staff_query_screen(Database *db, const char *user_id, UserType user_ty
                 "u.id_number, u.gender, u.address "
                 "FROM users u "
                 "WHERE u.role_id = 'role_owner' "
-                "AND u.registration_date > 0 "        // 只显示通过注册获得的用户
-                "ORDER BY u.registration_date DESC;"; // 按注册时间倒序排列
+                "AND u.registration_date > 0 "
+                "ORDER BY u.registration_date DESC;";
 
             sqlite3_stmt *stmt;
             if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
@@ -827,12 +953,10 @@ void show_staff_query_screen(Database *db, const char *user_id, UserType user_ty
                     const char *gender = (const char *)sqlite3_column_text(stmt, 7);
                     const char *id_number = (const char *)sqlite3_column_text(stmt, 6);
 
-                    // 格式化注册时间
                     char time_str[20];
                     struct tm *tm_info = localtime(&reg_time);
                     strftime(time_str, sizeof(time_str), "%Y-%m-%d", tm_info);
 
-                    // 隐藏身份证号中间部分
                     char masked_id[20] = "未填写";
                     if (id_number && strlen(id_number) == 18)
                     {
@@ -867,45 +991,44 @@ void show_staff_query_screen(Database *db, const char *user_id, UserType user_ty
             break;
 
         case 3:
-            // 查询用户房屋信息
+        {
+            clear_staff_screen();
+            printf("\n===== 用户房屋信息 =====\n\n");
+            const char *query =
+                "SELECT u.user_id, u.username, b.building_name, r.room_number, r.floor, r.area_sqm "
+                "FROM users u "
+                "LEFT JOIN rooms r ON u.user_id = r.owner_id "
+                "LEFT JOIN buildings b ON r.building_id = b.building_id "
+                "WHERE u.role_id = 'role_owner' "
+                "ORDER BY b.building_name, r.room_number;";
+
+            sqlite3_stmt *stmt;
+            if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
             {
-                clear_staff_screen();
-                printf("\n===== 用户房屋信息 =====\n\n");
-                const char *query =
-                    "SELECT u.user_id, u.username, b.building_name, r.room_number, r.floor, r.area_sqm "
-                    "FROM users u "
-                    "LEFT JOIN rooms r ON u.user_id = r.owner_id "
-                    "LEFT JOIN buildings b ON r.building_id = b.building_id "
-                    "WHERE u.role_id = 'role_owner' "
-                    "ORDER BY b.building_name, r.room_number;";
-
-                sqlite3_stmt *stmt;
-                if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
+                printf("%-12s%-16s%-16s%-16s%-16s%-16s\n",
+                       "用户ID", "用户名", "楼号", "房间号", "楼层", "面积(㎡)");
+                int found = 0;
+                while (sqlite3_step(stmt) == SQLITE_ROW)
                 {
-                    printf("%-12s%-16s%-16s%-16s%-16s%-16s\n",
-                           "用户ID", "用户名", "楼号", "房间号", "楼层", "面积(㎡)");
-                    int found = 0;
-                    while (sqlite3_step(stmt) == SQLITE_ROW)
-                    {
-                        found = 1;
-                        printf("%-12s%-16s%-16s%-16s%-16d%-16.2f\n",
-                               sqlite3_column_text(stmt, 0),
-                               sqlite3_column_text(stmt, 1),
-                               sqlite3_column_text(stmt, 2),
-                               sqlite3_column_text(stmt, 3),
-                               sqlite3_column_int(stmt, 4), // 使用%d而不是%s
-                               sqlite3_column_double(stmt, 5));
-                    }
-
-                    if (!found)
-                    {
-                        printf("\n未找到任何用户房屋信息\n");
-                    }
-
-                    sqlite3_finalize(stmt);
+                    found = 1;
+                    printf("%-12s%-16s%-16s%-16s%-16d%-16.2f\n",
+                           sqlite3_column_text(stmt, 0),
+                           sqlite3_column_text(stmt, 1),
+                           sqlite3_column_text(stmt, 2),
+                           sqlite3_column_text(stmt, 3),
+                           sqlite3_column_int(stmt, 4),
+                           sqlite3_column_double(stmt, 5));
                 }
+
+                if (!found)
+                {
+                    printf("\n未找到任何用户房屋信息\n");
+                }
+
+                sqlite3_finalize(stmt);
             }
-            break;
+        }
+        break;
 
         case 0:
             return;
@@ -919,7 +1042,13 @@ void show_staff_query_screen(Database *db, const char *user_id, UserType user_ty
     }
 }
 
-// 比较函数：按姓名比较服务人员
+/**
+ * @brief 按姓名比较服务人员（用于排序）
+ *
+ * @param a 第一个服务人员
+ * @param b 第二个服务人员
+ * @return int 比较结果
+ */
 int compare_staff_by_name(const void *a, const void *b)
 {
     const Staff *staff1 = (const Staff *)a;
@@ -927,13 +1056,19 @@ int compare_staff_by_name(const void *a, const void *b)
     return strcmp(staff1->name, staff2->name);
 }
 
-// 服务人员信息排序界面
+/**
+ * @brief 显示服务人员信息排序界面
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ */
 void show_staff_sort_screen(Database *db, const char *user_id, UserType user_type)
 {
     clear_staff_screen();
     printf("服务人员信息排序界面\n");
 
-    Staff staff_list[100]; // 定义 staff_list 数组
+    Staff staff_list[100];
     int count = query_all_staff(db, staff_list, 100);
     if (count <= 0)
     {
@@ -952,10 +1087,16 @@ void show_staff_sort_screen(Database *db, const char *user_id, UserType user_typ
 
     printf("按任意键返回主菜单...\n");
     getchar();
-    getchar(); // 等待用户输入
+    getchar();
 }
 
-// 服务人员信息统计界面
+/**
+ * @brief 显示服务人员信息统计界面
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ */
 void show_staff_statistics_screen(Database *db, const char *user_id, UserType user_type)
 {
     clear_staff_screen();
@@ -982,7 +1123,13 @@ void show_staff_statistics_screen(Database *db, const char *user_id, UserType us
     wait_for_user();
 }
 
-// 服务人员系统维护界面
+/**
+ * @brief 显示服务人员系统维护界面
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ */
 void show_staff_maintenance_screen(Database *db, const char *user_id, UserType user_type)
 {
     clear_staff_screen();
@@ -995,7 +1142,7 @@ void show_staff_maintenance_screen(Database *db, const char *user_id, UserType u
     if (scanf("%d", &choice) != 1)
     {
         printf("输入错误，请重试\n");
-        clear_input_buffer(); // 清空缓冲区
+        clear_input_buffer();
         return;
     }
 
@@ -1030,7 +1177,11 @@ void show_staff_maintenance_screen(Database *db, const char *user_id, UserType u
     wait_for_user();
 }
 
-// 显示当前费用标准
+/**
+ * @brief 显示当前费用标准
+ *
+ * @param db 数据库连接
+ */
 void show_current_fee_standards(Database *db)
 {
     printf("\n===== 当前收费标准 =====\n\n");
@@ -1067,7 +1218,11 @@ void show_current_fee_standards(Database *db)
     }
 }
 
-// 修改查询用户缴费情况函数
+/**
+ * @brief 处理用户缴费情况查询的Case 2
+ *
+ * @param db 数据库连接
+ */
 void case2_handler(Database *db)
 {
     int choice;
@@ -1129,6 +1284,13 @@ void case2_handler(Database *db)
     } while (choice != 0);
 }
 
+/**
+ * @brief 按年查询业主缴费情况
+ *
+ * @param db 数据库连接
+ * @param owner_name 业主姓名
+ * @param year 查询年份
+ */
 void query_owner_payment_by_year(Database *db, const char *owner_name, int year)
 {
     clear_staff_screen();
@@ -1220,12 +1382,17 @@ void query_owner_payment_by_year(Database *db, const char *owner_name, int year)
     wait_for_key();
 }
 
+/**
+ * @brief 查询业主所有缴费情况
+ *
+ * @param db 数据库连接
+ * @param owner_name 业主姓名
+ */
 void query_owner_all_payments(Database *db, const char *owner_name)
 {
     clear_staff_screen();
     printf("\n=== 查询业主 %s 的所有缴费情况 ===\n\n", owner_name);
 
-    // 1. 查询业主基本信息
     const char *user_query =
         "SELECT u.user_id, u.phone_number, b.building_name, r.room_number "
         "FROM users u "
@@ -1266,7 +1433,6 @@ void query_owner_all_payments(Database *db, const char *owner_name)
         return;
     }
 
-    // 2. 查询业主所有缴费记录
     const char *query =
         "SELECT t.transaction_id, t.fee_type, t.amount, t.status, t.payment_date, t.due_date "
         "FROM transactions t "
@@ -1306,7 +1472,6 @@ void query_owner_all_payments(Database *db, const char *owner_name)
             }
             strftime(due_date_str, sizeof(due_date_str), "%Y-%m-%d", localtime(&due_date));
 
-            // 更新统计信息
             if (status == 1)
             {
                 total_paid += amount;
@@ -1343,6 +1508,12 @@ void query_owner_all_payments(Database *db, const char *owner_name)
     }
     wait_for_key();
 }
+
+/**
+ * @brief 显示排序后的用户
+ *
+ * @param db 数据库连接
+ */
 void show_sorted_users(Database *db)
 {
     clear_staff_screen();
@@ -1379,7 +1550,14 @@ void show_sorted_users(Database *db)
     }
 }
 
-// 发送缴费提醒函数信息
+/**
+ * @brief 发送缴费提醒给指定用户
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param unpaid_amount 未付款金额
+ * @param fee_types 费用类型字符串
+ */
 void send_payment_reminder(Database *db, const char *user_id, double unpaid_amount, const char *fee_types)
 {
     char reminder[512];
@@ -1388,7 +1566,6 @@ void send_payment_reminder(Database *db, const char *user_id, double unpaid_amou
     time_t now = time(NULL);
     struct tm *t = localtime(&now);
 
-    // 获取用户更多信息
     const char *user_query =
         "SELECT name, phone_number FROM users WHERE user_id = ?";
 
@@ -1405,7 +1582,6 @@ void send_payment_reminder(Database *db, const char *user_id, double unpaid_amou
         sqlite3_finalize(stmt);
     }
 
-    // 如果fee_types为空，则获取费用类型信息
     char fee_types_str[256] = "";
     if (strlen(fee_types) == 0)
     {
@@ -1413,7 +1589,6 @@ void send_payment_reminder(Database *db, const char *user_id, double unpaid_amou
         fee_types = fee_types_str;
     }
 
-    // 查询逾期费用信息
     double overdue_amount = 0.0;
     int overdue_days = 0;
 
@@ -1435,14 +1610,12 @@ void send_payment_reminder(Database *db, const char *user_id, double unpaid_amou
         sqlite3_finalize(stmt);
     }
 
-    // 生成提醒内容
     snprintf(reminder, sizeof(reminder),
              "尊敬的%s业主:\n\n"
              "您好！我们的系统显示您目前有以下费用未缴纳：\n"
              "总金额：%.2f元\n",
              username, unpaid_amount);
 
-    // 如果有逾期费用
     if (overdue_amount > 0)
     {
         char overdue_info[200];
@@ -1453,11 +1626,9 @@ void send_payment_reminder(Database *db, const char *user_id, double unpaid_amou
         strncat(reminder, overdue_info, sizeof(reminder) - strlen(reminder) - 1);
     }
 
-    // 添加费用类型信息
     strncat(reminder, "费用类型：", sizeof(reminder) - strlen(reminder) - 1);
     strncat(reminder, fee_types, sizeof(reminder) - strlen(reminder) - 1);
 
-    // 添加结尾
     char ending[200];
     snprintf(ending, sizeof(ending),
              "\n\n请您及时缴纳费用。如已缴费请忽略此提醒。\n\n"
@@ -1468,7 +1639,6 @@ void send_payment_reminder(Database *db, const char *user_id, double unpaid_amou
              "翠湖花园");
     strncat(reminder, ending, sizeof(reminder) - strlen(reminder) - 1);
 
-    // 保存提醒到数据库
     char query[1024];
     snprintf(query, sizeof(query),
              "INSERT INTO payment_reminders (user_id, reminder_content, send_time, status) "
@@ -1485,7 +1655,12 @@ void send_payment_reminder(Database *db, const char *user_id, double unpaid_amou
     }
 }
 
-// 显示用户详细信息函数
+/**
+ * @brief 显示用户详细信息
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ */
 void show_user_detail(Database *db, const char *user_id)
 {
     clear_staff_screen();
@@ -1530,7 +1705,12 @@ void show_user_detail(Database *db, const char *user_id)
     }
 }
 
-// 添加缴费提醒操作函数
+/**
+ * @brief 显示发送缴费提醒界面
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ */
 void send_payment_reminder_screen(Database *db, const char *user_id)
 {
     clear_staff_screen();
@@ -1552,40 +1732,12 @@ void send_payment_reminder_screen(Database *db, const char *user_id)
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
     {
-        // sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
-        // printf("┌ 未缴费详情 ───────────────────────────────────────┐\n");
-        // double total_amount = 0;
-        // char fee_types[256] = "";
-
-        // while (sqlite3_step(stmt) == SQLITE_ROW)
-        // {
-        //     const char *name = (const char *)sqlite3_column_text(stmt, 0);
-        //     const char *phone = (const char *)sqlite3_column_text(stmt, 1);
-        //     double amount = sqlite3_column_double(stmt, 2);
-        //     time_t due_date = sqlite3_column_int64(stmt, 3);
-        //     const char *fee_type = (const char *)sqlite3_column_text(stmt, 4);
-
-        //     total_amount += amount;
-        //     if (strlen(fee_types) > 0)
-        //     {
-        //         strcat(fee_types, "、");
-        //     }
-        //     strcat(fee_types, fee_type);
-
-        //     char due_date_str[20];
-        //     strftime(due_date_str, sizeof(due_date_str), "%Y-%m-%d", localtime(&due_date));
-
-        //     printf("│ 费用类型: %-10s  金额: %-8.2f  到期: %-10s │\n",
-        //            fee_type, amount, due_date_str);
-        // }
-        // printf("└──────────────────────────────────────────────────┘\n");
         printf("\n是否发送缴费提醒？(Y/N): ");
         char choice;
         scanf(" %c", &choice);
 
         if (toupper(choice) == 'Y')
         {
-            // send_payment_reminder(db, user_id, total_amount, fee_types);
             printf("\n✓ 提醒已发送\n");
         }
 
@@ -1594,11 +1746,18 @@ void send_payment_reminder_screen(Database *db, const char *user_id)
     wait_for_user();
 }
 
-// 添加函数声明
-void show_user_detail(Database *db, const char *user_id);
-void send_payment_reminder_screen(Database *db, const char *user_id);
+/**
+ * @brief 批量发送缴费提醒
+ *
+ * @param db 数据库连接
+ */
 void send_bulk_payment_reminders(Database *db);
 
+/**
+ * @brief 显示用户查询菜单
+ *
+ * @param db 数据库连接
+ */
 void show_user_query_menu(Database *db)
 {
     clear_staff_screen();
@@ -1638,6 +1797,11 @@ void show_user_query_menu(Database *db)
     } while (choice != 0);
 }
 
+/**
+ * @brief 按姓名查询用户
+ *
+ * @param db 数据库连接
+ */
 void query_user_by_name(Database *db)
 {
     char name[64];
@@ -1671,6 +1835,11 @@ void query_user_by_name(Database *db)
     wait_for_key();
 }
 
+/**
+ * @brief 按房间号查询用户
+ *
+ * @param db 数据库连接
+ */
 void query_user_by_room(Database *db)
 {
     char building[32], room[32];
@@ -1705,6 +1874,11 @@ void query_user_by_room(Database *db)
     wait_for_key();
 }
 
+/**
+ * @brief 查询用户缴费状态
+ *
+ * @param db 数据库连接
+ */
 void query_user_payment_status(Database *db)
 {
     const char *query =
@@ -1739,6 +1913,11 @@ void query_user_payment_status(Database *db)
     wait_for_key();
 }
 
+/**
+ * @brief 显示所有用户
+ *
+ * @param db 数据库连接
+ */
 void show_all_users(Database *db)
 {
     clear_staff_screen();
@@ -1778,7 +1957,6 @@ void show_all_users(Database *db)
             int unpaid_count = sqlite3_column_int(stmt, 10);
             double total_unpaid = sqlite3_column_double(stmt, 11);
 
-            // 计算缴费率
             double payment_rate = 0;
             if (paid_count + unpaid_count > 0)
             {
@@ -1795,13 +1973,11 @@ void show_all_users(Database *db)
                    total_unpaid,
                    payment_rate);
 
-            // 如果有未缴费记录，显示详细信息
             if (unpaid_count > 0)
             {
                 printf("├───────────────────────────────────────────────────────────────────────────────────────────┤\n");
                 printf("│ 待缴费明细:                                                                              │\n");
 
-                // 查询未缴费详情
                 const char *detail_query =
                     "SELECT fee_type, amount, due_date "
                     "FROM transactions "
@@ -1839,7 +2015,9 @@ void show_all_users(Database *db)
     wait_for_key();
 }
 
-// 辅助函数：打印用户信息表头
+/**
+ * @brief 打印用户表头
+ */
 static void print_user_table_header()
 {
     printf("\n%-12s%-15s%-15s%-15s%-25s%-15s%-15s\n",
@@ -1847,7 +2025,11 @@ static void print_user_table_header()
     printf("--------------------------------------------------------------------------------\n");
 }
 
-// 辅助函数：打印用户信息行
+/**
+ * @brief 打印用户信息
+ *
+ * @param stmt SQLite查询结果
+ */
 static void print_user_info(sqlite3_stmt *stmt)
 {
     time_t reg_time = sqlite3_column_int64(stmt, 5);
@@ -1855,21 +2037,25 @@ static void print_user_info(sqlite3_stmt *stmt)
     strftime(time_str, sizeof(time_str), "%Y-%m-%d", localtime(&reg_time));
 
     printf("%-12s%-15s%-15s%-15s%-25s%-15s%-15s\n",
-           sqlite3_column_text(stmt, 1), // username
-           sqlite3_column_text(stmt, 2), // name
-           sqlite3_column_text(stmt, 3), // phone
-           sqlite3_column_text(stmt, 7), // building_name
-           sqlite3_column_text(stmt, 6), // room_number
-           time_str,                     // registration_date
-           "正常");                      // status
+           sqlite3_column_text(stmt, 1),
+           sqlite3_column_text(stmt, 2),
+           sqlite3_column_text(stmt, 3),
+           sqlite3_column_text(stmt, 7),
+           sqlite3_column_text(stmt, 6),
+           time_str,
+           "正常");
 }
 
+/**
+ * @brief 显示已缴费用户
+ *
+ * @param db 数据库连接
+ */
 void show_paid_users(Database *db)
 {
     clear_staff_screen();
     printf("\n=== 已缴费用户信息 ===\n\n");
 
-    // 改进SQL查询获取更详细的缴费信息
     const char *paid_query =
         "SELECT u.user_id, u.username, u.name, u.phone_number, b.building_name, r.room_number, "
         "r.area_sqm, SUM(t.amount) as total_paid, COUNT(t.transaction_id) as payment_count, "
@@ -1878,9 +2064,9 @@ void show_paid_users(Database *db)
         "JOIN transactions t ON u.user_id = t.user_id "
         "LEFT JOIN rooms r ON u.user_id = r.owner_id "
         "LEFT JOIN buildings b ON r.building_id = b.building_id "
-        "WHERE t.status = 1 AND u.role_id = 'role_owner' " // 只查询已支付的交易
+        "WHERE t.status = 1 AND u.role_id = 'role_owner' "
         "GROUP BY u.user_id, u.username, u.name, u.phone_number, b.building_name, r.room_number "
-        "ORDER BY total_paid DESC"; // 按照已付金额排序
+        "ORDER BY total_paid DESC";
 
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db->db, paid_query, -1, &stmt, NULL) == SQLITE_OK)
@@ -1907,14 +2093,14 @@ void show_paid_users(Database *db)
             total_paid += amount;
 
             printf("│ %-8s│ %-8s│ %-12s│ %-8s│ %-6s│ %10.2f│ %8d│ %-10s│\n",
-                   sqlite3_column_text(stmt, 0), // user_id
-                   sqlite3_column_text(stmt, 2), // name
-                   sqlite3_column_text(stmt, 3), // phone_number
+                   sqlite3_column_text(stmt, 0),
+                   sqlite3_column_text(stmt, 2),
+                   sqlite3_column_text(stmt, 3),
                    sqlite3_column_text(stmt, 4) ? sqlite3_column_text(stmt, 4) : (const unsigned char *)"未知",
                    sqlite3_column_text(stmt, 5) ? sqlite3_column_text(stmt, 5) : (const unsigned char *)"未知",
-                   amount,                      // total_paid
-                   sqlite3_column_int(stmt, 8), // payment_count
-                   date_str);                   // latest_payment
+                   amount,
+                   sqlite3_column_int(stmt, 8),
+                   date_str);
         }
 
         printf("├──────────────────────────────────────────────────────────────────────────────┤\n");
@@ -1936,7 +2122,12 @@ void show_paid_users(Database *db)
 
     wait_for_key();
 }
-// 改进未缴费用户显示
+
+/**
+ * @brief 显示未缴费用户
+ *
+ * @param db 数据库连接
+ */
 void show_unpaid_users(Database *db)
 {
     clear_staff_screen();
@@ -1979,7 +2170,6 @@ void show_unpaid_users(Database *db)
             const char *name = (const char *)sqlite3_column_text(stmt, 1);
             const char *phone = (const char *)sqlite3_column_text(stmt, 2);
 
-            // 组合住址显示
             char address[50] = "";
             if (sqlite3_column_text(stmt, 3) && sqlite3_column_text(stmt, 4))
             {
@@ -1998,7 +2188,6 @@ void show_unpaid_users(Database *db)
 
             total_unpaid += amount;
 
-            // 根据逾期天数确定状态
             const char *status = "正常";
             if (overdue_days > 90)
                 status = "严重逾期";
@@ -2030,7 +2219,12 @@ void show_unpaid_users(Database *db)
     wait_for_key();
 }
 
-// 添加新函数：显示服务区域信息
+/**
+ * @brief 显示服务人员负责区域
+ *
+ * @param db 数据库连接
+ * @param staff_id 服务人员ID
+ */
 void show_staff_service_areas(Database *db, const char *staff_id)
 {
     clear_staff_screen();
@@ -2078,8 +2272,11 @@ void show_staff_service_areas(Database *db, const char *staff_id)
     wait_for_key();
 }
 
-// 添加新函数：缴费管理菜单
-// 简化缴费管理菜单
+/**
+ * @brief 显示缴费管理菜单
+ *
+ * @param db 数据库连接
+ */
 void show_payment_management_menu(Database *db)
 {
     while (1)
@@ -2123,7 +2320,12 @@ void show_payment_management_menu(Database *db)
         }
     }
 }
-// 添加新函数：提醒管理菜单
+
+/**
+ * @brief 显示提醒管理菜单
+ *
+ * @param db 数据库连接
+ */
 void show_reminder_management_menu(Database *db)
 {
     int choice;
@@ -2160,7 +2362,11 @@ void show_reminder_management_menu(Database *db)
     } while (choice != 0);
 }
 
-// 添加新函数：统计菜单
+/**
+ * @brief 显示统计菜单
+ *
+ * @param db 数据库连接
+ */
 void show_statistics_menu(Database *db)
 {
     int choice;
@@ -2201,7 +2407,12 @@ void show_statistics_menu(Database *db)
     } while (choice != 0);
 }
 
-// 添加新函数：年度统计
+/**
+ * @brief 显示年度统计
+ *
+ * @param db 数据库连接
+ * @param year 年份
+ */
 void show_yearly_statistics(Database *db, int year)
 {
     clear_staff_screen();
@@ -2210,7 +2421,6 @@ void show_yearly_statistics(Database *db, int year)
     char year_str[5];
     snprintf(year_str, sizeof(year_str), "%d", year);
 
-    // 1. 查询年度整体统计数据
     const char *query =
         "SELECT "
         "(SELECT COUNT(DISTINCT user_id) FROM users WHERE role_id = 'role_owner') as total_owners, "
@@ -2248,7 +2458,6 @@ void show_yearly_statistics(Database *db, int year)
         sqlite3_finalize(stmt);
     }
 
-    // 2. 按费用类型统计
     const char *type_query =
         "SELECT fee_type, "
         "COUNT(DISTINCT user_id) as user_count, "
@@ -2288,7 +2497,6 @@ void show_yearly_statistics(Database *db, int year)
         sqlite3_finalize(stmt);
     }
 
-    // 3. 显示未缴费业主列表
     const char *unpaid_list_query =
         "SELECT DISTINCT u.name, u.phone_number, b.building_name, r.room_number, "
         "COUNT(t.transaction_id) as unpaid_count, SUM(t.amount) as unpaid_amount "
@@ -2335,7 +2543,12 @@ void show_yearly_statistics(Database *db, int year)
 
     wait_for_key();
 }
-// 添加两个缺失的统计函数实现
+
+/**
+ * @brief 显示当前统计
+ *
+ * @param db 数据库连接
+ */
 void show_current_statistics(Database *db)
 {
     clear_staff_screen();
@@ -2375,12 +2588,16 @@ void show_current_statistics(Database *db)
     wait_for_key();
 }
 
+/**
+ * @brief 显示欠费分析
+ *
+ * @param db 数据库连接
+ */
 void show_unpaid_analysis(Database *db)
 {
     clear_staff_screen();
     printf("\n=== 欠费情况分析 ===\n\n");
 
-    // 1. 按欠费时长统计
     const char *duration_query =
         "SELECT "
         "CASE "
@@ -2414,7 +2631,6 @@ void show_unpaid_analysis(Database *db)
         sqlite3_finalize(stmt);
     }
 
-    // 2. 按费用类型统计
     const char *type_query =
         "SELECT fee_type, COUNT(DISTINCT user_id) as user_count, "
         "SUM(amount) as total_amount "
@@ -2452,9 +2668,11 @@ void show_unpaid_analysis(Database *db)
     wait_for_key();
 }
 
-// 添加新函数：查询业主缴费情况
-// 修复版本 - 替换 show_owner_payment_query 函数
-// 重写查询业主缴费情况函数
+/**
+ * @brief 显示业主缴费查询
+ *
+ * @param db 数据库连接
+ */
 void show_owner_payment_query(Database *db)
 {
     clear_staff_screen();
@@ -2482,7 +2700,6 @@ void show_owner_payment_query(Database *db)
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
     {
-        // 使用模糊匹配以便搜索部分姓名
         char pattern[52];
         snprintf(pattern, sizeof(pattern), "%%%s%%", name);
         sqlite3_bind_text(stmt, 1, pattern, -1, SQLITE_STATIC);
@@ -2508,7 +2725,6 @@ void show_owner_payment_query(Database *db)
             printf("│ 已缴费: %2d笔，共计 %-10.2f 元          │\n", paid_count, paid);
             printf("│ 未缴费: %2d笔，共计 %-10.2f 元          │\n", unpaid_count, unpaid);
 
-            // 计算缴费率
             double rate = 0;
             if (paid_count + unpaid_count > 0)
                 rate = (double)paid_count / (paid_count + unpaid_count) * 100;
@@ -2516,18 +2732,15 @@ void show_owner_payment_query(Database *db)
             printf("│ 缴费率: %-5.1f%%                                │\n", rate);
             printf("└─────────────────────────────────────────────────┘\n");
 
-            // 显示详细缴费记录
             if (paid_count > 0)
             {
-                show_payment_details(db, user_id, 1); // 显示已缴费记录
+                show_payment_details(db, user_id, 1);
             }
 
-            // 显示详细欠费记录
             if (unpaid_count > 0)
             {
-                show_payment_details(db, user_id, 0); // 显示未缴费记录
+                show_payment_details(db, user_id, 0);
 
-                // 提供发送提醒选项
                 printf("\n是否向该业主发送缴费提醒? (y/n): ");
                 char choice;
                 scanf(" %c", &choice);
@@ -2556,7 +2769,13 @@ void show_owner_payment_query(Database *db)
     wait_for_key();
 }
 
-// 新增辅助函数：显示缴费详情
+/**
+ * @brief 显示缴费明细
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param status 缴费状态
+ */
 void show_payment_details(Database *db, const char *user_id, int status)
 {
     const char *status_str = status == 1 ? "已缴费" : "未缴费";
@@ -2609,8 +2828,11 @@ void show_payment_details(Database *db, const char *user_id, int status)
     }
 }
 
-// 显示已发送的提醒记录
-// 显示已发送的提醒记录 - 修复版本
+/**
+ * @brief 显示提醒历史记录
+ *
+ * @param db 数据库连接
+ */
 void show_reminder_history(Database *db)
 {
     clear_staff_screen();
