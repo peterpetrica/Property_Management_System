@@ -122,7 +122,7 @@ char *get_data_dir(char *buffer, size_t size)
         return NULL;
     }
 
-    snprintf(buffer, size, "%s/Database_property_management", home);
+    snprintf(buffer, size, "%s/Database", home);
 #endif
 
     if (!file_exists(buffer))
