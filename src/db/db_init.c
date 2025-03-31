@@ -500,19 +500,19 @@ int db_init_tables(Database *db)
         i++;
     }
 
-    // 初始化楼栋数据
-    i = 0;
-    while (INSERT_DEFAULT_BUILDINGS[i] != NULL)
-    {
-        result = db_execute(db, INSERT_DEFAULT_BUILDINGS[i]);
-        if (result != SQLITE_OK)
-        {
-            fprintf(stderr, "初始化楼栋数据失败: %s\n", sqlite3_errmsg(db->db));
-            db_execute(db, "ROLLBACK;");
-            return result;
-        }
-        i++;
-    }
+    // // 初始化楼栋数据
+    // i = 0;
+    // while (INSERT_DEFAULT_BUILDINGS[i] != NULL)
+    // {
+    //     result = db_execute(db, INSERT_DEFAULT_BUILDINGS[i]);
+    //     if (result != SQLITE_OK)
+    //     {
+    //         fprintf(stderr, "初始化楼栋数据失败: %s\n", sqlite3_errmsg(db->db));
+    //         db_execute(db, "ROLLBACK;");
+    //         return result;
+    //     }
+    //     i++;
+    // }
 
     // 初始化管理员账户
     result = db_init_admin(db);
@@ -530,13 +530,13 @@ int db_init_tables(Database *db)
         return result;
     }
 
-    // 初始化默认用户和房间数据
-    result = db_init_default_data(db);
-    if (result != SQLITE_OK)
-    {
-        db_execute(db, "ROLLBACK;");
-        return result;
-    }
+    // // 初始化默认用户和房间数据
+    // result = db_init_default_data(db);
+    // if (result != SQLITE_OK)
+    // {
+    //     db_execute(db, "ROLLBACK;");
+    //     return result;
+    // }
 
     // 提交事务
     result = db_execute(db, "COMMIT;");
