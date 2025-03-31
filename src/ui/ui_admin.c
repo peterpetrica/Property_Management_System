@@ -217,16 +217,16 @@ void manage_buildings(Database *db, const char *user_id)
 
     case 3: // 修改楼宇信息
     {
-        int building_id;
+        char building_name[100];
         char new_name[100], new_address[255];
-        printf("请输入要修改的楼宇ID: ");
-        scanf("%d", &building_id);
+        printf("请输入要修改的楼宇名: ");
+        scanf("%s", &building_name);
         getchar();
 
         // 先检查楼宇是否存在
         snprintf(sql, sizeof(sql),
-                 "SELECT COUNT(*) FROM buildings WHERE building_id = %d;",
-                 building_id);
+                 "SELECT COUNT(*) FROM buildings WHERE building_name = %s;",
+                 building_name);
         if (!execute_query(db, sql, &result) || atoi(result.rows[0].values[0]) == 0)
         {
             printf("修改失败，楼宇不存在。\n");
@@ -244,8 +244,8 @@ void manage_buildings(Database *db, const char *user_id)
 
         snprintf(sql, sizeof(sql),
                  "UPDATE buildings SET building_name = '%s', address = '%s' "
-                 "WHERE building_id = %d;",
-                 new_name, new_address, building_id);
+                 "WHERE building_name = %s;",
+                 new_name, new_address, building_name);
         if (execute_update(db, sql))
             printf("楼宇信息更新成功！\n");
         else
@@ -597,7 +597,7 @@ void manage_users(Database *db, const char *user_id, UserType user_type)
             return;
         }
 
-        //将密码转为哈希
+        // 将密码转为哈希
         char password_hash[256];
         hash_password(password, password_hash, sizeof(password_hash));
         // 插入新用户
