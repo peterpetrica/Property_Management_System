@@ -31,6 +31,33 @@
 #include <time.h>
 #include <ctype.h>
 
+typedef struct OwnerNode
+{
+    char name[50];
+    char phone[20];
+    char building[20];
+    char room[20];
+    double area;
+    char reg_date[20];
+    int unpaid_count;
+    struct OwnerNode *next;
+} OwnerNode;
+OwnerNode *create_owner_node(const char *name, const char *phone, const char *building, const char *room, double area, const char *reg_date, int unpaid_count)
+{
+    OwnerNode *new_node = (OwnerNode *)malloc(sizeof(OwnerNode));
+    if (new_node)
+    {
+        strncpy(new_node->name, name, sizeof(new_node->name) - 1);
+        strncpy(new_node->phone, phone, sizeof(new_node->phone) - 1);
+        strncpy(new_node->building, building, sizeof(new_node->building) - 1);
+        strncpy(new_node->room, room, sizeof(new_node->room) - 1);
+        new_node->area = area;
+        strncpy(new_node->reg_date, reg_date, sizeof(new_node->reg_date) - 1);
+        new_node->unpaid_count = unpaid_count;
+        new_node->next = NULL;
+    }
+    return new_node;
+}
 // 静态函数声明
 /**
  * @brief 等待用户按键后继续
@@ -466,6 +493,18 @@ void show_staff_main_screen(Database *db, const char *user_id, UserType user_typ
  * @param db 数据库连接
  * @param sort_criteria 排序条件
  */
+/**
+ * @brief 按不同排序方式显示业主
+ *
+ * @param db 数据库连接
+ * @param sort_criteria 排序条件
+ */
+/**
+ * @brief 按不同排序方式显示业主
+ *
+ * @param db 数据库连接
+ * @param sort_criteria 排序条件
+ */
 void show_sorted_owners_by(Database *db, const char *sort_criteria)
 {
     clear_staff_screen();
@@ -486,10 +525,11 @@ void show_sorted_owners_by(Database *db, const char *sort_criteria)
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
     {
-        
-        printf(" %-8s %-12s %-8s %-8s %-8s %-12s %-8s\n",
-               "姓名", "电话", "楼号", "房号", "面积", "注册时间", "待缴费");
-       
+
+        printf(" %-8s %-12s   %-8s    %-8s   %-8s    \n",
+               "姓名", "电话", "楼号", "房号", "面积");
+
+        OwnerNode *head = NULL;
 
         while (sqlite3_step(stmt) == SQLITE_ROW)
         {
@@ -497,7 +537,7 @@ void show_sorted_owners_by(Database *db, const char *sort_criteria)
             char date_str[20];
             strftime(date_str, sizeof(date_str), "%Y-%m-%d", localtime(&reg_date));
 
-            printf(" %-8s %-12s %-8s %-8s %8.2f %-12s %8d \n",
+            printf(" %-8s %-12s %-8s %-8s %8.2f  \n",
                    sqlite3_column_text(stmt, 2),
                    sqlite3_column_text(stmt, 3),
                    sqlite3_column_text(stmt, 6),
@@ -505,9 +545,34 @@ void show_sorted_owners_by(Database *db, const char *sort_criteria)
                    sqlite3_column_double(stmt, 8),
                    date_str,
                    sqlite3_column_int(stmt, 9));
+
+            // 将数据添加到链表中
+            OwnerNode *new_node = create_owner_node(
+                sqlite3_column_text(stmt, 2),
+                sqlite3_column_text(stmt, 3),
+                sqlite3_column_text(stmt, 6),
+                sqlite3_column_text(stmt, 7),
+                sqlite3_column_double(stmt, 8),
+                date_str,
+                sqlite3_column_int(stmt, 9));
+            add_owner_to_list(&head, new_node);
         }
-        
+
         sqlite3_finalize(stmt);
+
+        // 询问用户是否要导出数据
+        printf("\n是否将排序后的业主信息导出到文件？(y/n): ");
+        char export_choice;
+        scanf(" %c", &export_choice);
+        if (export_choice == 'y' || export_choice == 'Y')
+        {
+            // 导出数据到文件
+            write_list_to_file(head, "sorted_owners.csv");
+            printf("✓ 数据已成功导出到sorted_owners.csv\n");
+        }
+
+        // 释放链表内存
+        free_owner_list(head);
     }
     wait_for_key();
 }
@@ -558,8 +623,77 @@ void show_sorted_owners_menu(Database *db)
             printf("无效选择，请重试\n");
         }
     } while (choice != 0);
+    // 询问用户是否要导出数据 
+    printf("\n是否将排序后的业主信息导出到文件？(y/n): ");
+    char export_choice;
+    scanf(" %c", &export_choice);
+    if (export_choice == 'y' || export_choice == 'Y') 
+    {
+        // 创建链表并导出数据
+            OwnerNode *head = NULL;
+         // 假设show_sorted_owners_by函数已经填充了链表
+            write_list_to_file(head, "sorted_owners.csv");
+        free_owner_list(head);
+        printf("✓ 数据已成功导出到sorted_owners.csv\n");
+        
+    }
+    
 }
 
+
+/**
+ * @brief 将业主节点添加到链表
+ *
+ * @param head 链表头指针
+ * @param new_node 新的业主节点
+ */
+void add_owner_to_list(OwnerNode **head, OwnerNode *new_node) {
+    if (!*head) {
+        *head = new_node;
+    } else {
+        OwnerNode *current = *head;
+        while (current->next) {
+            current = current->next;
+        }
+        current->next = new_node;
+    }
+}
+
+/**
+ * @brief 将链表数据写入文件
+ *
+ * @param head 链表头指针
+ * @param filename 文件名
+ */
+void write_list_to_file(OwnerNode *head, const char *filename) {
+    FILE *file = fopen(filename, "w");
+    if (file) {
+        OwnerNode *current = head;
+        while (current) {
+            fprintf(file, "%s,%s,%s,%s,%.2f,%s,%d\n",
+                    current->name, current->phone, current->building, current->room,
+                    current->area, current->reg_date, current->unpaid_count);
+            current = current->next;
+        }
+        fclose(file);
+    }
+}
+
+/**
+ * @brief 释放链表内存
+ *
+ * @param head 链表头指针
+ */
+void free_owner_list(OwnerNode *head) {
+    OwnerNode *current = head;
+    while (current) {
+        OwnerNode *next = current->next;
+        free(current);
+        current = next;
+    }
+}
+
+    
 /**
  * @brief 显示服务人员负责的区域信息
  *
@@ -862,7 +996,7 @@ void modify_personal_info_screen(Database *db, const char *user_id, UserType use
             // 添加修改密码功能
             char old_password[100], new_password[100];
             printf("\n===== 修改密码 =====\n");
-
+            clear_input_buffer();
             printf("请输入旧密码: ");
             read_password(old_password, sizeof(old_password));
 
@@ -876,6 +1010,7 @@ void modify_personal_info_screen(Database *db, const char *user_id, UserType use
             if (strcmp(new_password, confirm_password) != 0)
             {
                 printf("\n两次输入的新密码不一致，密码修改失败\n");
+                wait_for_key(); // 使用统一的等待按键函数
                 break;
             }
 
@@ -887,8 +1022,7 @@ void modify_personal_info_screen(Database *db, const char *user_id, UserType use
             {
                 printf("\n密码修改失败，请确认旧密码是否正确\n");
             }
-            printf("\n按任意键继续...");
-            getchar();
+            wait_for_key(); // 使用统一的等待按键函数
             break;
         }
         case 0:
