@@ -59,7 +59,7 @@ static const char *get_fee_type_name(int fee_type)
     }
 }
 
-static void wait_for_key()
+void wait_for_key()
 {
     printf("\n按任意键继续...");
     getchar();
@@ -101,7 +101,7 @@ void clear_staff_screen()
 #ifdef _WIN32
     system("cls");
 #else
-    // system("clear");
+    system("clear");
 #endif
 }
 

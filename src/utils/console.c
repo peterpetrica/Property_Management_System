@@ -78,11 +78,12 @@ void read_password(char *password, size_t size)
 /**
  * @brief 清屏功能
  */
-void clear_screen(void) {
+void clear_screen(void)
+{
 #ifdef _WIN32
     system("cls");
 #else
-    // system("clear");
+    system("clear");
 #endif
 }
 
@@ -101,6 +102,7 @@ void pause_console()
 void wait_for_key() // 修改函数名，避免与系统函数冲突
 {
     printf("\n按任意键继续...");
+    fflush(stdin);
 #ifdef _WIN32
     _getch();
 #else

@@ -151,7 +151,7 @@ void show_payment_history(Database *db, const char *user_id)
     }
 
     printf("\n按Enter键返回...");
-    getchar();
+    wait_for_key();
 }
 
 // 创建缴费记录链表
@@ -453,7 +453,6 @@ void process_payment_screen(Database *db, const char *user_id)
                 printf("缴费日期: %s\n", display_date);
                 printf("缴费笔数: %d\n", record_count);
             }
-            // process_payment_screen 部分缴费部分的修改代码
             else
             {
                 printf("❌ 取消缴费操作\n");
@@ -469,13 +468,13 @@ void process_payment_screen(Database *db, const char *user_id)
         printf("❌ 查询未缴费用记录失败: %s\n", sqlite3_errmsg(db->db));
     }
     printf("\n按任意键返回...");
-    clear_input_buffer();
-    getchar();
+    wait_for_key();
 }
+
 // 查询剩余费用
 void query_remaining_balance(Database *db, const char *user_id)
 {
-    system("clear||cls");
+    clear_screen();
     printf("=====查询剩余费用=====\n");
     const char *query = "SELECT SUM(amount) FROM transactions WHERE user_id=?;";
     sqlite3_stmt *stmt;
@@ -496,11 +495,9 @@ void query_remaining_balance(Database *db, const char *user_id)
         printf("查询失败或无剩余费用\n");
     }
     sqlite3_finalize(stmt);
-    printf("按任意键返回...\n");
-    clear_input_buffer();
+    wait_for_key();
 }
 
-// 查询小区基本信息
 // 查询小区基本信息
 void query_community_info(Database *db)
 {
@@ -534,20 +531,18 @@ void query_community_info(Database *db)
         free_query_result(&result);
     }
 
-    printf("\n住户情况: 目前总住户578人\n");
     printf("配套设施: 健身房、游泳池、儿童乐园\n");
     printf("物业服务: 24小时物业服务中心\n");
     printf("当前状态: 一切正常\n");
     printf("\n=======================================\n");
 
-    printf("\n按任意键返回...");
-    clear_input_buffer();
-    getchar();
+    wait_for_key();
 }
+
 // 查询收费信息
 void query_fee_info(Database *db, const char *user_id)
 {
-    system("clear||cls");
+    clear_screen();
     printf("===== 物业费标准 =====\n");
 
     // 定义费用类型
@@ -597,8 +592,7 @@ void query_fee_info(Database *db, const char *user_id)
     }
 
     printf("\n--------------------------------------------\n");
-    printf("按任意键返回...");
-    clear_input_buffer();
+    wait_for_key();
 }
 
 // 查询服务人员信息
@@ -642,9 +636,7 @@ void query_service_staff_info(Database *db, const char *user_id)
     }
 
     sqlite3_finalize(stmt);
-    printf("\n按任意键返回...");
-    clear_input_buffer();
-    getchar();
+    wait_for_key();
 }
 
 // 修改用户名
@@ -687,7 +679,6 @@ void handle_change_password(Database *db, const char *user_id, UserType user_typ
 {
     char old_password[100];
     char new_password[100];
-    getchar();
     printf("请输入旧密码: ");
     read_password(old_password, sizeof(old_password));
     printf("请输入新密码: ");
@@ -748,34 +739,47 @@ void show_owner_personal_info_screen(Database *db, const char *user_id, UserType
     query_username_by_user_id(db, user_id, username);
     while (1)
     {
+        clear_screen();
         printf("更改您的用户名---1    更改您的密码---2    返回上一级---0\n");
         int num;
 
         scanf("%d", &num);
+        clear_input_buffer(); // 添加这行来清除输入缓冲区
+
         if (num == 1)
         {
             printf("请输入用户名\n");
             scanf("%s", username);
+            clear_input_buffer(); // 添加这行来清除输入缓冲区
+
             if (change_username(db, user_id, username))
             {
-                printf("用户名更改成功\n");
+                wait_for_key();
+                clear_screen(); // 添加这行确保等待按键后清屏
             }
             else
             {
                 printf("用户名修改失败，请重试。\n");
+                wait_for_key();
+                clear_screen(); // 添加这行确保等待按键后清屏
             }
         }
         else if (num == 2)
         {
             handle_change_password(db, user_id, user_type);
+            wait_for_key();
+            clear_screen(); // 添加这行确保等待按键后清屏
         }
         else if (num == 0)
         {
+            clear_screen();
             break;
         }
         else
         {
             printf("输入错误，请重新输入。\n");
+            wait_for_key();
+            // 这里不需要clear_screen因为循环开始就会执行
         }
     }
 }
@@ -786,7 +790,7 @@ void show_payment_management_screen(Database *db, const char *user_id, UserType 
     int choice;
     while (1)
     {
-        system("clear||cls");
+        clear_screen();
         printf("\n===== 缴费管理 =====\n");
         printf("1. 查看缴费记录\n");
         printf("2. 缴纳费用\n");
@@ -808,11 +812,11 @@ void show_payment_management_screen(Database *db, const char *user_id, UserType 
             query_due_payments(db, user_id);
             break;
         case 0:
+            clear_screen();
             return;
         default:
             printf("无效的选择，请重新输入\n");
-            printf("按任意键继续...");
-            getchar();
+            wait_for_key();
             break;
         }
     }
@@ -824,6 +828,7 @@ void show_owner_query_screen(Database *db, const char *user_id, UserType user_ty
     int choice;
     while (1)
     {
+        clear_screen();
         printf("\n===== 业主信息查询 =====\n");
         printf("1--查询小区基本信息\n");
         printf("2--查询收费信息\n");
@@ -865,7 +870,7 @@ void show_owner_query_screen(Database *db, const char *user_id, UserType user_ty
         case 0:
             // 用户选择返回上一级菜单
             {
-                printf("返回上一级菜单。\n");
+                clear_screen();
                 return;
             } // 直接退出函数
 
@@ -989,8 +994,7 @@ void query_due_payments(Database *db, const char *user_id)
     printf("- 此处仅显示未支付和逾期的费用\n");
     printf("- 请及时缴纳费用，避免产生逾期\n");
 
-    printf("\n按任意键返回...");
-    getchar();
+    wait_for_key();
 }
 // 查询特定业主的缴费信息
 void query_owner_payment_info(Database *db, const char *user_id)
@@ -1034,7 +1038,7 @@ void query_owner_payment_info(Database *db, const char *user_id)
 // 查询所有业主的缴费情况
 void query_all_owners_payment_info(Database *db)
 {
-    system("clear||cls");
+    clear_screen();
     printf("===== 查询所有业主缴费情况 =====\n");
 
     const char *query = "SELECT u.user_id, u.name, SUM(t.amount) AS total_paid FROM users u "
@@ -1060,6 +1064,5 @@ void query_all_owners_payment_info(Database *db)
     }
 
     sqlite3_finalize(stmt);
-    printf("\n按任意键返回...\n");
-    clear_input_buffer();
+    wait_for_key();
 }
