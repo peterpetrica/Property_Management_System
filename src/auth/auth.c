@@ -101,8 +101,10 @@ LoginResult authenticate_user(Database *db, const char *username, const char *pa
     char user_id[80] = {0};
     int permission_level = 0;
     UserType user_type = 0;
+    char hashed_password[256] = {0};
+    hash_password(password, hashed_password, sizeof(hashed_password));
 
-    if (check_user_credentials(db, username, password, &user_type, user_id, &permission_level))
+    if (check_user_credentials(db, username, hashed_password, &user_type, user_id, &permission_level))
     {
         result.success = true;
         result.user_type = user_type;
@@ -183,7 +185,8 @@ bool change_password(Database *db, const char *user_id, UserType user_type, cons
     if (sqlite3_step(stmt) == SQLITE_ROW)
     {
         const unsigned char *db_pass = sqlite3_column_text(stmt, 0);
-        if (db_pass) strncpy(stored_password, (const char*)db_pass, sizeof(stored_password)-1);
+        if (db_pass)
+            strncpy(stored_password, (const char *)db_pass, sizeof(stored_password) - 1);
     }
     else
     {
@@ -194,13 +197,27 @@ bool change_password(Database *db, const char *user_id, UserType user_type, cons
     sqlite3_finalize(stmt);
 
     // 2. 校验旧密码
-    if (strcmp(stored_password, old_password) != 0)
+    char hashed_old_password[256];
+    if (!hash_password(old_password, hashed_old_password, sizeof(hashed_old_password)))
+    {
+        fprintf(stderr, "密码加密失败\n");
+        return false;
+    }
+
+    if (strcmp(stored_password, hashed_old_password) != 0)
     {
         fprintf(stderr, "错误：旧密码不正确\n");
         return false;
     }
 
     // 3. 更新密码（仅通过user_id定位）
+    char new_password_hash[256];
+    if (!hash_password(new_password, new_password_hash, sizeof(new_password_hash)))
+    {
+        fprintf(stderr, "密码加密失败\n");
+        return false;
+    }
+    sqlite3_stmt *stmt_update = NULL;
     const char *sql_update = "UPDATE users SET password_hash = ? WHERE user_id = ?;";
     if (sqlite3_prepare_v2(db->db, sql_update, -1, &stmt, NULL) != SQLITE_OK)
     {
@@ -208,7 +225,7 @@ bool change_password(Database *db, const char *user_id, UserType user_type, cons
         return false;
     }
 
-    sqlite3_bind_text(stmt, 1, new_password, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 1, new_password_hash, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 2, user_id, -1, SQLITE_STATIC);
 
     int rc = sqlite3_step(stmt);

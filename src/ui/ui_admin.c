@@ -597,11 +597,15 @@ void manage_users(Database *db, const char *user_id, UserType user_type)
             return;
         }
 
+        //将密码转为哈希
+        char password_hash[256];
+        hash_password(password, password_hash, sizeof(password_hash));
+        // 插入新用户
         snprintf(sql, sizeof(sql),
                  "INSERT INTO users (user_id, username, password_hash, name, "
                  "phone_number, email, role_id, status, registration_date) "
                  "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '1', datetime('now'));",
-                 new_user_id, username, password, name, phone, email, role_id);
+                 new_user_id, username, password_hash, name, phone, email, role_id);
 
         if (execute_update(db, sql))
             printf("用户添加成功！新用户ID: %s\n", new_user_id);
@@ -685,10 +689,13 @@ void manage_users(Database *db, const char *user_id, UserType user_type)
         case 1: // 修改密码
             printf("请输入新密码: ");
             read_password(new_password, sizeof(new_password));
+            // 将密码转为哈希
+            char new_password_hash[256];
+            hash_password(new_password, new_password_hash, sizeof(new_password_hash));
 
             snprintf(sql, sizeof(sql),
-                     "UPDATE users SET password = '%s' WHERE user_id = '%s';",
-                     new_password, modify_user_id);
+                     "UPDATE users SET password_hash = '%s' WHERE user_id = '%s';",
+                     new_password_hash, modify_user_id);
 
             if (execute_update(db, sql))
                 printf("用户密码更新成功！\n");

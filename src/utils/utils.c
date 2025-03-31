@@ -63,38 +63,7 @@ void generate_uuid(char *out)
 }
 
 /**
- * @brief 生成随机盐值
- *
- * @param length 盐值长度
- * @return char* 生成的盐值字符串，调用者负责释放内存
- */
-static char *generate_salt(size_t length)
-{
-    const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
-    const size_t charset_size = sizeof(charset) - 1;
-
-    char *salt = (char *)malloc(length + 1);
-    if (!salt)
-        return NULL;
-
-    unsigned char *random_bytes = (unsigned char *)malloc(length);
-    if (RAND_bytes(random_bytes, length) != 1)
-    {
-        free(salt);
-        return NULL;
-    }
-
-    for (size_t i = 0; i < length; i++)
-    {
-        salt[i] = charset[random_bytes[i] % charset_size];
-    }
-    salt[length] = '\0';
-
-    return salt;
-}
-
-/**
- * @brief 存储密码（当前为明文存储）
+ * @brief 存储密码
  *
  * @param password 原始密码
  * @param hashed_output 输出缓冲区
@@ -103,31 +72,35 @@ static char *generate_salt(size_t length)
  */
 bool hash_password(const char *password, char *hashed_output, size_t output_size)
 {
-    if (!password || !hashed_output || output_size <= 0)
+    if (!password || !hashed_output || output_size <= SHA256_DIGEST_LENGTH * 2 + 1)
     {
         return false;
     }
 
-    strncpy(hashed_output, password, output_size - 1);
-    hashed_output[output_size - 1] = '\0';
+    const char *salt = "pms"; // 固定的盐值
+
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    char salted_password[256]; // 用于存储加盐后的密码
+
+    // 创建加盐密码
+    snprintf(salted_password, sizeof(salted_password), "%s%s", password, salt);
+
+    // 计算SHA-256哈希
+    SHA256_CTX sha256;
+    SHA256_Init(&sha256);
+    SHA256_Update(&sha256, salted_password, strlen(salted_password));
+    SHA256_Final(hash, &sha256);
+
+    // 将哈希值转换为十六进制字符串
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; i++)
+    {
+        sprintf(hashed_output + (i * 2), "%02x", hash[i]);
+    }
+    hashed_output[SHA256_DIGEST_LENGTH * 2] = '\0';
 
     return true;
 }
 
-/**
- * @brief 验证密码
- *
- * @param password 待验证的密码
- * @param hash 存储的密码（当前为明文）
- * @return bool 密码是否匹配
- */
-bool verify_password(const char *password, const char *hash)
-{
-    if (!password || !hash)
-        return false;
-
-    return (strcmp(password, hash) == 0);
-}
 
 /**
  * @brief 格式化时间为字符串
@@ -226,15 +199,18 @@ void trim_newline(char *str)
 /**
  * @brief 清除输入缓冲区
  */
-void clear_input_buffer(void) {
+void clear_input_buffer(void)
+{
     int c;
-    while ((c = getchar()) != '\n' && c != EOF);
+    while ((c = getchar()) != '\n' && c != EOF)
+        ;
 }
 
 /**
  * @brief 暂停程序执行，等待用户按任意键继续
  */
-void pause(void) {
+void pause(void)
+{
     printf("\n按任意键继续...");
     getchar();
 }

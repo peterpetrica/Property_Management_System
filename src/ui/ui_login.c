@@ -349,9 +349,12 @@ bool show_registration_screen(Database *db)
         return false;
     }
 
+    char password_hash[256];
+    hash_password(password, password_hash, sizeof(password_hash));
+
     sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 2, username, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 3, password, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, password_hash, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 4, name, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 5, phone, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 6, email, -1, SQLITE_STATIC);

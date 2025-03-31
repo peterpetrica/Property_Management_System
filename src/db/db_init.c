@@ -207,10 +207,13 @@ int db_init_admin(Database *db)
     generate_uuid(admin_uuid);
 
     char sql[512];
+    char password_hash[256];
+    hash_password("admin123", password_hash, sizeof(password_hash));
+
     snprintf(sql, sizeof(sql),
              "INSERT OR IGNORE INTO users (user_id, username, password_hash, name, role_id, status, registration_date) "
-             "VALUES ('%s', 'admin', 'admin123', '系统管理员', 'role_admin', 1, strftime('%%s','now'));",
-             admin_uuid);
+             "VALUES ('%s', 'admin', '%s', '系统管理员', 'role_admin', 1, strftime('%%s','now'));",
+             admin_uuid, password_hash);
 
     int result = db_execute(db, sql);
     if (result != SQLITE_OK)
@@ -273,10 +276,13 @@ int db_init_staff(Database *db)
         sqlite3_finalize(stmt);
 
         // 插入默认物业人员用户
+        char password_hash[256];
+        hash_password("staff123", password_hash, sizeof(password_hash));
+
         snprintf(sql, sizeof(sql),
                  "INSERT INTO users (user_id, username, password_hash, name, role_id, status, registration_date) "
-                 "VALUES ('%s', 'staff', 'staff123', '物业服务员', 'role_staff', 1, strftime('%%s','now'));",
-                 staff_user_uuid);
+                 "VALUES ('%s', 'staff', '%s', '物业服务员', 'role_staff', 1, strftime('%%s','now'));",
+                 staff_user_uuid, password_hash);
 
         result = db_execute(db, sql);
         if (result != SQLITE_OK)

@@ -14,9 +14,6 @@ void generate_uuid(char *out);
 // 修改 hash_password 函数声明
 bool hash_password(const char *password, char *hashed_output, size_t output_size);
 
-// 验证密码
-bool verify_password(const char *password, const char *hash);
-
 // 格式化时间为字符串
 char *format_time(time_t time, char *buffer, int buffer_size);
 
