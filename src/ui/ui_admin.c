@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h> 
 
 /**
  * @brief 显示管理员主界面
@@ -770,40 +771,42 @@ void manage_users(Database *db, const char *user_id, UserType user_type)
     printf("5. 返回上一级\n");
     printf("请输入选项: ");
     scanf("%d", &choice);
-    getchar();
+    clear_input_buffer();
 
     switch (choice)
     {
     case 1:
     {
         char username[100], password[100], name[100], phone[20], email[100];
-        char new_user_id[41];
-        int role_choice;
-        char role_id[20];
+    char new_user_id[41];
+    int role_choice;
+    char role_id[20];
 
-        generate_uuid(new_user_id);
+    generate_uuid(new_user_id);
+    
+    // 修改这部分代码
+    printf("请输入用户名: ");
+    fgets(username, sizeof(username), stdin);
+    trim_newline(username);  // 先获取输入再处理换行符
 
-        printf("请输入用户名: ");
-        trim_newline(username);
+    printf("请输入密码: ");
+    read_password(password, sizeof(password));
 
-        printf("请输入密码: ");
-        read_password(password, sizeof(password));
+    printf("请输入姓名: ");
+    fgets(name, sizeof(name), stdin);
+    trim_newline(name);
 
-        printf("请输入姓名: ");
-        fgets(name, sizeof(name), stdin);
-        trim_newline(name);
+    printf("请输入电话: ");
+    fgets(phone, sizeof(phone), stdin);
+    trim_newline(phone);
 
-        printf("请输入电话: ");
-        fgets(phone, sizeof(phone), stdin);
-        trim_newline(phone);
+    printf("请输入邮箱: ");
+    fgets(email, sizeof(email), stdin);
+    trim_newline(email);
 
-        printf("请输入邮箱: ");
-        fgets(email, sizeof(email), stdin);
-        trim_newline(email);
-
-        printf("请选择角色(1-管理员 2-物业人员 3-业主): ");
-        scanf("%d", &role_choice);
-        getchar();
+    printf("请选择角色(1-管理员 2-物业人员 3-业主): ");
+    scanf("%d", &role_choice);
+    getchar();  // 清除换行符
 
         switch (role_choice)
         {
@@ -1734,8 +1737,6 @@ void show_info_statistics_screen(Database *db, const char *user_id, UserType use
         printf("\n=== 信息统计界面 ===\n");
         printf("1. 楼宇统计\n");
         printf("2. 住户统计\n");
-        printf("3. 费用统计\n");
-        printf("4. 服务统计\n");
         printf("0. 返回主菜单\n");
         printf("请输入选项: ");
 
@@ -1833,62 +1834,6 @@ void show_info_statistics_screen(Database *db, const char *user_id, UserType use
             }
             break;
         }
-
-        case 3:
-        {
-            snprintf(sql, sizeof(sql),
-                     "SELECT t.fee_type, "
-                     "COUNT(*) as bill_count, "
-                     "SUM(t.amount) as total_amount, "
-                     "AVG(t.amount) as avg_amount "
-                     "FROM transactions t "
-                     "GROUP BY t.fee_type");
-
-            if (execute_query(db, sql, &result))
-            {
-                printf("\n费用统计信息：\n");
-                printf("------------------------\n");
-                printf("%-15s %-10s %-15s %-15s\n",
-                       "费用类型", "账单数", "总金额", "平均金额");
-                for (int i = 0; i < result.row_count; i++)
-                {
-                    printf("%-15s %-10s %-15s %-15s\n",
-                           result.rows[i].values[0],
-                           result.rows[i].values[1],
-                           result.rows[i].values[2],
-                           result.rows[i].values[3]);
-                }
-                free_query_result(&result);
-            }
-            break;
-        }
-
-        case 4:
-        {
-            snprintf(sql, sizeof(sql),
-                     "SELECT u.name as staff_name, "
-                     "COUNT(DISTINCT sa.building_id) as building_count "
-                     "FROM users u "
-                     "LEFT JOIN service_areas sa ON u.user_id = sa.staff_id "
-                     "WHERE u.role_id = 2 "
-                     "GROUP BY u.user_id");
-
-            if (execute_query(db, sql, &result))
-            {
-                printf("\n服务人员工作量统计：\n");
-                printf("------------------------\n");
-                printf("%-20s %-15s\n", "服务人员", "负责楼宇数");
-                for (int i = 0; i < result.row_count; i++)
-                {
-                    printf("%-20s %-15s\n",
-                           result.rows[i].values[0],
-                           result.rows[i].values[1]);
-                }
-                free_query_result(&result);
-            }
-            break;
-        }
-
         case 0:
             return;
 
@@ -1912,97 +1857,144 @@ void show_info_statistics_screen(Database *db, const char *user_id, UserType use
  */
 void show_system_maintenance_screen(Database *db, const char *user_id, UserType user_type)
 {
-    while (1)
-    {
+    // 检查用户权限
+    if (user_type != USER_ADMIN) {
+        printf("权限不足，无法访问系统维护功能\n");
+        pause_console();
+        return;
+    }
+
+    while (1) {
         clear_screen();
         printf("\n=== 系统维护界面 ===\n");
         printf("1. 数据库备份\n");
         printf("2. 数据库恢复\n");
-        printf("3. 数据库重置\n");
         printf("0. 返回主菜单\n");
-        printf("请输入选项: ");
+        printf("\n请输入选项: ");
 
         int choice;
         scanf("%d", &choice);
-        getchar();
+        getchar(); // 清除换行符
 
-        switch (choice)
-        {
-        case 1:
-        {
-            char backup_path[256];
-            printf("\n请输入备份文件保存路径: ");
-            fgets(backup_path, sizeof(backup_path), stdin);
-            trim_newline(backup_path);
+        char filepath[256];
+        char confirm;
 
-            if (backup_database(db))
+        switch (choice) {
+            case 1: // 数据库备份
             {
-                printf("数据库备份成功!\n");
-            }
-            else
-            {
-                printf("数据库备份失败!\n");
-            }
-            break;
-        }
-
-        case 2:
-        {
-            char backup_path[256];
-            printf("\n请输入备份文件路径: ");
-            fgets(backup_path, sizeof(backup_path), stdin);
-            trim_newline(backup_path);
-
-            printf("\n警告:数据库恢复将覆盖当前所有数据,确定要继续吗?(y/n): ");
-            char confirm = getchar();
-            getchar();
-
-            if (confirm == 'y' || confirm == 'Y')
-            {
-                if (restore_database(db))
-                {
-                    printf("数据库恢复成功!\n");
+                printf("\n=== 数据库备份 ===\n");
+                printf("请输入备份文件保存路径 (默认为 backup.db): ");
+                fgets(filepath, sizeof(filepath), stdin);
+                trim_newline(filepath);
+                
+                if (strlen(filepath) == 0) {
+                    strcpy(filepath, "backup.db");
                 }
-                else
-                {
-                    printf("数据库恢复失败!\n");
+
+                // 创建备份文件
+                sqlite3 *backup_db;
+                sqlite3_backup *backup;
+                
+                if (sqlite3_open(filepath, &backup_db) != SQLITE_OK) {
+                    printf("错误：无法创建备份文件\n");
+                    break;
                 }
-            }
-            break;
-        }
 
-        case 3:
-        {
-            printf("\n警告:数据库重置将清空所有数据,确定要继续吗?(y/n): ");
-            char confirm = getchar();
-            getchar();
-
-            if (confirm == 'y' || confirm == 'Y')
-            {
-                if (clean_database(db))
-                {
-                    if (db_init_tables(db))
-                    {
-                        printf("数据库重置成功!\n");
+                backup = sqlite3_backup_init(backup_db, "main", db->db, "main");
+                
+                if (backup) {
+                    if (sqlite3_backup_step(backup, -1) == SQLITE_DONE) {
+                        printf("数据库备份成功！备份文件：%s\n", filepath);
+                    } else {
+                        printf("数据库备份失败\n");
                     }
-                    else
-                    {
-                        printf("数据库表初始化失败!\n");
-                    }
+                    sqlite3_backup_finish(backup);
+                } else {
+                    printf("备份初始化失败\n");
                 }
-                else
-                {
-                    printf("数据库清理失败!\n");
-                }
+                
+                sqlite3_close(backup_db);
+                break;
             }
+
+            case 2: // 数据库恢复
+{
+    printf("\n=== 数据库恢复 ===\n");
+    printf("请输入备份文件路径: ");
+    fgets(filepath, sizeof(filepath), stdin);
+    trim_newline(filepath);
+    
+    // 去除路径中的引号
+    char *start = filepath;
+    char *end = filepath + strlen(filepath) - 1;
+    
+    // 去除开头的引号
+    if (*start == '\'' || *start == '"') {
+        start++;
+    }
+    
+    // 去除结尾的引号
+    if (*end == '\'' || *end == '"') {
+        *end = '\0';
+    }
+    
+    // 复制处理后的路径
+    char clean_path[256];
+    strncpy(clean_path, start, sizeof(clean_path)-1);
+    clean_path[sizeof(clean_path)-1] = '\0';
+
+    // 检查文件是否存在
+    if (access(clean_path, F_OK) == -1) {
+        printf("错误：备份文件不存在\n");
+        printf("尝试访问的路径：%s\n", clean_path);
+        break;
+    }
+
+    printf("\n警告：恢复操作将覆盖当前所有数据！\n");
+    printf("确定要继续吗？(y/n): ");
+    scanf(" %c", &confirm);
+    getchar();
+
+    if (confirm == 'y' || confirm == 'Y') {
+        sqlite3 *backup_db;
+        sqlite3_backup *backup;
+
+        // 尝试打开备份文件
+        if (sqlite3_open(clean_path, &backup_db) != SQLITE_OK) {
+            printf("错误：无法打开备份文件：%s\n", sqlite3_errmsg(backup_db));
+            sqlite3_close(backup_db);
             break;
         }
 
-        case 0:
-            return;
+        // 初始化备份
+        backup = sqlite3_backup_init(db->db, "main", backup_db, "main");
+        
+        if (backup) {
+            // 执行恢复
+            int rc = sqlite3_backup_step(backup, -1);
+            sqlite3_backup_finish(backup);
+            
+            if (rc == SQLITE_DONE) {
+                printf("数据库恢复成功！\n");
+            } else {
+                printf("数据库恢复失败：%s\n", sqlite3_errmsg(db->db));
+            }
+        } else {
+            printf("恢复初始化失败：%s\n", sqlite3_errmsg(db->db));
+        }
+        
+        // 关闭备份数据库连接
+        sqlite3_close(backup_db);
+    }
+    break;
+}
 
-        default:
-            printf("无效选项,请重新输入\n");
+
+            case 0: // 返回主菜单
+                return;
+
+            default:
+                printf("无效选项，请重新输入\n");
         }
 
         printf("\n按Enter键继续...");
