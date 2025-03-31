@@ -643,7 +643,6 @@ void manage_users(Database *db, const char *user_id, UserType user_type)
         generate_uuid(new_user_id);
 
         printf("请输入用户名: ");
-        fgets(username, sizeof(username), stdin);
         trim_newline(username);
 
         printf("请输入密码: ");
@@ -1231,64 +1230,128 @@ void show_service_assignment_screen(Database *db, const char *user_id, UserType 
 
 /**
  * @brief 显示信息查询界面
- *
- * 提供楼盘信息查询和业主模糊查询功能
- *
+ * 
+ * 提供业主信息和服务人员信息的查询功能
+ * 
  * @param db 数据库连接指针
  * @param user_id 当前登录用户的ID
  * @param user_type 当前登录用户的类型
  */
+void show_info_query_screen(Database *db, const char *user_id, UserType user_type)
+{
+    int choice;
+    char sql[1024];
+
+    do {
+        clear_screen();
+        printf("\n=== 信息查询 ===\n");
+        printf("1. 业主信息查询\n");
+        printf("2. 服务人员信息查询\n");
+        printf("0. 返回主菜单\n");
+        printf("\n请选择: ");
+
+        scanf("%d", &choice);
+        getchar();
+
+        QueryResult result;
+
+        switch(choice) {
+            case 1: // 业主信息查询
+            {
+                char owner_name[100];
+                printf("\n请输入业主姓名(支持模糊查询): ");
+                fgets(owner_name, sizeof(owner_name), stdin);
+                trim_newline(owner_name);
+
+                snprintf(sql, sizeof(sql),
+                    "SELECT u.name, u.phone_number, u.email, "
+                    "b.building_name, r.room_number, r.floor "
+                    "FROM users u "
+                    "LEFT JOIN rooms r ON u.user_id = r.owner_id "
+                    "LEFT JOIN buildings b ON r.building_id = b.building_id "
+                    "WHERE u.role_id = 'role_owner' AND u.name LIKE '%%%s%%' "
+                    "ORDER BY u.name", owner_name);
+
+                if (execute_query(db, sql, &result)) {
+                    printf("\n=== 业主信息查询结果 ===\n");
+                    printf("%-15s %-15s %-25s %-15s %-10s %-6s\n",
+                           "姓名", "电话", "邮箱", "所在楼宇", "房间号", "楼层");
+                    printf("--------------------------------------------------------------------------------\n");
+
+                    for (int i = 0; i < result.row_count; i++) {
+                        printf("%-15s %-15s %-25s %-15s %-10s %-6s\n",
+                            result.rows[i].values[0],  // 姓名
+                            result.rows[i].values[1] ? result.rows[i].values[1] : "未登记",  // 电话
+                            result.rows[i].values[2] ? result.rows[i].values[2] : "未登记",  // 邮箱
+                            result.rows[i].values[3] ? result.rows[i].values[3] : "未分配",  // 楼宇
+                            result.rows[i].values[4] ? result.rows[i].values[4] : "--",      // 房间号
+                            result.rows[i].values[5] ? result.rows[i].values[5] : "--");     // 楼层
+                    }
+                    printf("--------------------------------------------------------------------------------\n");
+                    printf("共 %d 条记录\n", result.row_count);
+                    free_query_result(&result);
+                }
+                break;
+            }
+
+            case 2: // 服务人员信息查询
+            {
+                char staff_name[100];
+                printf("\n请输入服务人员姓名(支持模糊查询): ");
+                fgets(staff_name, sizeof(staff_name), stdin);
+                trim_newline(staff_name);
+
+                snprintf(sql, sizeof(sql),
+                    "SELECT u.name, st.type_name, u.phone_number, "
+                    "COUNT(DISTINCT sa.building_id) as building_count, "
+                    "GROUP_CONCAT(b.building_name) as buildings "
+                    "FROM users u "
+                    "JOIN staff s ON u.user_id = s.user_id "
+                    "JOIN staff_types st ON s.staff_type_id = st.staff_type_id "
+                    "LEFT JOIN service_areas sa ON s.staff_id = sa.staff_id "
+                    "LEFT JOIN buildings b ON sa.building_id = b.building_id "
+                    "WHERE u.role_id = 'role_staff' AND u.name LIKE '%%%s%%' "
+                    "GROUP BY u.user_id "
+                    "ORDER BY u.name", staff_name);
+
+                if (execute_query(db, sql, &result)) {
+                    printf("\n=== 服务人员查询结果 ===\n");
+                    printf("%-15s %-15s %-15s %-12s %-30s\n",
+                           "姓名", "服务类型", "联系电话", "负责楼宇数", "负责楼宇");
+                    printf("--------------------------------------------------------------------------------\n");
+
+                    for (int i = 0; i < result.row_count; i++) {
+                        printf("%-15s %-15s %-15s %-12s %-30s\n",
+                            result.rows[i].values[0],  // 姓名
+                            result.rows[i].values[1],  // 服务类型
+                            result.rows[i].values[2],  // 电话
+                            result.rows[i].values[3],  // 楼宇数量
+                            result.rows[i].values[4] ? result.rows[i].values[4] : "无"); // 楼宇列表
+                    }
+                    printf("--------------------------------------------------------------------------------\n");
+                    printf("共 %d 条记录\n", result.row_count);
+                    free_query_result(&result);
+                }
+                break;
+            }
+
+            case 0:
+                return;
+
+            default:
+                printf("\n无效的选择，请重新输入!\n");
+        }
+
+        printf("\n按Enter键继续...");
+        getchar();
+
+    } while (1);
+}
+
 
  #include <stdio.h>
  #include <stdlib.h>
  #include <string.h>
- 
- // 业主信息链表结构
- typedef struct OwnerNode {
-     char name[50];
-     char phone[20];
-     char email[50];
-     char building[50];
-     char room[10];
-     char floor[10];
-     struct OwnerNode *next;
- } OwnerNode;
- 
- // 服务人员信息链表结构
- typedef struct StaffNode {
-     char name[50];
-     char service_type[50];
-     int building_count;
-     char buildings[200];
-     struct StaffNode *next;
- } StaffNode;
- 
- // 创建业主信息节点
- OwnerNode* create_owner_node(const char *name, const char *phone, const char *email, 
-                              const char *building, const char *room, const char *floor) {
-     OwnerNode *node = (OwnerNode*)malloc(sizeof(OwnerNode));
-     if (!node) return NULL;
-     strncpy(node->name, name, sizeof(node->name));
-     strncpy(node->phone, phone, sizeof(node->phone));
-     strncpy(node->email, email, sizeof(node->email));
-     strncpy(node->building, building, sizeof(node->building));
-     strncpy(node->room, room, sizeof(node->room));
-     strncpy(node->floor, floor, sizeof(node->floor));
-     node->next = NULL;
-     return node;
- }
- 
- // 创建服务人员信息节点
- StaffNode* create_staff_node(const char *name, const char *service_type, int building_count, const char *buildings) {
-     StaffNode *node = (StaffNode*)malloc(sizeof(StaffNode));
-     if (!node) return NULL;
-     strncpy(node->name, name, sizeof(node->name));
-     strncpy(node->service_type, service_type, sizeof(node->service_type));
-     node->building_count = building_count;
-     strncpy(node->buildings, buildings, sizeof(node->buildings));
-     node->next = NULL;
-     return node;
- }
  
  // 保存业主信息到文件
  void save_owners_to_file(OwnerNode *head, const char *filename) {
