@@ -114,13 +114,15 @@ char *get_data_dir(char *buffer, size_t size)
 
     snprintf(buffer, size, "%s\\PropertyManagementSystem", appdata);
 #else
-    const char *home = getenv("HOME");
+#include <unistd.h>
+    char cwd[1024];
+    const char *home = getcwd(cwd, sizeof(cwd));
     if (!home)
     {
         return NULL;
     }
 
-    snprintf(buffer, size, "%s/.property_management", home);
+    snprintf(buffer, size, "%s/Database_property_management", home);
 #endif
 
     if (!file_exists(buffer))
