@@ -12,8 +12,8 @@
  *
  * 每个界面函数负责显示菜单、接收用户输入并调用相应的业务逻辑函数
  *
- * @author 物业管理系统团队
- * @date 2023
+ * @author @ZhuLaoliu888 @abbydu626 @Fxiansheng-ai @peterpetrica
+ * @date 2025-03
  */
 
 #include "ui/ui_staff.h"

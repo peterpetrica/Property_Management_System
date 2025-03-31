@@ -5,8 +5,8 @@
  * 本文件包含所有管理员操作界面的实现，包括信息管理、服务分配、
  * 信息查询、信息排序、统计分析、系统维护和费用管理等功能模块。
  *
- * @author 物业管理系统开发团队
- * @date 2023
+ * @author @ZhuLaoliu888 @abbydu626 @Fxiansheng-ai @peterpetrica
+ * @date 2025-03
  */
 #include "ui/ui_admin.h"
 #include "ui/ui_login.h"

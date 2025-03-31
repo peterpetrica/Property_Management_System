@@ -9,8 +9,8 @@
  * - 业主信息查询
  * - 系统维护等功能
  *
- * @author 物业管理系统开发团队
- * @date 2023-07-15
+ * @author @ZhuLaoliu888 @abbydu626 @Fxiansheng-ai @peterpetrica
+ * @date 2025-03
  */
 
 #include "ui/ui_owner.h"
