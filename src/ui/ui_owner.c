@@ -1,17 +1,16 @@
-/*
- * 文件: ui_owner.c
- * 功能: 实现物业管理系统中业主用户界面的各种功能
+/**
+ * @file ui_owner.c
+ * @brief 实现物业管理系统中业主用户界面的各种功能
  *
  * 该文件包含业主界面的所有UI组件和交互逻辑，包括：
  * - 业主主界面
  * - 个人信息管理
  * - 缴费管理
  * - 业主信息查询
- * - 业主信息排序
- * - 业主信息统计
  * - 系统维护等功能
  *
- * 每个界面函数接收数据库连接和用户令牌作为参数，用于身份验证和数据操作
+ * @author 物业管理系统开发团队
+ * @date 2023-07-15
  */
 
 #include "ui/ui_owner.h"
@@ -31,14 +30,17 @@
 #include <time.h>
 #include <sys/time.h>
 
-// 定义缴费记录链表结构
+/**
+ * @struct PaymentRecord
+ * @brief 定义缴费记录链表结构
+ */
 typedef struct PaymentRecord
 {
-    char transaction_id[37];
-    char fee_type[20];
-    double amount;
-    time_t payment_date;
-    struct PaymentRecord *next;
+    char transaction_id[37];    /**< 交易ID */
+    char fee_type[20];          /**< 费用类型 */
+    double amount;              /**< 金额 */
+    time_t payment_date;        /**< 缴费日期 */
+    struct PaymentRecord *next; /**< 指向下一条记录的指针 */
 } PaymentRecord;
 
 // 函数原型声明
@@ -46,7 +48,14 @@ PaymentRecord *create_payment_record_list(Database *db, const char *user_id);
 void export_payment_records_to_file(PaymentRecord *head);
 void free_payment_record_list(PaymentRecord *head);
 
-// 显示缴费记录
+/**
+ * @brief 显示用户的缴费记录
+ *
+ * 查询并显示指定用户的所有已完成缴费记录，提供导出功能
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ */
 void show_payment_history(Database *db, const char *user_id)
 {
     clear_screen();
@@ -154,7 +163,15 @@ void show_payment_history(Database *db, const char *user_id)
     wait_for_key();
 }
 
-// 创建缴费记录链表
+/**
+ * @brief 创建缴费记录链表
+ *
+ * 从数据库中查询用户的缴费记录并构建链表结构
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @return PaymentRecord* 缴费记录链表头指针，失败返回NULL
+ */
 PaymentRecord *create_payment_record_list(Database *db, const char *user_id)
 {
     const char *query =
@@ -230,7 +247,13 @@ PaymentRecord *create_payment_record_list(Database *db, const char *user_id)
     return head;
 }
 
-// 导出缴费记录到文件
+/**
+ * @brief 导出缴费记录到文件
+ *
+ * 将缴费记录链表中的数据导出到带时间戳的文本文件
+ *
+ * @param head 缴费记录链表头指针
+ */
 void export_payment_records_to_file(PaymentRecord *head)
 {
     // 生成带时间戳的文件名
@@ -283,7 +306,11 @@ void export_payment_records_to_file(PaymentRecord *head)
     printf("✅ 缴费记录已导出到文件：%s\n", filename);
 }
 
-// 释放链表内存
+/**
+ * @brief 释放缴费记录链表内存
+ *
+ * @param head 缴费记录链表头指针
+ */
 void free_payment_record_list(PaymentRecord *head)
 {
     PaymentRecord *current = head;
@@ -295,6 +322,13 @@ void free_payment_record_list(PaymentRecord *head)
     }
 }
 
+/**
+ * @brief 查询用户总费用
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @return double 总费用金额，出错返回-1.0
+ */
 double query_total_fee(Database *db, const char *user_id)
 {
     // 1. 定义所有变量
@@ -330,6 +364,14 @@ double query_total_fee(Database *db, const char *user_id)
     return total_fee;
 }
 
+/**
+ * @brief 缴费处理界面
+ *
+ * 显示用户未缴费项目并处理批量缴费
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ */
 void process_payment_screen(Database *db, const char *user_id)
 {
     clear_screen();
@@ -471,7 +513,12 @@ void process_payment_screen(Database *db, const char *user_id)
     wait_for_key();
 }
 
-// 查询剩余费用
+/**
+ * @brief 查询剩余费用
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ */
 void query_remaining_balance(Database *db, const char *user_id)
 {
     clear_screen();
@@ -498,7 +545,13 @@ void query_remaining_balance(Database *db, const char *user_id)
     wait_for_key();
 }
 
-// 查询小区基本信息
+/**
+ * @brief 查询小区基本信息
+ *
+ * 显示小区名称、楼盘信息、配套设施等基本信息
+ *
+ * @param db 数据库连接
+ */
 void query_community_info(Database *db)
 {
     printf("\n============= 小区基本信息 =============\n\n");
@@ -539,7 +592,14 @@ void query_community_info(Database *db)
     wait_for_key();
 }
 
-// 查询收费信息
+/**
+ * @brief 查询收费信息
+ *
+ * 显示各类费用的收费标准
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ */
 void query_fee_info(Database *db, const char *user_id)
 {
     clear_screen();
@@ -595,7 +655,14 @@ void query_fee_info(Database *db, const char *user_id)
     wait_for_key();
 }
 
-// 查询服务人员信息
+/**
+ * @brief 查询服务人员信息
+ *
+ * 显示物业服务人员的基本信息
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ */
 void query_service_staff_info(Database *db, const char *user_id)
 {
     printf("\n============= 服务人员信息 =============\n\n");
@@ -639,7 +706,14 @@ void query_service_staff_info(Database *db, const char *user_id)
     wait_for_key();
 }
 
-// 修改用户名
+/**
+ * @brief 修改用户名
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param username 新用户名
+ * @return bool 成功返回true，失败返回false
+ */
 bool change_username(Database *db, const char *user_id, char *username)
 {
     if (db == NULL || user_id == NULL || username == NULL)
@@ -674,7 +748,13 @@ bool change_username(Database *db, const char *user_id, char *username)
     return true;
 }
 
-// 修改密码
+/**
+ * @brief 处理修改密码的功能
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ */
 void handle_change_password(Database *db, const char *user_id, UserType user_type)
 {
     char old_password[100];
@@ -694,7 +774,15 @@ void handle_change_password(Database *db, const char *user_id, UserType user_typ
     }
 }
 
-// 主界面
+/**
+ * @brief 业主主界面
+ *
+ * 显示业主可用的功能选项并处理菜单选择
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ */
 void main_screen_owner(Database *db, const char *user_id, UserType user_type)
 {
     char username[100];
@@ -732,7 +820,15 @@ void main_screen_owner(Database *db, const char *user_id, UserType user_type)
     }
 }
 
-// 个人信息管理界面
+/**
+ * @brief 业主个人信息管理界面
+ *
+ * 提供修改用户名和密码的功能
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ */
 void show_owner_personal_info_screen(Database *db, const char *user_id, UserType user_type)
 {
     char username[100];
@@ -784,7 +880,15 @@ void show_owner_personal_info_screen(Database *db, const char *user_id, UserType
     }
 }
 
-// 缴费管理界面
+/**
+ * @brief 缴费管理界面
+ *
+ * 提供查看缴费记录、缴纳费用、查询应缴费用等功能
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ */
 void show_payment_management_screen(Database *db, const char *user_id, UserType user_type)
 {
     int choice;
@@ -822,7 +926,15 @@ void show_payment_management_screen(Database *db, const char *user_id, UserType 
     }
 }
 
-// 业主信息查询界面
+/**
+ * @brief 业主信息查询界面
+ *
+ * 提供查询小区信息、收费信息、服务人员信息等功能
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ */
 void show_owner_query_screen(Database *db, const char *user_id, UserType user_type)
 {
     int choice;
@@ -884,32 +996,26 @@ void show_owner_query_screen(Database *db, const char *user_id, UserType user_ty
     }
 }
 
-// TODO: 实现业主信息排序界面显示和操作逻辑
-// 业主信息统计界面
-void show_owner_statistics_screen(Database *db, const char *user_id, UserType user_type)
-{
-    // TODO: 实现业主信息统计界面显示和操作逻辑
-}
-
-// 业主系统维护界面
-void show_owner_maintenance_screen(Database *db, const char *user_id, UserType user_type)
-{
-    // TODO: 实现业主系统维护界面显示和操作逻辑
-}
-
-// 兼容旧接口
+/**
+ * @brief 显示业主主界面（兼容旧接口）
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ * @param user_type 用户类型
+ */
 void show_owner_main_screen(Database *db, const char *user_id, UserType user_type)
 {
     main_screen_owner(db, user_id, user_type);
 }
 
 /**
- * 查询应缴费用
+ * @brief 查询应缴费用
+ *
+ * 显示用户未支付和逾期的费用清单
  *
  * @param db 数据库连接
  * @param user_id 用户ID
  */
-
 void query_due_payments(Database *db, const char *user_id)
 {
     clear_screen();
@@ -996,7 +1102,13 @@ void query_due_payments(Database *db, const char *user_id)
 
     wait_for_key();
 }
-// 查询特定业主的缴费信息
+
+/**
+ * @brief 查询特定业主的缴费信息
+ *
+ * @param db 数据库连接
+ * @param user_id 业主ID
+ */
 void query_owner_payment_info(Database *db, const char *user_id)
 {
     printf("\n===== 缴费记录查询 =====\n");
@@ -1035,7 +1147,13 @@ void query_owner_payment_info(Database *db, const char *user_id)
     sqlite3_finalize(stmt);
 }
 
-// 查询所有业主的缴费情况
+/**
+ * @brief 查询所有业主的缴费情况
+ *
+ * 显示所有业主的累计缴费金额
+ *
+ * @param db 数据库连接
+ */
 void query_all_owners_payment_info(Database *db)
 {
     clear_screen();
