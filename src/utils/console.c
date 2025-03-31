@@ -9,6 +9,7 @@
  * 特别是需要隐藏密码输入的安全场景。
  */
 #include "utils/console.h"
+#include "utils/utils.h"
 #include "db/db_query.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -102,7 +103,7 @@ void pause_console()
 void wait_for_key() // 修改函数名，避免与系统函数冲突
 {
     printf("\n按任意键继续...");
-    fflush(stdin);
+    clear_input_buffer(); // 清除输入缓冲区
 #ifdef _WIN32
     _getch();
 #else
