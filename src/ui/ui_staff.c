@@ -193,14 +193,11 @@ void show_area_management_menu(Database *db, const char *user_id)
     do
     {
         clear_staff_screen();
-        printf("\n┌─────────── 负责区域管理 ─────────────┐\n");
-        printf("│                                        │\n");
-        printf("│  1. 查看负责区域信息                  │\n");
-        printf("│  2. 查看区域内业主信息                │\n");
-        printf("│  0. 返回主菜单                        │\n");
-        printf("│                                        │\n");
-        printf("└────────────────────────────────────────┘\n");
-        printf("\n请选择操作 (0-2): ");
+        printf("\n===== 负责区域管理 =====\n");
+        printf("1. 查看负责区域信息\n");
+        printf("2. 查看区域内业主信息\n");
+        printf("0. 返回主菜单\n");
+        printf("请选择: ");
 
         scanf("%d", &choice);
         clear_input_buffer();
@@ -258,10 +255,10 @@ void show_staff_areas(Database *db, const char *user_id)
         sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
         sqlite3_bind_text(stmt, 2, user_id, -1, SQLITE_STATIC);
 
-        printf("┌─────────────────────────────────────────────┐\n");
-        printf("│ %-10s│ %-8s│ %-8s│ %-6s│\n",
+       
+        printf(" %-10s %-8s %-8s    %-6s\n",
                "楼号", "总房间", "住户数", "楼层");
-        printf("├─────────────────────────────────────────────┤\n");
+       
 
         bool found = false;
         while (sqlite3_step(stmt) == SQLITE_ROW)
@@ -272,12 +269,12 @@ void show_staff_areas(Database *db, const char *user_id)
             int owner_count = sqlite3_column_int(stmt, 2);
             int floors_count = sqlite3_column_int(stmt, 3);
 
-            printf("│ %-10s│ %-8d│ %-8d│ %-6d│\n",
+            printf(" %-10s %-8d %-8d %-6d\n",
                    building_name ? building_name : "未知",
                    total_rooms, owner_count, floors_count);
         }
 
-        printf("└─────────────────────────────────────────────┘\n");
+       
 
         if (!found)
         {
@@ -374,16 +371,16 @@ void show_area_owners(Database *db, const char *user_id)
     {
         sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
 
-        printf("┌─────────────────────────────────────────────────────────────────────┐\n");
-        printf("│ %-8s │ %-10s │ %-12s │ %-8s │ %-6s │ %-10s │\n",
+       
+        printf(" %-8s   %-10s  %-12s    %-8s  %-6s   %-10s \n",
                "用户名", "姓名", "联系电话", "楼号", "房号", "面积(㎡)");
-        printf("├─────────────────────────────────────────────────────────────────────┤\n");
+        
 
         bool found = false;
         while (sqlite3_step(stmt) == SQLITE_ROW)
         {
             found = true;
-            printf("│ %-8s │ %-10s │ %-12s │ %-8s │ %-6s │ %-10.2f │\n",
+            printf(" %-8s  %-10s  %-12s  %-8s  %-6s  %-10.2f \n",
                    sqlite3_column_text(stmt, 0),
                    sqlite3_column_text(stmt, 1),
                    sqlite3_column_text(stmt, 2),
@@ -392,8 +389,7 @@ void show_area_owners(Database *db, const char *user_id)
                    sqlite3_column_double(stmt, 6));
         }
 
-        printf("└─────────────────────────────────────────────────────────────────────┘\n");
-
+       
         if (!found)
         {
             printf("\n⚠️ 您负责的区域暂无业主信息\n");
@@ -419,18 +415,15 @@ void show_staff_main_screen(Database *db, const char *user_id, UserType user_typ
     while (1)
     {
         clear_staff_screen();
-        printf("\n┌─────────── 物业服务人员系统 ─────────────┐\n");
-        printf("│                                            │\n");
-        printf("│  1. 查看负责区域                          │\n");
-        printf("│  2. 业主缴费查询                          │\n");
-        printf("│  3. 缴费提醒管理                          │\n");
-        printf("│  4. 业主信息排序                          │\n");
-        printf("│  5. 缴费统计分析                          │\n");
-        printf("│  6. 个人信息维护                          │\n");
-        printf("│  7. 退出登录                              │\n");
-        printf("│                                            │\n");
-        printf("└────────────────────────────────────────────┘\n");
-        printf("\n请选择操作[1-7]: ");
+        printf("\n===== 物业服务人员系统 =====\n");
+        printf("1. 查看负责区域\n");
+        printf("2. 业主缴费查询\n");
+        printf("3. 缴费提醒管理\n");
+        printf("4. 业主信息排序\n");
+        printf("5. 缴费统计分析\n");
+        printf("6. 个人信息维护\n");
+        printf("7. 退出登录\n");
+        printf("请选择操作[1-7]: ");
 
         int choice;
         scanf("%d", &choice);
@@ -493,10 +486,10 @@ void show_sorted_owners_by(Database *db, const char *sort_criteria)
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
     {
-        printf("┌──────────────────────────────────────────────────────────────────────┐\n");
-        printf("│ %-8s│ %-12s│ %-8s│ %-8s│ %-8s│ %-12s│ %-8s│\n",
+        
+        printf(" %-8s %-12s %-8s %-8s %-8s %-12s %-8s\n",
                "姓名", "电话", "楼号", "房号", "面积", "注册时间", "待缴费");
-        printf("├──────────────────────────────────────────────────────────────────────┤\n");
+       
 
         while (sqlite3_step(stmt) == SQLITE_ROW)
         {
@@ -504,7 +497,7 @@ void show_sorted_owners_by(Database *db, const char *sort_criteria)
             char date_str[20];
             strftime(date_str, sizeof(date_str), "%Y-%m-%d", localtime(&reg_date));
 
-            printf("│ %-8s│ %-12s│ %-8s│ %-8s│ %8.2f│ %-12s│ %8d │\n",
+            printf(" %-8s %-12s %-8s %-8s %8.2f %-12s %8d \n",
                    sqlite3_column_text(stmt, 2),
                    sqlite3_column_text(stmt, 3),
                    sqlite3_column_text(stmt, 6),
@@ -513,7 +506,7 @@ void show_sorted_owners_by(Database *db, const char *sort_criteria)
                    date_str,
                    sqlite3_column_int(stmt, 9));
         }
-        printf("└──────────────────────────────────────────────────────────────────────┘\n");
+        
         sqlite3_finalize(stmt);
     }
     wait_for_key();
@@ -596,10 +589,10 @@ void show_assigned_areas(Database *db, const char *staff_id)
         sqlite3_bind_text(stmt, 1, staff_id, -1, SQLITE_STATIC);
         sqlite3_bind_text(stmt, 2, staff_id, -1, SQLITE_STATIC);
 
-        printf("┌───────────────────────────────────────────────────────────────────────┐\n");
-        printf("│ %-15s│ %-10s│ %-10s│ %-8s│ %-15s│ %-12s│\n",
+        
+        printf(" %-15s %-10s %-10s %-8s %-15s %-12s\n",
                "楼宇名称", "总房间数", "业主数", "楼层数", "每层单元数", "分配日期");
-        printf("├───────────────────────────────────────────────────────────────────────┤\n");
+        
 
         bool found = false;
         while (sqlite3_step(stmt) == SQLITE_ROW)
@@ -620,7 +613,7 @@ void show_assigned_areas(Database *db, const char *staff_id)
 
             const char *service_type = (const char *)sqlite3_column_text(stmt, 6);
 
-            printf("│ %-15s│ %-10d│ %-10d│ %-8d│ %-15d│ %-12s│\n",
+            printf(" %-15s %-10d %-10d %-8d %-15d %-12s\n",
                    building_name ? building_name : "未知",
                    total_rooms,
                    owner_count,
@@ -628,8 +621,7 @@ void show_assigned_areas(Database *db, const char *staff_id)
                    units_per_floor,
                    date_str);
         }
-        printf("└───────────────────────────────────────────────────────────────────────┘\n");
-
+       
         if (!found)
         {
             printf("\n⚠️ 您当前没有负责的区域\n");
@@ -780,6 +772,7 @@ void modify_personal_info_screen(Database *db, const char *user_id, UserType use
         printf("当前信息:\n");
         printf("1. 姓名: %s\n", staff.name);
         printf("2. 联系方式: %s\n", staff.phone_number);
+        printf("3. 修改密码\n");
         printf("0. 返回主菜单\n");
         printf("请选择要修改的选项: ");
 
@@ -864,6 +857,40 @@ void modify_personal_info_screen(Database *db, const char *user_id, UserType use
             } while (1);
             break;
         }
+        case 3:
+        {
+            // 添加修改密码功能
+            char old_password[100], new_password[100];
+            printf("\n===== 修改密码 =====\n");
+
+            printf("请输入旧密码: ");
+            read_password(old_password, sizeof(old_password));
+
+            printf("\n请输入新密码: ");
+            read_password(new_password, sizeof(new_password));
+
+            printf("\n请确认新密码: ");
+            char confirm_password[100];
+            read_password(confirm_password, sizeof(confirm_password));
+
+            if (strcmp(new_password, confirm_password) != 0)
+            {
+                printf("\n两次输入的新密码不一致，密码修改失败\n");
+                break;
+            }
+
+            if (change_password(db, user_id, user_type, old_password, new_password))
+            {
+                printf("\n密码修改成功！\n");
+            }
+            else
+            {
+                printf("\n密码修改失败，请确认旧密码是否正确\n");
+            }
+            printf("\n按任意键继续...");
+            getchar();
+            break;
+        }
         case 0:
             printf("返回主菜单...\n");
             return;
@@ -935,11 +962,10 @@ void show_staff_query_screen(Database *db, const char *user_id, UserType user_ty
             sqlite3_stmt *stmt;
             if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
             {
-                printf("┌────────────────────────────────────────────────────────────────────────────────────┐\n");
-                printf("│ %-12s │ %-10s │ %-8s │ %-11s │ %-15s │ %-10s │ %-20s │\n",
+                
+                printf(" %-12s  %-10s  %-8s  %-11s  %-15s  %-10s  %-20s \n",
                        "用户ID", "用户名", "姓名", "电话", "注册时间", "性别", "身份证号");
-                printf("├────────────────────────────────────────────────────────────────────────────────────┤\n");
-
+               
                 int found = 0;
                 while (sqlite3_step(stmt) == SQLITE_ROW)
                 {
@@ -964,7 +990,7 @@ void show_staff_query_screen(Database *db, const char *user_id, UserType user_ty
                                  id_number, id_number + 14);
                     }
 
-                    printf("│ %-12s │ %-10s │ %-8s │ %-11s │ %-15s │ %-10s │ %-20s │\n",
+                    printf(" %-12s  %-10s  %-8s  %-11s  %-15s  %-10s  %-20s \n",
                            user_id ? user_id : "N/A",
                            username ? username : "N/A",
                            name ? name : "N/A",
@@ -974,7 +1000,7 @@ void show_staff_query_screen(Database *db, const char *user_id, UserType user_ty
                            id_number ? masked_id : "未填写");
                 }
 
-                printf("└────────────────────────────────────────────────────────────────────────────────────┘\n");
+                
 
                 if (!found)
                 {
@@ -1201,19 +1227,19 @@ void show_current_fee_standards(Database *db)
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
     {
-        printf("┌────────────┬──────────┬─────────────┐\n");
-        printf("│ %-10s │ %-8s │ %-11s │\n",
+       
+        printf(" %-10s     %-8s  %-11s \n",
                "费用类型", "单价", "计费单位");
-        printf("├────────────┼──────────┼─────────────┤\n");
+       
 
         while (sqlite3_step(stmt) == SQLITE_ROW)
         {
-            printf("│ %-10s │ %8.2f │ %-11s │\n",
+            printf(" %-10s  %8.2f  %-11s \n",
                    sqlite3_column_text(stmt, 3),
                    sqlite3_column_double(stmt, 1),
                    sqlite3_column_text(stmt, 2));
         }
-        printf("└────────────┴──────────┴─────────────┘\n");
+        
         sqlite3_finalize(stmt);
     }
 }
@@ -1318,11 +1344,10 @@ void query_owner_payment_by_year(Database *db, const char *owner_name, int year)
         sqlite3_bind_text(stmt, 2, year_str, -1, SQLITE_STATIC);
         sqlite3_bind_text(stmt, 3, year_str, -1, SQLITE_STATIC);
 
-        printf("┌──────────────────────────────────────────────────────────────────────┐\n");
-        printf("│ %-8s │ %-8s │ %-6s │ %-10s │ %-10s │ %-8s │ %-6s │\n",
+        
+        printf(" %-8s  %-8s  %-6s  %-10s  %-10s  %-8s  %-6s \n",
                "费用类型", "金额", "状态", "缴费日期", "到期日期", "楼号", "房号");
-        printf("├──────────────────────────────────────────────────────────────────────┤\n");
-
+       
         bool found = false;
         double total_paid = 0;
         double total_unpaid = 0;
@@ -1352,7 +1377,7 @@ void query_owner_payment_by_year(Database *db, const char *owner_name, int year)
             }
             strftime(due_date_str, sizeof(due_date_str), "%Y-%m-%d", localtime(&due_date));
 
-            printf("│ %-8s │ %8.2f │ %-6s │ %-10s │ %-10s │ %-8s │ %-6s │\n",
+            printf(" %-8s  %8.2f  %-6s  %-10s  %-10s  %-8s  %-6s \n",
                    fee_type, amount,
                    status == 1 ? "已缴费" : (status == 2 ? "已逾期" : "未缴费"),
                    payment_date_str, due_date_str,
@@ -1362,11 +1387,11 @@ void query_owner_payment_by_year(Database *db, const char *owner_name, int year)
 
         if (found)
         {
-            printf("├──────────────────────────────────────────────────────────────────────┤\n");
-            printf("│ 统计信息: 已缴费总额: %-10.2f    未缴费总额: %-10.2f        │\n",
+            
+            printf(" 统计信息: 已缴费总额: %-10.2f    未缴费总额: %-10.2f        \n",
                    total_paid, total_unpaid);
         }
-        printf("└──────────────────────────────────────────────────────────────────────┘\n");
+        
 
         if (!found)
         {
@@ -1443,10 +1468,10 @@ void query_owner_all_payments(Database *db, const char *owner_name)
     {
         sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
 
-        printf("┌─────────────────────────────────────────────────────────────┐\n");
-        printf("│ %-10s│ %-10s│ %-8s│ %-12s│ %-12s│\n",
+        
+        printf(" %-10s %-10s %-8s %-12s %-12s\n",
                "缴费类型", "金额", "状态", "缴费日期", "到期日期");
-        printf("├─────────────────────────────────────────────────────────────┤\n");
+        
 
         bool found = false;
         double total_paid = 0.0;
@@ -1483,7 +1508,7 @@ void query_owner_all_payments(Database *db, const char *owner_name)
                 unpaid_count++;
             }
 
-            printf("│ %-10s│ %10.2f│ %-8s│ %-12s│ %-12s│\n",
+            printf(" %-10s %10.2f %-8s %-12s %-12s\n",
                    fee_type, amount,
                    status == 1 ? "已缴费" : "未缴费",
                    payment_date_str, due_date_str);
@@ -1491,10 +1516,10 @@ void query_owner_all_payments(Database *db, const char *owner_name)
 
         if (!found)
         {
-            printf("│ %-57s │\n", "该业主暂无任何缴费记录");
+            printf(" %-57s \n", "该业主暂无任何缴费记录");
         }
 
-        printf("└─────────────────────────────────────────────────────────────┘\n");
+        
 
         if (found)
         {
@@ -1531,21 +1556,21 @@ void show_sorted_users(Database *db)
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
     {
-        printf("┌──────────────────────────────────────────────────────────────┐\n");
-        printf("│ %-10s │ %-12s │ %-8s │ %-8s │ %-10s │\n",
+        
+        printf(" %-10s  %-12s  %-8s  %-8s  %-10s \n",
                "姓名", "电话", "楼号", "房号", "未缴笔数");
-        printf("├──────────────────────────────────────────────────────────────┤\n");
+        
 
         while (sqlite3_step(stmt) == SQLITE_ROW)
         {
-            printf("│ %-10s │ %-12s │ %-8s │ %-8s │ %-10d │\n",
+            printf(" %-10s  %-12s  %-8s  %-8s  %-10d \n",
                    sqlite3_column_text(stmt, 0),
                    sqlite3_column_text(stmt, 1),
                    sqlite3_column_text(stmt, 2),
                    sqlite3_column_text(stmt, 3),
                    sqlite3_column_int(stmt, 4));
         }
-        printf("└──────────────────────────────────────────────────────────────┘\n");
+        
         sqlite3_finalize(stmt);
     }
 }
@@ -1682,20 +1707,20 @@ void show_user_detail(Database *db, const char *user_id)
 
         if (sqlite3_step(stmt) == SQLITE_ROW)
         {
-            printf("┌─ 基本信息 ───────────────────────────────┐\n");
-            printf("│ 用户名: %-35s │\n", sqlite3_column_text(stmt, 0));
-            printf("│ 姓  名: %-35s │\n", sqlite3_column_text(stmt, 1));
-            printf("│ 电  话: %-35s │\n", sqlite3_column_text(stmt, 2));
-            printf("│ 邮  箱: %-35s │\n", sqlite3_column_text(stmt, 3));
-            printf("│ 性  别: %-35s │\n", sqlite3_column_text(stmt, 5));
-            printf("│ 地  址: %-35s │\n", sqlite3_column_text(stmt, 6));
-            printf("└─────────────────────────────────────────┘\n");
+            printf("   基本信息 \n");
+            printf(" 用户名: %-35s \n", sqlite3_column_text(stmt, 0));
+            printf(" 姓  名: %-35s \n", sqlite3_column_text(stmt, 1));
+            printf(" 电  话: %-35s \n", sqlite3_column_text(stmt, 2));
+            printf(" 邮  箱: %-35s \n", sqlite3_column_text(stmt, 3));
+            printf(" 性  别: %-35s \n", sqlite3_column_text(stmt, 5));
+            printf(" 地  址: %-35s \n", sqlite3_column_text(stmt, 6));
+          
             const char *name = (const char *)sqlite3_column_text(stmt, 0);
-            printf("\n┌─ 房产信息 ───────────────────────────────┐\n");
-            printf("│ 楼  号: %-35s │\n", sqlite3_column_text(stmt, 7));
-            printf("│ 房  号: %-35s │\n", sqlite3_column_text(stmt, 8));
-            printf("│ 面  积: %-35.2f │\n", sqlite3_column_double(stmt, 9));
-            printf("└─────────────────────────────────────────┘\n");
+            printf("\n   房产信息 \n");
+            printf(" 楼  号: %-35s \n", sqlite3_column_text(stmt, 7));
+            printf(" 房  号: %-35s \n", sqlite3_column_text(stmt, 8));
+            printf(" 面  积: %-35.2f \n", sqlite3_column_double(stmt, 9));
+           
             time_t reg_date = sqlite3_column_int64(stmt, 4);
             char date_str[20];
             strftime(date_str, sizeof(date_str), "%Y-%m-%d", localtime(&reg_date));
@@ -1940,10 +1965,10 @@ void show_all_users(Database *db)
     if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
     {
         printf("\n=== 业主信息总览 ===\n\n");
-        printf("┌───────────────────────────────────────────────────────────────────────────────────────────┐\n");
-        printf("│ %-8s│ %-12s│ %-8s│ %-10s│ %-6s│ %-8s│ %-12s│ %-12s│\n",
+        
+        printf(" %-8s %-12s %-8s %-10s %-6s %-8s %-12s %-12s\n",
                "姓名", "电话", "楼号", "房号", "面积", "已缴费", "待缴费", "缴费率");
-        printf("├───────────────────────────────────────────────────────────────────────────────────────────┤\n");
+       
 
         while (sqlite3_step(stmt) == SQLITE_ROW)
         {
@@ -1963,7 +1988,7 @@ void show_all_users(Database *db)
                 payment_rate = (double)paid_count / (paid_count + unpaid_count) * 100;
             }
 
-            printf("│ %-8s│ %-12s│ %-8s│ %-10s│ %6.1f│ %8.2f│ %12.2f│ %11.1f%%│\n",
+            printf(" %-8s %-12s %-8s %-10s %6.1f %8.2f %12.2f %11.1f%%\n",
                    name ? name : "未知",
                    phone ? phone : "未知",
                    building ? building : "未分配",
@@ -1975,8 +2000,8 @@ void show_all_users(Database *db)
 
             if (unpaid_count > 0)
             {
-                printf("├───────────────────────────────────────────────────────────────────────────────────────────┤\n");
-                printf("│ 待缴费明细:                                                                              │\n");
+                
+                printf(" 待缴费明细:                                                                              \n");
 
                 const char *detail_query =
                     "SELECT fee_type, amount, due_date "
@@ -1998,7 +2023,7 @@ void show_all_users(Database *db)
                         char date_str[20];
                         strftime(date_str, sizeof(date_str), "%Y-%m-%d", localtime(&due_date));
 
-                        printf("│ %-12s: %-8.2f元  到期日期: %-12s                                          │\n",
+                        printf(" %-12s: %-8.2f元  到期日期: %-12s                                          \n",
                                get_fee_type_name(fee_type),
                                amount,
                                date_str);
@@ -2006,10 +2031,9 @@ void show_all_users(Database *db)
                     sqlite3_finalize(detail_stmt);
                 }
             }
-            printf("├───────────────────────────────────────────────────────────────────────────────────────────┤\n");
+            
         }
-        printf("└───────────────────────────────────────────────────────────────────────────────────────────┘\n");
-
+        
         sqlite3_finalize(stmt);
     }
     wait_for_key();
@@ -2071,10 +2095,10 @@ void show_paid_users(Database *db)
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db->db, paid_query, -1, &stmt, NULL) == SQLITE_OK)
     {
-        printf("┌──────────────────────────────────────────────────────────────────────────────┐\n");
-        printf("│ %-8s│ %-8s│ %-12s│ %-8s│ %-6s│ %-10s│ %-8s│ %-10s│\n",
+       
+        printf(" %-8s %-8s %-12s %-8s %-6s %-10s %-8s %-10s\n",
                "用户ID", "姓名", "电话", "楼号", "房号", "已缴金额", "缴费笔数", "最近缴费");
-        printf("├──────────────────────────────────────────────────────────────────────────────┤\n");
+        
 
         int count = 0;
         double total_paid = 0.0;
@@ -2092,7 +2116,7 @@ void show_paid_users(Database *db)
             double amount = sqlite3_column_double(stmt, 7);
             total_paid += amount;
 
-            printf("│ %-8s│ %-8s│ %-12s│ %-8s│ %-6s│ %10.2f│ %8d│ %-10s│\n",
+            printf(" %-8s %-8s %-12s %-8s %-6s %10.2f %8d %-10s\n",
                    sqlite3_column_text(stmt, 0),
                    sqlite3_column_text(stmt, 2),
                    sqlite3_column_text(stmt, 3),
@@ -2103,10 +2127,10 @@ void show_paid_users(Database *db)
                    date_str);
         }
 
-        printf("├──────────────────────────────────────────────────────────────────────────────┤\n");
-        printf("│ 总计: %d位业主已缴费，收款总额 %.2f元                                      │\n",
+        
+        printf(" 总计: %d位业主已缴费，收款总额 %.2f元                                      │\n",
                count, total_paid);
-        printf("└──────────────────────────────────────────────────────────────────────────────┘\n");
+       
 
         if (count == 0)
         {
@@ -2156,10 +2180,10 @@ void show_unpaid_users(Database *db)
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
     {
-        printf("┌──────────────────────────────────────────────────────────────────────┐\n");
-        printf("│ %-8s│ %-12s│ %-15s│ %-8s│ %-10s│ %-10s│\n",
+       
+        printf(" %-8s %-12s %-15s %-8s    %-10s    %-10s\n",
                "姓名", "电话", "住址", "欠费金额", "欠费项目", "欠费状态");
-        printf("├──────────────────────────────────────────────────────────────────────┤\n");
+        
 
         int count = 0;
         double total_unpaid = 0.0;
@@ -2196,23 +2220,23 @@ void show_unpaid_users(Database *db)
             else if (overdue_days > 0)
                 status = "即将逾期";
 
-            printf("│ %-8s│ %-12s│ %-15s│ %8.2f│ %-10s│ %-10s│\n",
+            printf(" %-8s %-12s %-15s %8.2f %-10s %-10s\n",
                    name, phone, address, amount,
                    fee_types ? fee_types : "物业费等", status);
         }
 
         if (count > 0)
         {
-            printf("├──────────────────────────────────────────────────────────────────────┤\n");
-            printf("│ 总计: %-2d位业主欠费，共计金额: %-10.2f元                        │\n",
+            
+            printf(" 总计: %-2d位业主欠费，共计金额: %-10.2f元                        \n",
                    count, total_unpaid);
         }
         else
         {
-            printf("│ %-70s │\n", "当前没有欠费业主");
+            printf(" %-70s \n", "当前没有欠费业主");
         }
 
-        printf("└──────────────────────────────────────────────────────────────────────┘\n");
+        
         sqlite3_finalize(stmt);
     }
 
@@ -2244,23 +2268,23 @@ void show_staff_service_areas(Database *db, const char *staff_id)
     {
         sqlite3_bind_text(stmt, 1, staff_id, -1, SQLITE_STATIC);
 
-        printf("┌────────────────────────────────────────────────────────────┐\n");
-        printf("│ %-10s│ %-20s│ %-12s│ %-12s│\n",
+        
+        printf(" %-10s %-20s %-12s %-12s\n",
                "楼栋", "地址", "房间数", "业主数");
-        printf("├────────────────────────────────────────────────────────────┤\n");
+        
 
         bool found = false;
         while (sqlite3_step(stmt) == SQLITE_ROW)
         {
             found = true;
-            printf("│ %-10s│ %-20s│ %-12d│ %-12d│\n",
+            printf(" %-10s %-20s %-12d %-12d\n",
                    sqlite3_column_text(stmt, 0),
                    sqlite3_column_text(stmt, 1),
                    sqlite3_column_int(stmt, 2),
                    sqlite3_column_int(stmt, 3));
         }
 
-        printf("└────────────────────────────────────────────────────────────┘\n");
+        
 
         if (!found)
         {
@@ -2282,16 +2306,13 @@ void show_payment_management_menu(Database *db)
     while (1)
     {
         clear_staff_screen();
-        printf("\n┌─────────── 业主缴费管理 ─────────────┐\n");
-        printf("│                                        │\n");
-        printf("│  1. 按姓名查询业主缴费情况            │\n");
-        printf("│  2. 显示所有欠费业主                  │\n");
-        printf("│  3. 显示所有已缴费业主                │\n");
-        printf("│  4. 查看当前收费标准                  │\n");
-        printf("│  0. 返回上级菜单                      │\n");
-        printf("│                                        │\n");
-        printf("└────────────────────────────────────────┘\n");
-        printf("\n请选择(0-5): ");
+        printf("\n===== 业主缴费管理 =====\n");
+        printf("1. 按姓名查询业主缴费情况\n");
+        printf("2. 显示所有欠费业主\n");
+        printf("3. 显示所有已缴费业主\n");
+        printf("4. 查看当前收费标准\n");
+        printf("0. 返回上级菜单\n");
+        printf("请选择(0-4): ");
 
         int choice;
         scanf("%d", &choice);
@@ -2445,15 +2466,15 @@ void show_yearly_statistics(Database *db, int year)
             double paid_amount = sqlite3_column_double(stmt, 3);
             double unpaid_amount = sqlite3_column_double(stmt, 4);
 
-            printf("┌─────────────────────────────────┐\n");
-            printf("│ 总业主数量: %-8d           │\n", total_owners);
-            printf("│ 已缴费用户: %-8d (%.1f%%)   │\n",
+        
+            printf(" 总业主数量: %-8d           \n", total_owners);
+            printf(" 已缴费用户: %-8d (%.1f%%)   \n",
                    paid_users, total_owners > 0 ? (float)paid_users / total_owners * 100 : 0);
-            printf("│ 未缴费用户: %-8d (%.1f%%)   │\n",
+            printf(" 未缴费用户: %-8d (%.1f%%)   \n",
                    unpaid_users, total_owners > 0 ? (float)unpaid_users / total_owners * 100 : 0);
-            printf("│ 已收缴费总额: %-8.2f元     │\n", paid_amount);
-            printf("│ 未收缴费总额: %-8.2f元     │\n", unpaid_amount);
-            printf("└─────────────────────────────────┘\n\n");
+            printf(" 已收缴费总额: %-8.2f元     \n", paid_amount);
+            printf(" 未收缴费总额: %-8.2f元     \n", unpaid_amount);
+            
         }
         sqlite3_finalize(stmt);
     }
@@ -2473,9 +2494,9 @@ void show_yearly_statistics(Database *db, int year)
         sqlite3_bind_text(stmt, 2, year_str, -1, SQLITE_STATIC);
 
         printf("【按费用类型统计】\n");
-        printf("┌────────────┬──────────┬────────────┐\n");
-        printf("│ %-10s │ %-8s │ %-10s │\n", "费用类型", "用户数", "总金额");
-        printf("├────────────┼──────────┼────────────┤\n");
+        
+        printf(" %-10s  %-8s  %-10s \n", "费用类型", "用户数", "总金额");
+       
 
         double total = 0;
         while (sqlite3_step(stmt) == SQLITE_ROW)
@@ -2485,14 +2506,13 @@ void show_yearly_statistics(Database *db, int year)
             double amount = sqlite3_column_double(stmt, 2);
             total += amount;
 
-            printf("│ %-10s │ %-8d │ %10.2f │\n",
+            printf(" %-10s  %-8d  %10.2f \n",
                    get_fee_type_name(fee_type),
                    user_count,
                    amount);
         }
-        printf("├────────────┼──────────┼────────────┤\n");
-        printf("│ %-10s │ %-8s │ %10.2f │\n", "合计", "", total);
-        printf("└────────────┴──────────┴────────────┘\n\n");
+        
+        printf(" %-10s  %-8s  %10.2f \n", "合计", "", total);
 
         sqlite3_finalize(stmt);
     }
@@ -2514,16 +2534,16 @@ void show_yearly_statistics(Database *db, int year)
         sqlite3_bind_text(stmt, 1, year_str, -1, SQLITE_STATIC);
 
         printf("【%d年度未缴费业主TOP10】\n", year);
-        printf("┌────────────────────────────────────────────────────────────┐\n");
-        printf("│ %-8s│ %-12s│ %-8s│ %-6s│ %-8s│ %-10s│\n",
+        
+        printf(" %-8s %-12s %-8s %-6s %-8s %-10s\n",
                "业主", "电话", "楼号", "房号", "未缴笔数", "未缴金额");
-        printf("├────────────────────────────────────────────────────────────┤\n");
+        
 
         bool found = false;
         while (sqlite3_step(stmt) == SQLITE_ROW)
         {
             found = true;
-            printf("│ %-8s│ %-12s│ %-8s│ %-6s│ %-8d│ %10.2f│\n",
+            printf(" %-8s %-12s %-8s %-6s %-8d %10.2f\n",
                    sqlite3_column_text(stmt, 0),
                    sqlite3_column_text(stmt, 1),
                    sqlite3_column_text(stmt, 2) ? sqlite3_column_text(stmt, 2) : (const unsigned char *)"未知",
@@ -2534,10 +2554,10 @@ void show_yearly_statistics(Database *db, int year)
 
         if (!found)
         {
-            printf("│ %-62s │\n", "暂无未缴费记录");
+            printf(" %-62s \n", "暂无未缴费记录");
         }
 
-        printf("└────────────────────────────────────────────────────────────┘\n");
+        
         sqlite3_finalize(stmt);
     }
 
@@ -2573,15 +2593,15 @@ void show_current_statistics(Database *db)
             double total_paid = sqlite3_column_double(stmt, 3);
             double total_unpaid = sqlite3_column_double(stmt, 4);
 
-            printf("┌─────────────────────────────────┐\n");
-            printf("│ 总业主数量: %-8d           │\n", total_owners);
-            printf("│ 已缴费用户: %-8d (%.1f%%)   │\n",
+            
+            printf("总业主数量: %-8d           \n", total_owners);
+            printf("已缴费用户: %-8d (%.1f%%)   \n",
                    paid_users, total_owners > 0 ? (float)paid_users / total_owners * 100 : 0);
-            printf("│ 未缴费用户: %-8d (%.1f%%)   │\n",
+            printf("未缴费用户: %-8d (%.1f%%)   \n",
                    unpaid_users, total_owners > 0 ? (float)unpaid_users / total_owners * 100 : 0);
-            printf("│ 已收缴费总额: %-8.2f元     │\n", total_paid);
-            printf("│ 未收缴费总额: %-8.2f元     │\n", total_unpaid);
-            printf("└─────────────────────────────────┘\n");
+            printf("已收缴费总额: %-8.2f元     \n", total_paid);
+            printf("未收缴费总额: %-8.2f元     \n", total_unpaid);
+            
         }
         sqlite3_finalize(stmt);
     }
@@ -2616,18 +2636,16 @@ void show_unpaid_analysis(Database *db)
     if (sqlite3_prepare_v2(db->db, duration_query, -1, &stmt, NULL) == SQLITE_OK)
     {
         printf("【按欠费时长统计】\n");
-        printf("┌────────────┬──────────┬────────────┐\n");
-        printf("│ %-10s │ %-8s │ %-10s │\n", "欠费时长", "用户数", "欠费金额");
-        printf("├────────────┼──────────┼────────────┤\n");
+        printf("%-10s  %-8s  %-10s \n", "欠费时长", "用户数", "欠费金额");
 
         while (sqlite3_step(stmt) == SQLITE_ROW)
         {
-            printf("│ %-10s │ %-8d │ %10.2f │\n",
+            printf(" %-10s  %-8d  %10.2f \n",
                    sqlite3_column_text(stmt, 0),
                    sqlite3_column_int(stmt, 1),
                    sqlite3_column_double(stmt, 2));
         }
-        printf("└────────────┴──────────┴────────────┘\n\n");
+        
         sqlite3_finalize(stmt);
     }
 
@@ -2642,9 +2660,9 @@ void show_unpaid_analysis(Database *db)
     if (sqlite3_prepare_v2(db->db, type_query, -1, &stmt, NULL) == SQLITE_OK)
     {
         printf("【按费用类型统计】\n");
-        printf("┌────────────┬──────────┬────────────┐\n");
-        printf("│ %-10s │ %-8s │ %-10s │\n", "费用类型", "用户数", "欠费金额");
-        printf("├────────────┼──────────┼────────────┤\n");
+        
+        printf(" %-10s  %-8s  %-10s \n", "费用类型", "用户数", "欠费金额");
+        
 
         double total = 0;
         while (sqlite3_step(stmt) == SQLITE_ROW)
@@ -2654,14 +2672,14 @@ void show_unpaid_analysis(Database *db)
             double amount = sqlite3_column_double(stmt, 2);
             total += amount;
 
-            printf("│ %-10s │ %-8d │ %10.2f │\n",
+            printf(" %-10s  %-8d  %10.2f \n",
                    get_fee_type_name(fee_type),
                    user_count,
                    amount);
         }
-        printf("├────────────┼──────────┼────────────┤\n");
-        printf("│ %-10s │ %-8s │ %10.2f │\n", "合计", "", total);
-        printf("└────────────┴──────────┴────────────┘\n");
+       
+        printf(" %-10s  %-8s  %10.2f \n", "合计", "", total);
+       
 
         sqlite3_finalize(stmt);
     }
@@ -2721,16 +2739,16 @@ void show_owner_payment_query(Database *db)
             printf("\n=== %s (%s) - %s楼 %s房 - 缴费记录 ===\n\n",
                    owner_name, phone, building, room);
 
-            printf("┌─────────────────────────────────────────────────┐\n");
-            printf("│ 已缴费: %2d笔，共计 %-10.2f 元          │\n", paid_count, paid);
-            printf("│ 未缴费: %2d笔，共计 %-10.2f 元          │\n", unpaid_count, unpaid);
+           
+            printf(" 已缴费: %2d笔，共计 %-10.2f 元          \n", paid_count, paid);
+            printf(" 未缴费: %2d笔，共计 %-10.2f 元          \n", unpaid_count, unpaid);
 
             double rate = 0;
             if (paid_count + unpaid_count > 0)
                 rate = (double)paid_count / (paid_count + unpaid_count) * 100;
 
-            printf("│ 缴费率: %-5.1f%%                                │\n", rate);
-            printf("└─────────────────────────────────────────────────┘\n");
+            printf(" 缴费率: %-5.1f%%                                \n", rate);
+            
 
             if (paid_count > 0)
             {
@@ -2780,10 +2798,10 @@ void show_payment_details(Database *db, const char *user_id, int status)
 {
     const char *status_str = status == 1 ? "已缴费" : "未缴费";
     printf("\n【%s记录】\n", status_str);
-    printf("┌──────────────────────────────────────────────────────┐\n");
-    printf("│ %-10s│ %-8s│ %-12s│ %-15s│\n",
+    
+    printf(" %-10s %-8s %-12s %-15s\n",
            "费用类型", "金额", "日期", "备注");
-    printf("├──────────────────────────────────────────────────────┤\n");
+    
 
     const char *query =
         "SELECT t.fee_type, t.amount, "
@@ -2811,7 +2829,7 @@ void show_payment_details(Database *db, const char *user_id, int status)
             char date_str[20];
             strftime(date_str, sizeof(date_str), "%Y-%m-%d", localtime(&date));
 
-            printf("│ %-10s│ %8.2f│ %-12s│ %-15s│\n",
+            printf(" %-10s %8.2f %-12s %-15s\n",
                    get_fee_type_name(fee_type),
                    amount,
                    date_str,
@@ -2820,10 +2838,10 @@ void show_payment_details(Database *db, const char *user_id, int status)
 
         if (!found)
         {
-            printf("│ %-54s │\n", "无记录");
+            printf(" %-54s \n", "无记录");
         }
 
-        printf("└──────────────────────────────────────────────────────┘\n");
+       
         sqlite3_finalize(stmt);
     }
 }
@@ -2849,10 +2867,10 @@ void show_reminder_history(Database *db)
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) == SQLITE_OK)
     {
-        printf("┌────────────────────────────────────────────────────────────────┐\n");
-        printf("│ %-8s│ %-10s│ %-12s│ %-16s│ %-20s│\n",
+        
+        printf(" %-8s %-10s %-12s %-16s %-20s\n",
                "编号", "姓名", "电话", "发送时间", "内容预览");
-        printf("├────────────────────────────────────────────────────────────────┤\n");
+       
 
         bool found = false;
         while (sqlite3_step(stmt) == SQLITE_ROW)
@@ -2867,16 +2885,16 @@ void show_reminder_history(Database *db)
             char time_str[20];
             strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M", localtime(&send_time));
 
-            printf("│ %-8d│ %-10s│ %-12s│ %-16s│ %-20s│\n",
+            printf(" %-8d %-10s %-12s %-16s %-20s\n",
                    id, name, phone, time_str, preview);
         }
 
         if (!found)
         {
-            printf("│ %-68s │\n", "暂无提醒记录");
+            printf(" %-68s \n", "暂无提醒记录");
         }
 
-        printf("└────────────────────────────────────────────────────────────────┘\n");
+        
         sqlite3_finalize(stmt);
     }
     else
