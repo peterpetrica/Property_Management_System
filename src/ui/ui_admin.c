@@ -988,8 +988,8 @@ void show_service_assignment_screen(Database *db, const char *user_id, UserType 
         }
         case 2: // 取消分配
         {
-            char building_name[100]; // 增加缓冲区大小
-            char staff_name[100];    // 服务人员姓名
+            char building_name[100];  // 增加缓冲区大小
+            char staff_username[100]; // 服务人员用户名
 
             printf("\n请输入楼宇名称: ");
             fgets(building_name, sizeof(building_name), stdin);
@@ -1015,19 +1015,19 @@ void show_service_assignment_screen(Database *db, const char *user_id, UserType 
                 strcpy(building_id, result.rows[0].values[0]);
                 free_query_result(&result);
 
-                // 获取服务人员姓名
-                printf("\n请输入服务人员姓名: ");
-                fgets(staff_name, sizeof(staff_name), stdin);
-                trim_newline(staff_name);
+                // 获取服务人员用户名
+                printf("\n请输入服务人员用户名: ");
+                fgets(staff_username, sizeof(staff_username), stdin);
+                trim_newline(staff_username);
 
-                // 根据姓名查询服务人员ID，且服务人员必须已分配到该楼宇
+                // 根据用户名查询服务人员ID，且服务人员必须已分配到该楼宇
                 snprintf(sql, sizeof(sql),
-                         "SELECT sa.staff_id, u.name as staff_name "
+                         "SELECT sa.staff_id "
                          "FROM service_areas sa "
                          "JOIN staff s ON sa.staff_id = s.staff_id "
                          "JOIN users u ON s.user_id = u.user_id "
-                         "WHERE u.name = '%s' AND sa.building_id = '%s'",
-                         staff_name, building_id);
+                         "WHERE u.username = '%s' AND sa.building_id = '%s'",
+                         staff_username, building_id);
 
                 if (execute_query(db, sql, &result))
                 {
@@ -1071,36 +1071,37 @@ void show_service_assignment_screen(Database *db, const char *user_id, UserType 
             QueryResult result;
             char sql[512];
 
-            // 修改SQL查询，直接通过users表和buildings表关联
+            // 修改SQL查询，获取服务人员的用户名和姓名
             snprintf(sql, sizeof(sql),
-                     "SELECT u.name as staff_name, b.building_name "
-                     "FROM service_areas sa "
-                     "JOIN staff s ON sa.staff_id = s.staff_id "
-                     "JOIN users u ON s.user_id = u.user_id "
-                     "JOIN buildings b ON sa.building_id = b.building_id "
-                     "ORDER BY b.building_name, u.name");
+                 "SELECT u.name as staff_name, u.username as staff_username, b.building_name "
+                 "FROM service_areas sa "
+                 "JOIN staff s ON sa.staff_id = s.staff_id "
+                 "JOIN users u ON s.user_id = u.user_id "
+                 "JOIN buildings b ON sa.building_id = b.building_id "
+                 "ORDER BY b.building_name, u.name");
 
             if (execute_query(db, sql, &result))
             {
-                printf("\n=== 服务人员分配情况 ===\n");
-                printf("%-20s %-20s\n",
-                       "服务人员姓名", "楼宇名称");
-                printf("----------------------------------------\n");
+            printf("\n=== 服务人员分配情况 ===\n");
+            printf("%-20s %-20s %-20s\n",
+                   "服务人员姓名", "服务人员用户名", "楼宇名称");
+            printf("------------------------------------------------------------\n");
 
-                for (int i = 0; i < result.row_count; i++)
-                {
-                    printf("%-20s %-20s\n",
-                           result.rows[i].values[0],
-                           result.rows[i].values[1]);
-                }
-                printf("----------------------------------------\n");
-                printf("共 %d 条记录\n", result.row_count);
+            for (int i = 0; i < result.row_count; i++)
+            {
+                printf("%-20s %-20s %-20s\n",
+                   result.rows[i].values[0],  // 服务人员姓名
+                   result.rows[i].values[1],  // 服务人员用户名
+                   result.rows[i].values[2]); // 楼宇名称
+            }
+            printf("------------------------------------------------------------\n");
+            printf("共 %d 条记录\n", result.row_count);
 
-                free_query_result(&result);
+            free_query_result(&result);
             }
             else
             {
-                printf("查询失败。\n");
+            printf("查询失败。\n");
             }
             break;
         }
