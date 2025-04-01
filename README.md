@@ -1,8 +1,11 @@
 # 物业管理系统
 
-## 完结撒花🎆🎆🎆
+## 完结撒花 🎆🎆🎆
 
-这不算一个完美的项目，但至少是一个结果还不错的C语言课程设计作业
+这不算一个完美的项目，但至少是一个结果还不错的 C 语言课程设计作业
+
+欢迎基于此进行二次开发或直接使用来应付课设或者大作业，本项目遵循 MIT 协议
+（如果可能的话，使用的时候可以给我留个言或者给个 star 吧）
 
 本项目主要由 @peterpetrica 主要负责维护（至少在编写期间）
 
@@ -12,20 +15,27 @@
 - @abbydu626
 - @Fxiansheng-ai
 
-
+在此感谢以下贡献者：
+<a href="https://github.com/peterpetrica/Property_Management_System/graphs/contributors">
+<img src="https://contrib.rocks/image?repo=peterpetrica/Property_Management_System" />
+</a>
 
 ## 增加了假数据生成脚本
 
-脚本放置在data_gen文件夹下
+脚本放置在 data_gen 文件夹下
 
 先执行
+
 ```bash
 pip install -r ./data_gen/requirements.txt
 ```
-来安装所需依赖库，再运行 
+
+来安装所需依赖库，再运行
+
 ```bash
-python3 ./data_gen/property_faker.py 
+python3 ./data_gen/property_faker.py
 ```
+
 即可
 
 ## SQLite 可视化

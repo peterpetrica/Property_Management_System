@@ -1,15 +1,3 @@
-/*******************************************************************************
- * 工具函数库 - 实现文件
- *
- * 该文件提供了系统中使用的各种通用工具函数的实现：
- * - UUID生成：生成唯一标识符
- * - 密码处理：密码加密、盐值生成及密码验证
- * - 时间处理：时间格式化与解析
- * - 字符串处理：安全的字符串复制
- *
- * 这些功能为物业管理系统提供基础支持功能和安全保障。
- ******************************************************************************/
-
 #include "utils/utils.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -77,12 +65,11 @@ bool hash_password(const char *password, char *hashed_output, size_t output_size
         return false;
     }
 
-    const char *salt = "pms"; // 固定的盐值
+    const char *salt = "pms"; // 盐
 
     unsigned char hash[SHA256_DIGEST_LENGTH];
-    char salted_password[256]; // 用于存储加盐后的密码
+    char salted_password[256];
 
-    // 创建加盐密码
     snprintf(salted_password, sizeof(salted_password), "%s%s", password, salt);
 
     // 计算SHA-256哈希
@@ -91,7 +78,7 @@ bool hash_password(const char *password, char *hashed_output, size_t output_size
     SHA256_Update(&sha256, salted_password, strlen(salted_password));
     SHA256_Final(hash, &sha256);
 
-    // 将哈希值转换为十六进制字符串
+    // 哈希转十六进制
     for (int i = 0; i < SHA256_DIGEST_LENGTH; i++)
     {
         sprintf(hashed_output + (i * 2), "%02x", hash[i]);
@@ -100,7 +87,6 @@ bool hash_password(const char *password, char *hashed_output, size_t output_size
 
     return true;
 }
-
 
 /**
  * @brief 格式化时间为字符串

@@ -1,13 +1,3 @@
-/*
- * 控制台工具函数集合
- *
- * 本文件提供了与控制台交互相关的工具函数，包括：
- * 1. 跨平台的getch实现（Windows/Linux）
- * 2. 密码安全输入功能（输入时显示星号，支持退格）
- *
- * 主要用于系统中需要处理控制台输入输出的场景，
- * 特别是需要隐藏密码输入的安全场景。
- */
 #include "utils/console.h"
 #include "utils/utils.h"
 #include "db/db_query.h"
@@ -124,30 +114,26 @@ void print_query_result(QueryResult *result)
         return;
     }
 
-    // 打印表头
-    for (int i = 0; i < result->column_count; i++) // 修正成员名
+    for (int i = 0; i < result->column_count; i++)
     {
-        printf("%-15s", result->column_names[i]); // 修正成员名
+        printf("%-15s", result->column_names[i]);
     }
     printf("\n");
 
-    // 打印分隔线
-    for (int i = 0; i < result->column_count; i++) // 修正成员名
+    for (int i = 0; i < result->column_count; i++)
     {
         printf("---------------");
     }
     printf("\n");
 
-    // 打印数据行
     for (int i = 0; i < result->row_count; i++)
     {
-        for (int j = 0; j < result->column_count; j++) // 修正成员名
+        for (int j = 0; j < result->column_count; j++)
         {
             printf("%-15s", result->rows[i].values[j] ? result->rows[i].values[j] : "NULL");
         }
         printf("\n");
     }
 
-    // 打印总记录数
     printf("\n共 %d 条记录\n", result->row_count);
 }

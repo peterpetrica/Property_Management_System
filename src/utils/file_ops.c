@@ -1,16 +1,3 @@
-/**
- * file_ops.c
- * 文件操作工具函数实现
- *
- * 本文件提供了一系列文件操作函数，包括：
- * - 复制文件
- * - 删除文件
- * - 检查文件是否存在
- * - 创建目录
- * - 获取程序的数据目录路径
- *
- * 这些函数旨在简化程序中的文件操作，并提供跨平台(Windows/Linux)支持
- */
 #include "utils/file_ops.h"
 #include <stdio.h>
 #include <stdlib.h>

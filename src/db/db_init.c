@@ -1,18 +1,3 @@
-/**
- * db_init.c
- * 数据库初始化模块
- *
- * 本模块负责物业管理系统数据库的初始化工作，包括：
- * 1. 创建所有必要的数据库表（用户、角色、楼宇、房屋等）
- * 2. 设置表之间的外键关系
- * 3. 初始化默认管理员账户
- *
- * 主要功能：
- * - db_init_tables: 创建所有必要的数据库表
- * - db_init_admin: 初始化默认管理员账户
- * - db_init_staff: 初始化默认物业服务人员账户
- */
-
 #include "db/database.h"
 #include "utils/utils.h"
 #include <stdio.h>

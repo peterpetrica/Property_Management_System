@@ -1,16 +1,3 @@
-/**
- * apartment.c
- * 房屋管理模块实现
- *
- * 该文件实现了系统中与房屋相关的所有功能，包括：
- * - 添加新房屋
- * - 更新房屋信息
- * - 删除房屋
- * - 获取房屋列表
- * - 获取特定楼宇的所有房屋
- * - 获取业主的所有房屋
- */
-
 #include "models/apartment.h"
 #include "auth/auth.h"
 #include "utils/utils.h"

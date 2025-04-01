@@ -26,7 +26,7 @@
 #include "ui/ui_staff.h"
 #include "ui/ui_owner.h"
 #include "utils/file_ops.h"
-#include "models/transaction.h" // 添加此行
+#include "models/transaction.h"
 
 #define DB_FILENAME "property_management.db"
 
@@ -87,31 +87,6 @@ int main()
     system("clear||cls");
 
     LoginResult login_result = show_login_screen(&db);
-
-    // 移除以下逻辑，因为登录函数已经处理了跳转
-    /*
-    if (login_result.success)
-    {
-        switch (login_result.user_type)
-        {
-        case USER_ADMIN:
-            system("clear||cls");
-            show_admin_main_screen(&db, login_result.user_id, login_result.user_type);
-            break;
-        case USER_STAFF:
-            system("clear||cls");
-            show_staff_main_screen(&db, login_result.user_id, login_result.user_type);
-            break;
-        case USER_OWNER:
-            system("clear||cls");
-            show_owner_main_screen(&db, login_result.user_id, login_result.user_type);
-            break;
-        default:
-            puts("未知的用户类型");
-            break;
-        }
-    }
-    */
 
     // 清理资源
     db_close(&db);
