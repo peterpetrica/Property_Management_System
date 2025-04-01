@@ -2602,9 +2602,9 @@ void show_yearly_statistics(Database *db, int year)
 
         
             printf(" 总业主数量: %-8d           \n", total_owners);
-            printf(" 已缴费用户: %-8d (%.1f%%)   \n",
+            printf(" 已缴费用户: %-8d \n",
                    paid_users, total_owners > 0 ? (float)paid_users / total_owners * 100 : 0);
-            printf(" 未缴费用户: %-8d (%.1f%%)   \n",
+            printf(" 未缴费用户: %-8d \n",
                    unpaid_users, total_owners > 0 ? (float)unpaid_users / total_owners * 100 : 0);
             printf(" 已收缴费总额: %-8.2f元     \n", paid_amount);
             printf(" 未收缴费总额: %-8.2f元     \n", unpaid_amount);
