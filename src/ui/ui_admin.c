@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h> 
 
 /**
  * @brief 显示管理员主界面
@@ -87,6 +88,147 @@ void show_admin_main_screen(Database *db, const char *user_id, UserType user_typ
             break;
         }
     }
+}
+
+/**
+ * @brief 业主信息链表节点结构
+ */
+typedef struct OwnerNode
+{
+    char name[100];
+    char phone[20];
+    char email[100];
+    char building[50];
+    char room[20];
+    char floor[10];
+    struct OwnerNode *next;
+} OwnerNode;
+
+/**
+ * @brief 服务人员信息链表节点结构
+ */
+typedef struct StaffNode
+{
+    char name[100];
+    char service_type[50];
+    int building_count;
+    char buildings[255];
+    struct StaffNode *next;
+} StaffNode;
+
+/**
+ * @brief 创建一个新的业主节点
+ *
+ * @param name 业主姓名
+ * @param phone 电话号码
+ * @param email 电子邮箱
+ * @param building 所在楼宇
+ * @param room 房间号
+ * @param floor 楼层
+ * @return OwnerNode* 新创建的节点指针
+ */
+OwnerNode *create_owner_node_by_admin(const char *name, const char *phone, const char *email,
+                                      const char *building, const char *room, const char *floor)
+{
+    OwnerNode *node = (OwnerNode *)malloc(sizeof(OwnerNode));
+    if (node == NULL)
+    {
+        printf("内存分配失败\n");
+        return NULL;
+    }
+
+    strncpy(node->name, name ? name : "未知", sizeof(node->name) - 1);
+    strncpy(node->phone, phone ? phone : "未登记", sizeof(node->phone) - 1);
+    strncpy(node->email, email ? email : "未登记", sizeof(node->email) - 1);
+    strncpy(node->building, building ? building : "未分配", sizeof(node->building) - 1);
+    strncpy(node->room, room ? room : "--", sizeof(node->room) - 1);
+    strncpy(node->floor, floor ? floor : "--", sizeof(node->floor) - 1);
+
+    node->next = NULL;
+    return node;
+}
+
+/**
+ * @brief 创建一个新的服务人员节点
+ *
+ * @param name 服务人员姓名
+ * @param service_type 服务类型
+ * @param building_count 负责楼宇数量
+ * @param buildings 负责楼宇列表
+ * @return StaffNode* 新创建的节点指针
+ */
+StaffNode *create_staff_node(const char *name, const char *service_type,
+                             int building_count, const char *buildings)
+{
+    StaffNode *node = (StaffNode *)malloc(sizeof(StaffNode));
+    if (node == NULL)
+    {
+        printf("内存分配失败\n");
+        return NULL;
+    }
+
+    strncpy(node->name, name ? name : "未知", sizeof(node->name) - 1);
+    strncpy(node->service_type, service_type ? service_type : "未知", sizeof(node->service_type) - 1);
+    node->building_count = building_count;
+    strncpy(node->buildings, buildings ? buildings : "无", sizeof(node->buildings) - 1);
+
+    node->next = NULL;
+    return node;
+}
+
+/**
+ * @brief 保存业主信息到文件
+ *
+ * @param head 业主信息链表头指针
+ * @param filename 要保存的文件名
+ */
+void save_owners_to_file(OwnerNode *head, const char *filename)
+{
+    FILE *file = fopen(filename, "w");
+    if (!file)
+    {
+        printf("无法打开文件 %s\n", filename);
+        return;
+    }
+    fprintf(file, "%-15s %-15s %-25s %-15s %-10s %-6s\n",
+            "姓名", "电话", "邮箱", "所在楼宇", "房间号", "楼层");
+    fprintf(file, "--------------------------------------------------------------------------------\n");
+
+    for (OwnerNode *node = head; node != NULL; node = node->next)
+    {
+        fprintf(file, "%-15s %-15s %-25s %-15s %-10s %-6s\n",
+                node->name, node->phone, node->email,
+                node->building, node->room, node->floor);
+    }
+    fclose(file);
+    printf("业主信息已保存到 %s\n", filename);
+}
+
+/**
+ * @brief 保存服务人员信息到文件
+ *
+ * @param head 服务人员信息链表头指针
+ * @param filename 要保存的文件名
+ */
+void save_staff_to_file(StaffNode *head, const char *filename)
+{
+    FILE *file = fopen(filename, "w");
+    if (!file)
+    {
+        printf("无法打开文件 %s\n", filename);
+        return;
+    }
+    fprintf(file, "%-15s %-15s %-12s %-40s\n",
+            "姓名", "服务类型", "负责楼宇数", "负责楼宇");
+    fprintf(file, "--------------------------------------------------------------------------------\n");
+
+    for (StaffNode *node = head; node != NULL; node = node->next)
+    {
+        fprintf(file, "%-15s %-15s %-12d %-40s\n",
+                node->name, node->service_type, node->building_count, node->buildings);
+    }
+    fclose(file);
+    printf("服务人员信息已保存到 %s\n", filename);
 }
 
 /**
@@ -484,7 +626,7 @@ void manage_apartments(Database *db, const char *user_id)
             free_query_result(&result);
             break;
         }
-        char building_id[41];
+        char building_id[41]; // 修复变量名
         strncpy(building_id, result.rows[0].values[0], sizeof(building_id));
         free_query_result(&result);
 
@@ -629,41 +771,42 @@ void manage_users(Database *db, const char *user_id, UserType user_type)
     printf("5. 返回上一级\n");
     printf("请输入选项: ");
     scanf("%d", &choice);
-    getchar();
+    clear_input_buffer();
 
     switch (choice)
     {
     case 1:
     {
         char username[100], password[100], name[100], phone[20], email[100];
-        char new_user_id[41];
-        int role_choice;
-        char role_id[20];
+    char new_user_id[41];
+    int role_choice;
+    char role_id[20];
 
-        generate_uuid(new_user_id);
+    generate_uuid(new_user_id);
+    
+    // 修改这部分代码
+    printf("请输入用户名: ");
+    fgets(username, sizeof(username), stdin);
+    trim_newline(username);  // 先获取输入再处理换行符
 
-        printf("请输入用户名: ");
-        fgets(username, sizeof(username), stdin);
-        trim_newline(username);
+    printf("请输入密码: ");
+    read_password(password, sizeof(password));
 
-        printf("请输入密码: ");
-        read_password(password, sizeof(password));
+    printf("请输入姓名: ");
+    fgets(name, sizeof(name), stdin);
+    trim_newline(name);
 
-        printf("请输入姓名: ");
-        fgets(name, sizeof(name), stdin);
-        trim_newline(name);
+    printf("请输入电话: ");
+    fgets(phone, sizeof(phone), stdin);
+    trim_newline(phone);
 
-        printf("请输入电话: ");
-        fgets(phone, sizeof(phone), stdin);
-        trim_newline(phone);
+    printf("请输入邮箱: ");
+    fgets(email, sizeof(email), stdin);
+    trim_newline(email);
 
-        printf("请输入邮箱: ");
-        fgets(email, sizeof(email), stdin);
-        trim_newline(email);
-
-        printf("请选择角色(1-管理员 2-物业人员 3-业主): ");
-        scanf("%d", &role_choice);
-        getchar();
+    printf("请选择角色(1-管理员 2-物业人员 3-业主): ");
+    scanf("%d", &role_choice);
+    getchar();  // 清除换行符
 
         switch (role_choice)
         {
@@ -910,39 +1053,80 @@ void manage_users(Database *db, const char *user_id, UserType user_type)
         }
         break;
     }
-    case 4:
+        // ...existing code...
+
+    case 4: // 查看所有用户
     {
-        snprintf(sql, sizeof(sql), "SELECT username, name, phone_number, email, role_id, status, registration_date FROM users;");
+        snprintf(sql, sizeof(sql),
+                 "SELECT username, name, phone_number, email, "
+                 "CASE role_id "
+                 "   WHEN 'role_admin' THEN '管理员' "
+                 "   WHEN 'role_staff' THEN '物业人员' "
+                 "   WHEN 'role_owner' THEN '业主' "
+                 "   ELSE '未知' END as role_name, "
+                 "CASE status "
+                 "   WHEN '1' THEN '正常' "
+                 "   WHEN '0' THEN '禁用' "
+                 "   ELSE '未知' END as status_name, "
+                 "registration_date "
+                 "FROM users;");
+
         if (execute_query(db, sql, &result))
         {
             printf("\n=== 用户列表 ===\n");
             printf("%-15s %-15s %-15s %-25s %-12s %-10s %-20s\n",
-                   "用户名", "姓名", "电话", "邮箱", "角色ID", "状态", "注册日期");
+                   "用户名", "姓名", "电话", "邮箱", "角色", "状态", "注册日期");
             printf("----------------------------------------------------------------------------------------------------------\n");
 
             for (int i = 0; i < result.row_count; i++)
             {
                 char formatted_date[30] = {0};
+                time_t timestamp;
 
-                time_t date_time = parse_time(result.rows[i].values[6]);
-
-                if (date_time != (time_t)-1)
+                // 尝试转换日期字符串为时间戳
+                if (result.rows[i].values[6] && strlen(result.rows[i].values[6]) > 0)
                 {
-                    format_time(date_time, formatted_date, sizeof(formatted_date));
+                    if (strstr(result.rows[i].values[6], "-")) // ISO格式日期
+                    {
+                        struct tm tm = {0};
+                        if (strptime(result.rows[i].values[6], "%Y-%m-%d %H:%M:%S", &tm) != NULL)
+                        {
+                            timestamp = mktime(&tm);
+                            strftime(formatted_date, sizeof(formatted_date),
+                                     "%Y-%m-%d %H:%M:%S", localtime(&timestamp));
+                        }
+                        else
+                        {
+                            strncpy(formatted_date, "格式错误", sizeof(formatted_date) - 1);
+                        }
+                    }
+                    else // UNIX时间戳
+                    {
+                        timestamp = (time_t)atoll(result.rows[i].values[6]);
+                        if (timestamp > 0)
+                        {
+                            strftime(formatted_date, sizeof(formatted_date),
+                                     "%Y-%m-%d %H:%M:%S", localtime(&timestamp));
+                        }
+                        else
+                        {
+                            strncpy(formatted_date, "无效时间戳", sizeof(formatted_date) - 1);
+                        }
+                    }
                 }
                 else
                 {
-                    strncpy(formatted_date, result.rows[i].values[6], sizeof(formatted_date) - 1);
+                    strncpy(formatted_date, "未设置", sizeof(formatted_date) - 1);
                 }
 
                 printf("%-15s %-15s %-15s %-25s %-12s %-10s %-20s\n",
-                       result.rows[i].values[0],
-                       result.rows[i].values[1],
-                       result.rows[i].values[2],
-                       result.rows[i].values[3],
-                       result.rows[i].values[4],
-                       result.rows[i].values[5],
-                       formatted_date);
+                       result.rows[i].values[0], // username
+                       result.rows[i].values[1], // name
+                       result.rows[i].values[2], // phone_number
+                       result.rows[i].values[3], // email
+                       result.rows[i].values[4], // role_name
+                       result.rows[i].values[5], // status_name
+                       formatted_date);          // formatted registration_date
             }
             printf("----------------------------------------------------------------------------------------------------------\n");
             printf("共 %d 条记录\n", result.row_count);
@@ -955,6 +1139,8 @@ void manage_users(Database *db, const char *user_id, UserType user_type)
         }
         break;
     }
+
+        // ...existing code...
     case 5:
         return;
     default:
@@ -1189,7 +1375,7 @@ void show_service_assignment_screen(Database *db, const char *user_id, UserType 
 /**
  * @brief 显示信息查询界面
  *
- * 提供楼盘信息查询和业主模糊查询功能
+ * 提供业主信息和服务人员信息的查询功能
  *
  * @param db 数据库连接指针
  * @param user_id 当前登录用户的ID
@@ -1203,195 +1389,115 @@ void show_info_query_screen(Database *db, const char *user_id, UserType user_typ
     do
     {
         clear_screen();
-        printf("========================\n");
-        printf("  信息查询\n");
-        printf("========================\n");
-        printf("1. 查询楼盘信息\n");
-        printf("2. 模糊查询业主姓名\n");
+        printf("\n=== 信息查询 ===\n");
+        printf("1. 业主信息查询\n");
+        printf("2. 服务人员信息查询\n");
         printf("0. 返回主菜单\n");
-        printf("请选择操作: ");
+        printf("\n请选择: ");
+
         scanf("%d", &choice);
         getchar();
 
+        QueryResult result;
+
         switch (choice)
         {
-        case 1:
+        case 1: // 业主信息查询
         {
-            QueryResult result;
-            char check_sql[256];
-            snprintf(check_sql, sizeof(check_sql),
-                     "SELECT name FROM sqlite_master "
-                     "WHERE type='table' AND name='buildings';");
-
-            if (!execute_query(db, check_sql, &result) || result.row_count == 0)
-            {
-                printf("查询楼盘信息失败，'buildings' 表不存在。\n");
-                free_query_result(&result);
-                break;
-            }
-            free_query_result(&result);
+            char owner_name[100];
+            printf("\n请输入业主姓名(支持模糊查询): ");
+            fgets(owner_name, sizeof(owner_name), stdin);
+            trim_newline(owner_name);
 
             snprintf(sql, sizeof(sql),
-                     "SELECT building_id, building_name, address, floors_count "
-                     "FROM buildings ORDER BY building_id;");
+                     "SELECT u.name, u.phone_number, u.email, "
+                     "b.building_name, r.room_number, r.floor "
+                     "FROM users u "
+                     "LEFT JOIN rooms r ON u.user_id = r.owner_id "
+                     "LEFT JOIN buildings b ON r.building_id = b.building_id "
+                     "WHERE u.role_id = 'role_owner' AND u.name LIKE '%%%s%%' "
+                     "ORDER BY u.name",
+                     owner_name);
 
             if (execute_query(db, sql, &result))
             {
-                printf("\n=== 楼盘列表 ===\n");
-                printf("%-20s %-30s %-10s\n",
-                       "楼宇名称", "地址", "楼层数");
-                printf("--------------------------------------------------------\n");
+                printf("\n=== 业主信息查询结果 ===\n");
+                printf("%-15s %-15s %-25s %-15s %-10s %-6s\n",
+                       "姓名", "电话", "邮箱", "所在楼宇", "房间号", "楼层");
+                printf("--------------------------------------------------------------------------------\n");
 
                 for (int i = 0; i < result.row_count; i++)
                 {
-                    printf("%-20s %-30s %-10s\n",
-                           result.rows[i].values[1],
-                           result.rows[i].values[2],
-                           result.rows[i].values[3]);
+                    printf("%-15s %-15s %-25s %-15s %-10s %-6s\n",
+                           result.rows[i].values[0],                                       // 姓名
+                           result.rows[i].values[1] ? result.rows[i].values[1] : "未登记", // 电话
+                           result.rows[i].values[2] ? result.rows[i].values[2] : "未登记", // 邮箱
+                           result.rows[i].values[3] ? result.rows[i].values[3] : "未分配", // 楼宇
+                           result.rows[i].values[4] ? result.rows[i].values[4] : "--",     // 房间号
+                           result.rows[i].values[5] ? result.rows[i].values[5] : "--");    // 楼层
                 }
-                printf("--------------------------------------------------------\n");
-                printf("共 %d 栋楼\n", result.row_count);
+                printf("--------------------------------------------------------------------------------\n");
+                printf("共 %d 条记录\n", result.row_count);
                 free_query_result(&result);
-            }
-            else
-            {
-                printf("查询楼盘信息失败。\n");
             }
             break;
         }
-        case 2:
-        {
-            char name[100];
-            printf("请输入业主姓名（支持模糊查询）: ");
-            fgets(name, sizeof(name), stdin);
-            trim_newline(name);
 
-            QueryResult result;
+        case 2: // 服务人员信息查询
+        {
+            char staff_name[100];
+            printf("\n请输入服务人员姓名(支持模糊查询): ");
+            fgets(staff_name, sizeof(staff_name), stdin);
+            trim_newline(staff_name);
 
             snprintf(sql, sizeof(sql),
-                     "SELECT user_id, name, phone_number "
-                     "FROM users "
-                     "WHERE role_id = 'role_owner' "
-                     "AND name LIKE '%%%s%%'",
-                     name);
+                     "SELECT u.name, st.type_name, u.phone_number, "
+                     "COUNT(DISTINCT sa.building_id) as building_count, "
+                     "GROUP_CONCAT(b.building_name) as buildings "
+                     "FROM users u "
+                     "JOIN staff s ON u.user_id = s.user_id "
+                     "JOIN staff_types st ON s.staff_type_id = st.staff_type_id "
+                     "LEFT JOIN service_areas sa ON s.staff_id = sa.staff_id "
+                     "LEFT JOIN buildings b ON sa.building_id = b.building_id "
+                     "WHERE u.role_id = 'role_staff' AND u.name LIKE '%%%s%%' "
+                     "GROUP BY u.user_id "
+                     "ORDER BY u.name",
+                     staff_name);
 
             if (execute_query(db, sql, &result))
             {
-                if (result.row_count > 0)
-                {
-                    printf("\n=== 查询结果 ===\n");
-                    printf("%-20s %-20s %-15s\n",
-                           "用户ID", "姓名", "联系电话");
-                    printf("------------------------------------------------\n");
+                printf("\n=== 服务人员查询结果 ===\n");
+                printf("%-15s %-15s %-15s %-12s %-30s\n",
+                       "姓名", "服务类型", "联系电话", "负责楼宇数", "负责楼宇");
+                printf("--------------------------------------------------------------------------------\n");
 
-                    for (int i = 0; i < result.row_count; i++)
-                    {
-                        printf("%-20s %-20s %-15s\n",
-                               result.rows[i].values[0],
-                               result.rows[i].values[1],
-                               result.rows[i].values[2]);
-                    }
-                    printf("------------------------------------------------\n");
-                    printf("共找到 %d 条记录\n", result.row_count);
-                }
-                else
+                for (int i = 0; i < result.row_count; i++)
                 {
-                    printf("\n未找到符合条件的业主。\n");
+                    printf("%-15s %-15s %-15s %-12s %-30s\n",
+                           result.rows[i].values[0],                                    // 姓名
+                           result.rows[i].values[1],                                    // 服务类型
+                           result.rows[i].values[2],                                    // 电话
+                           result.rows[i].values[3],                                    // 楼宇数量
+                           result.rows[i].values[4] ? result.rows[i].values[4] : "无"); // 楼宇列表
                 }
+                printf("--------------------------------------------------------------------------------\n");
+                printf("共 %d 条记录\n", result.row_count);
                 free_query_result(&result);
-            }
-            else
-            {
-                printf("查询失败。\n");
             }
             break;
         }
+
         case 0:
-            printf("返回主菜单...\n");
             return;
 
         default:
-            printf("无效选项，请重新选择。\n");
-            break;
+            printf("\n无效的选择，请重新输入!\n");
         }
 
         printf("\n按Enter键继续...");
         getchar();
+
     } while (1);
-}
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-typedef struct Node
-{
-    char owner_name[100];
-    char payment_amount[100];
-    char payment_date[100];
-    struct Node *next;
-} Node;
-
-Node *create_node(const char *owner_name, const char *payment_amount, const char *payment_date)
-{
-    Node *new_node = (Node *)malloc(sizeof(Node));
-    if (new_node)
-    {
-        strcpy(new_node->owner_name, owner_name);
-        strcpy(new_node->payment_amount, payment_amount);
-        strcpy(new_node->payment_date, payment_date);
-        new_node->next = NULL;
-    }
-    return new_node;
-}
-
-/**
- * @brief 将排序结果保存到文件
- *
- * 将链表中的排序结果数据保存到指定文件
- *
- * @param head 链表头节点指针
- * @param filename 目标文件名
- */
-void save_to_file(Node *head, const char *filename)
-{
-    FILE *file = fopen(filename, "w");
-    if (!file)
-    {
-        printf("无法打开文件进行写入\n");
-        return;
-    }
-
-    fprintf(file, "Owner Name               Payment Amount     Payment Date\n");
-    fprintf(file, "---------------------------------------------------------\n");
-
-    Node *current = head;
-    while (current)
-    {
-        fprintf(file, "%-25s %-18s %-15s\n", current->owner_name, current->payment_amount, current->payment_date);
-        current = current->next;
-    }
-
-    fclose(file);
-    printf("数据已成功保存到 %s\n", filename);
-}
-
-/**
- * @brief 释放链表内存
- *
- * 释放链表占用的所有内存
- *
- * @param head 链表头节点指针
- */
-void free_linked_list(Node *head)
-{
-    Node *current = head;
-    while (current)
-    {
-        Node *temp = current;
-        current = current->next;
-        free(temp);
-    }
 }
 
 /**
@@ -1406,112 +1512,212 @@ void free_linked_list(Node *head)
 void show_info_sort_screen(Database *db, const char *user_id, UserType user_type)
 {
     int choice;
-    Node *head = NULL;
-    Node *tail = NULL;
+    char sql[1024];
 
     do
     {
         clear_screen();
-        printf("========================\n");
-        printf("  信息排序\n");
-        printf("========================\n");
-        printf("1. 按缴费时间排序\n");
-        printf("2. 按缴费金额排序\n");
-        printf("3. 按姓名升序排序业主信息\n");
+        printf("\n=== 信息排序 ===\n");
+        printf("1. 按姓名排序查看业主信息\n");
+        printf("2. 按负责楼宇数量排序查看服务人员\n");
         printf("0. 返回主菜单\n");
-        printf("请选择操作: ");
+        printf("\n请选择: ");
+
         scanf("%d", &choice);
         getchar();
 
-        char sql[1024];
         QueryResult result;
 
         switch (choice)
         {
-        case 1:
+        case 1: // 按姓名排序查看业主信息
+        {
             snprintf(sql, sizeof(sql),
-                     "SELECT u.name AS owner_name, "
-                     "t.amount AS payment_amount, "
-                     "datetime(t.payment_date, 'unixepoch') AS payment_date "
-                     "FROM transactions t "
-                     "JOIN users u ON t.user_id = u.user_id "
-                     "ORDER BY t.payment_date ASC");
-            break;
-
-        case 2:
-            snprintf(sql, sizeof(sql),
-                     "SELECT u.name AS owner_name, "
-                     "t.amount AS payment_amount, "
-                     "datetime(t.payment_date, 'unixepoch') AS payment_date "
-                     "FROM transactions t "
-                     "JOIN users u ON t.user_id = u.user_id "
-                     "ORDER BY t.amount ASC");
-            break;
-
-        case 3:
-            snprintf(sql, sizeof(sql),
-                     "SELECT u.name AS owner_name, "
-                     "u.phone_number AS phone, "
-                     "u.email AS email "
+                     "SELECT u.name, u.phone_number, u.email, "
+                     "b.building_name, r.room_number, r.floor "
                      "FROM users u "
-                     "WHERE u.role_id = 3 "
+                     "LEFT JOIN rooms r ON u.user_id = r.owner_id "
+                     "LEFT JOIN buildings b ON r.building_id = b.building_id "
+                     "WHERE u.role_id = 'role_owner' "
                      "ORDER BY u.name ASC");
+
+            if (execute_query(db, sql, &result))
+            {
+                printf("\n=== 业主信息(按姓名排序) ===\n");
+                printf("%-15s %-15s %-25s %-15s %-10s %-6s\n",
+                       "姓名", "电话", "邮箱", "所在楼宇", "房间号", "楼层");
+                printf("--------------------------------------------------------------------------------\n");
+
+                for (int i = 0; i < result.row_count; i++)
+                {
+                    printf("%-15s %-15s %-25s %-15s %-10s %-6s\n",
+                           result.rows[i].values[0],                                       // 姓名
+                           result.rows[i].values[1] ? result.rows[i].values[1] : "未登记", // 电话
+                           result.rows[i].values[2] ? result.rows[i].values[2] : "未登记", // 邮箱
+                           result.rows[i].values[3] ? result.rows[i].values[3] : "未分配", // 楼宇
+                           result.rows[i].values[4] ? result.rows[i].values[4] : "--",     // 房间号
+                           result.rows[i].values[5] ? result.rows[i].values[5] : "--");    // 楼层
+                }
+                printf("--------------------------------------------------------------------------------\n");
+                printf("共 %d 条记录\n", result.row_count);
+                free_query_result(&result);
+
+                // 提供保存到文件选项
+                printf("\n是否要保存排序结果到文件? (y/n): ");
+                char save_choice;
+                scanf(" %c", &save_choice);
+                getchar();
+
+                if (save_choice == 'y' || save_choice == 'Y')
+                {
+                    char filename[100];
+                    printf("请输入文件名: ");
+                    fgets(filename, sizeof(filename), stdin);
+                    trim_newline(filename);
+
+                    // 创建链表存储业主信息
+                    OwnerNode *head = NULL;
+                    OwnerNode *current = NULL;
+
+                    // 将查询结果转换为链表
+                    for (int i = 0; i < result.row_count; i++)
+                    {
+                        OwnerNode *node = create_owner_node_by_admin(
+                            result.rows[i].values[0], // 姓名
+                            result.rows[i].values[1], // 电话
+                            result.rows[i].values[2], // 邮箱
+                            result.rows[i].values[3], // 楼宇
+                            result.rows[i].values[4], // 房间号
+                            result.rows[i].values[5]  // 楼层
+                        );
+
+                        if (head == NULL)
+                        {
+                            head = node;
+                            current = node;
+                        }
+                        else
+                        {
+                            current->next = node;
+                            current = node;
+                        }
+                    }
+
+                    // 保存到文件
+                    save_owners_to_file(head, filename);
+
+                    // 释放链表
+                    while (head != NULL)
+                    {
+                        OwnerNode *temp = head;
+                        head = head->next;
+                        free(temp);
+                    }
+                }
+            }
             break;
+        }
+
+        case 2: // 按负责楼宇数量排序查看服务人员
+        {
+            snprintf(sql, sizeof(sql),
+                     "SELECT u.name, st.type_name, "
+                     "COUNT(DISTINCT sa.building_id) as building_count, "
+                     "GROUP_CONCAT(b.building_name) as buildings "
+                     "FROM users u "
+                     "JOIN staff s ON u.user_id = s.user_id "
+                     "JOIN staff_types st ON s.staff_type_id = st.staff_type_id "
+                     "LEFT JOIN service_areas sa ON s.staff_id = sa.staff_id "
+                     "LEFT JOIN buildings b ON sa.building_id = b.building_id "
+                     "WHERE u.role_id = 'role_staff' "
+                     "GROUP BY u.user_id "
+                     "ORDER BY building_count DESC");
+
+            if (execute_query(db, sql, &result))
+            {
+                printf("\n=== 服务人员(按负责楼宇数量排序) ===\n");
+                printf("%-15s %-15s %-12s %-40s\n",
+                       "姓名", "服务类型", "负责楼宇数", "负责楼宇");
+                printf("--------------------------------------------------------------------------------\n");
+
+                // 提供保存到文件选项
+                printf("\n是否要保存排序结果到文件? (y/n): ");
+                char save_choice;
+                scanf(" %c", &save_choice);
+                getchar();
+
+                if (save_choice == 'y' || save_choice == 'Y')
+                {
+                    char filename[100];
+                    printf("请输入文件名: ");
+                    fgets(filename, sizeof(filename), stdin);
+                    trim_newline(filename);
+
+                    // 创建链表存储结果
+                    StaffNode *head = NULL;
+                    StaffNode *current = NULL;
+
+                    // 将查询结果转换为链表
+                    for (int i = 0; i < result.row_count; i++)
+                    {
+                        StaffNode *node = create_staff_node(
+                            result.rows[i].values[0],                                  // 姓名
+                            result.rows[i].values[1],                                  // 服务类型
+                            atoi(result.rows[i].values[2]),                            // 楼宇数量
+                            result.rows[i].values[3] ? result.rows[i].values[3] : "无" // 楼宇列表
+                        );
+
+                        if (head == NULL)
+                        {
+                            head = node;
+                            current = node;
+                        }
+                        else
+                        {
+                            current->next = node;
+                            current = node;
+                        }
+                    }
+
+                    // 保存到文件
+                    save_staff_to_file(head, filename);
+
+                    // 释放链表
+                    while (head != NULL)
+                    {
+                        StaffNode *temp = head;
+                        head = head->next;
+                        free(temp);
+                    }
+                }
+
+                // 显示结果
+                for (int i = 0; i < result.row_count; i++)
+                {
+                    printf("%-15s %-15s %-12s %-40s\n",
+                           result.rows[i].values[0],                                    // 姓名
+                           result.rows[i].values[1],                                    // 服务类型
+                           result.rows[i].values[2],                                    // 楼宇数量
+                           result.rows[i].values[3] ? result.rows[i].values[3] : "无"); // 楼宇列表
+                }
+                printf("--------------------------------------------------------------------------------\n");
+                printf("共 %d 条记录\n", result.row_count);
+                free_query_result(&result);
+            }
+            break;
+        }
 
         case 0:
-            printf("返回主菜单...\n");
-            free_linked_list(head);
             return;
 
         default:
-            printf("无效选项，请重新选择。\n");
-            continue;
-        }
-
-        if (execute_query(db, sql, &result))
-        {
-            printf("\n查询结果：\n");
-            printf("----------------------------------------\n");
-
-            for (int i = 0; i < result.column_count; i++)
-            {
-                printf("%-20s", result.column_names[i]);
-            }
-            printf("\n");
-            printf("----------------------------------------\n");
-
-            for (int i = 0; i < result.row_count; i++)
-            {
-                Node *new_node = create_node(result.rows[i].values[0], result.rows[i].values[1], result.rows[i].values[2]);
-                if (tail == NULL)
-                {
-                    head = new_node;
-                    tail = head;
-                }
-                else
-                {
-                    tail->next = new_node;
-                    tail = new_node;
-                }
-            }
-
-            printf("----------------------------------------\n");
-            printf("共 %d 条记录\n", result.row_count);
-            free_query_result(&result);
-
-            save_to_file(head, "sorted_info.txt");
-        }
-        else
-        {
-            printf("查询失败。\n");
+            printf("\n无效的选择，请重新输入!\n");
         }
 
         printf("\n按Enter键继续...");
         getchar();
 
-    } while (choice != 0);
-
-    free_linked_list(head);
+    } while (1);
 }
 
 /**
@@ -1531,8 +1737,6 @@ void show_info_statistics_screen(Database *db, const char *user_id, UserType use
         printf("\n=== 信息统计界面 ===\n");
         printf("1. 楼宇统计\n");
         printf("2. 住户统计\n");
-        printf("3. 费用统计\n");
-        printf("4. 服务统计\n");
         printf("0. 返回主菜单\n");
         printf("请输入选项: ");
 
@@ -1630,62 +1834,6 @@ void show_info_statistics_screen(Database *db, const char *user_id, UserType use
             }
             break;
         }
-
-        case 3:
-        {
-            snprintf(sql, sizeof(sql),
-                     "SELECT t.fee_type, "
-                     "COUNT(*) as bill_count, "
-                     "SUM(t.amount) as total_amount, "
-                     "AVG(t.amount) as avg_amount "
-                     "FROM transactions t "
-                     "GROUP BY t.fee_type");
-
-            if (execute_query(db, sql, &result))
-            {
-                printf("\n费用统计信息：\n");
-                printf("------------------------\n");
-                printf("%-15s %-10s %-15s %-15s\n",
-                       "费用类型", "账单数", "总金额", "平均金额");
-                for (int i = 0; i < result.row_count; i++)
-                {
-                    printf("%-15s %-10s %-15s %-15s\n",
-                           result.rows[i].values[0],
-                           result.rows[i].values[1],
-                           result.rows[i].values[2],
-                           result.rows[i].values[3]);
-                }
-                free_query_result(&result);
-            }
-            break;
-        }
-
-        case 4:
-        {
-            snprintf(sql, sizeof(sql),
-                     "SELECT u.name as staff_name, "
-                     "COUNT(DISTINCT sa.building_id) as building_count "
-                     "FROM users u "
-                     "LEFT JOIN service_areas sa ON u.user_id = sa.staff_id "
-                     "WHERE u.role_id = 2 "
-                     "GROUP BY u.user_id");
-
-            if (execute_query(db, sql, &result))
-            {
-                printf("\n服务人员工作量统计：\n");
-                printf("------------------------\n");
-                printf("%-20s %-15s\n", "服务人员", "负责楼宇数");
-                for (int i = 0; i < result.row_count; i++)
-                {
-                    printf("%-20s %-15s\n",
-                           result.rows[i].values[0],
-                           result.rows[i].values[1]);
-                }
-                free_query_result(&result);
-            }
-            break;
-        }
-
         case 0:
             return;
 
@@ -1709,97 +1857,144 @@ void show_info_statistics_screen(Database *db, const char *user_id, UserType use
  */
 void show_system_maintenance_screen(Database *db, const char *user_id, UserType user_type)
 {
-    while (1)
-    {
+    // 检查用户权限
+    if (user_type != USER_ADMIN) {
+        printf("权限不足，无法访问系统维护功能\n");
+        pause_console();
+        return;
+    }
+
+    while (1) {
         clear_screen();
         printf("\n=== 系统维护界面 ===\n");
         printf("1. 数据库备份\n");
         printf("2. 数据库恢复\n");
-        printf("3. 数据库重置\n");
         printf("0. 返回主菜单\n");
-        printf("请输入选项: ");
+        printf("\n请输入选项: ");
 
         int choice;
         scanf("%d", &choice);
-        getchar();
+        getchar(); // 清除换行符
 
-        switch (choice)
-        {
-        case 1:
-        {
-            char backup_path[256];
-            printf("\n请输入备份文件保存路径: ");
-            fgets(backup_path, sizeof(backup_path), stdin);
-            trim_newline(backup_path);
+        char filepath[256];
+        char confirm;
 
-            if (backup_database(db))
+        switch (choice) {
+            case 1: // 数据库备份
             {
-                printf("数据库备份成功!\n");
-            }
-            else
-            {
-                printf("数据库备份失败!\n");
-            }
-            break;
-        }
-
-        case 2:
-        {
-            char backup_path[256];
-            printf("\n请输入备份文件路径: ");
-            fgets(backup_path, sizeof(backup_path), stdin);
-            trim_newline(backup_path);
-
-            printf("\n警告:数据库恢复将覆盖当前所有数据,确定要继续吗?(y/n): ");
-            char confirm = getchar();
-            getchar();
-
-            if (confirm == 'y' || confirm == 'Y')
-            {
-                if (restore_database(db))
-                {
-                    printf("数据库恢复成功!\n");
+                printf("\n=== 数据库备份 ===\n");
+                printf("请输入备份文件保存路径 (默认为 backup.db): ");
+                fgets(filepath, sizeof(filepath), stdin);
+                trim_newline(filepath);
+                
+                if (strlen(filepath) == 0) {
+                    strcpy(filepath, "backup.db");
                 }
-                else
-                {
-                    printf("数据库恢复失败!\n");
+
+                // 创建备份文件
+                sqlite3 *backup_db;
+                sqlite3_backup *backup;
+                
+                if (sqlite3_open(filepath, &backup_db) != SQLITE_OK) {
+                    printf("错误：无法创建备份文件\n");
+                    break;
                 }
-            }
-            break;
-        }
 
-        case 3:
-        {
-            printf("\n警告:数据库重置将清空所有数据,确定要继续吗?(y/n): ");
-            char confirm = getchar();
-            getchar();
-
-            if (confirm == 'y' || confirm == 'Y')
-            {
-                if (clean_database(db))
-                {
-                    if (db_init_tables(db))
-                    {
-                        printf("数据库重置成功!\n");
+                backup = sqlite3_backup_init(backup_db, "main", db->db, "main");
+                
+                if (backup) {
+                    if (sqlite3_backup_step(backup, -1) == SQLITE_DONE) {
+                        printf("数据库备份成功！备份文件：%s\n", filepath);
+                    } else {
+                        printf("数据库备份失败\n");
                     }
-                    else
-                    {
-                        printf("数据库表初始化失败!\n");
-                    }
+                    sqlite3_backup_finish(backup);
+                } else {
+                    printf("备份初始化失败\n");
                 }
-                else
-                {
-                    printf("数据库清理失败!\n");
-                }
+                
+                sqlite3_close(backup_db);
+                break;
             }
+
+            case 2: // 数据库恢复
+{
+    printf("\n=== 数据库恢复 ===\n");
+    printf("请输入备份文件路径: ");
+    fgets(filepath, sizeof(filepath), stdin);
+    trim_newline(filepath);
+    
+    // 去除路径中的引号
+    char *start = filepath;
+    char *end = filepath + strlen(filepath) - 1;
+    
+    // 去除开头的引号
+    if (*start == '\'' || *start == '"') {
+        start++;
+    }
+    
+    // 去除结尾的引号
+    if (*end == '\'' || *end == '"') {
+        *end = '\0';
+    }
+    
+    // 复制处理后的路径
+    char clean_path[256];
+    strncpy(clean_path, start, sizeof(clean_path)-1);
+    clean_path[sizeof(clean_path)-1] = '\0';
+
+    // 检查文件是否存在
+    if (access(clean_path, F_OK) == -1) {
+        printf("错误：备份文件不存在\n");
+        printf("尝试访问的路径：%s\n", clean_path);
+        break;
+    }
+
+    printf("\n警告：恢复操作将覆盖当前所有数据！\n");
+    printf("确定要继续吗？(y/n): ");
+    scanf(" %c", &confirm);
+    getchar();
+
+    if (confirm == 'y' || confirm == 'Y') {
+        sqlite3 *backup_db;
+        sqlite3_backup *backup;
+
+        // 尝试打开备份文件
+        if (sqlite3_open(clean_path, &backup_db) != SQLITE_OK) {
+            printf("错误：无法打开备份文件：%s\n", sqlite3_errmsg(backup_db));
+            sqlite3_close(backup_db);
             break;
         }
 
-        case 0:
-            return;
+        // 初始化备份
+        backup = sqlite3_backup_init(db->db, "main", backup_db, "main");
+        
+        if (backup) {
+            // 执行恢复
+            int rc = sqlite3_backup_step(backup, -1);
+            sqlite3_backup_finish(backup);
+            
+            if (rc == SQLITE_DONE) {
+                printf("数据库恢复成功！\n");
+            } else {
+                printf("数据库恢复失败：%s\n", sqlite3_errmsg(db->db));
+            }
+        } else {
+            printf("恢复初始化失败：%s\n", sqlite3_errmsg(db->db));
+        }
+        
+        // 关闭备份数据库连接
+        sqlite3_close(backup_db);
+    }
+    break;
+}
 
-        default:
-            printf("无效选项,请重新输入\n");
+
+            case 0: // 返回主菜单
+                return;
+
+            default:
+                printf("无效选项，请重新输入\n");
         }
 
         printf("\n按Enter键继续...");

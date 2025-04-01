@@ -396,10 +396,11 @@ void process_payment_screen(Database *db, const char *user_id)
     }
     clear_input_buffer();
 
+    // 修改查询语句，包含所有未支付的费用（包括逾期的）
     const char *query_unpaid =
-        "SELECT transaction_id, amount, due_date "
+        "SELECT transaction_id, amount, due_date, status "
         "FROM transactions "
-        "WHERE user_id = ? AND fee_type = ? AND status = 0 "
+        "WHERE user_id = ? AND fee_type = ? AND (status = 0 OR status = 2) "
         "ORDER BY due_date ASC";
 
     sqlite3_stmt *stmt_unpaid;
@@ -413,6 +414,7 @@ void process_payment_screen(Database *db, const char *user_id)
             char transaction_id[37];
             double amount;
             time_t due_date;
+            int status;  // 添加状态字段
         } unpaid_records[100];
         int record_count = 0;
         double total_unpaid = 0.0;
@@ -429,6 +431,7 @@ void process_payment_screen(Database *db, const char *user_id)
 
                 unpaid_records[record_count].amount = sqlite3_column_double(stmt_unpaid, 1);
                 unpaid_records[record_count].due_date = sqlite3_column_int64(stmt_unpaid, 2);
+                unpaid_records[record_count].status = sqlite3_column_int(stmt_unpaid, 3);
                 total_unpaid += unpaid_records[record_count].amount;
                 record_count++;
             }
@@ -438,23 +441,25 @@ void process_payment_screen(Database *db, const char *user_id)
         if (record_count > 0)
         {
             printf("\n=== 未缴%s记录 ===\n", fee_types[fee_type - 1]);
-            printf("交易编号\t\t金额\t\t到期日期\n");
-            printf("--------------------------------------------------\n");
+            printf("交易编号\t\t金额\t\t到期日期\t\t状态\n");
+            printf("----------------------------------------------------------\n");
 
             for (int i = 0; i < record_count; i++)
             {
                 char date_str[20];
                 strftime(date_str, sizeof(date_str), "%Y-%m-%d",
                          localtime(&unpaid_records[i].due_date));
-                printf("%-24s ￥%-10.2f %s\n",
+                const char *status_str = (unpaid_records[i].status == 2) ? "已逾期" : "未支付";
+                printf("%-24s ￥%-10.2f %-12s %s\n",
                        unpaid_records[i].transaction_id,
                        unpaid_records[i].amount,
-                       date_str);
+                       date_str,
+                       status_str);
             }
-            printf("--------------------------------------------------\n");
+            printf("----------------------------------------------------------\n");
             printf("总计: %d笔待缴费用，共计￥%.2f\n", record_count, total_unpaid);
 
-            printf("\n将一次性缴清所有欠费，确定吗 (1-是/0-否): ");
+            printf("\n将一次性缴清所有费用，确定吗 (1-是/0-否): ");
             int choice;
             scanf("%d", &choice);
             clear_input_buffer();
@@ -512,7 +517,6 @@ void process_payment_screen(Database *db, const char *user_id)
     printf("\n按任意键返回...");
     wait_for_key();
 }
-
 /**
  * @brief 查询剩余费用
  *
@@ -721,33 +725,101 @@ bool change_username(Database *db, const char *user_id, char *username)
         fprintf(stderr, "无效的数据库或输入参数\n");
         return false;
     }
-    const char *sql = "UPDATE users SET username = ? WHERE user_id = ?;";
-    sqlite3_stmt *stmt;
+
+    // 首先获取当前用户名
+    char current_username[100];
+    const char *get_current_sql = "SELECT username FROM users WHERE user_id = ?;";
+    sqlite3_stmt *current_stmt;
     int rc;
-    // 预处理 SQL 语句`
-    rc = sqlite3_prepare_v2(db->db, sql, -1, &stmt, 0);
+
+    rc = sqlite3_prepare_v2(db->db, get_current_sql, -1, &current_stmt, 0);
     if (rc != SQLITE_OK)
     {
         fprintf(stderr, "SQL 预处理失败: %s\n", sqlite3_errmsg(db->db));
         return false;
     }
-    // 绑定参数
-    sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 2, user_id, -1, SQLITE_STATIC);
-    // 执行 SQL 语句
-    rc = sqlite3_step(stmt);
+
+    sqlite3_bind_text(current_stmt, 1, user_id, -1, SQLITE_STATIC);
+    
+    if (sqlite3_step(current_stmt) == SQLITE_ROW)
+    {
+        const char *current = (const char *)sqlite3_column_text(current_stmt, 0);
+        strncpy(current_username, current, sizeof(current_username) - 1);
+        current_username[sizeof(current_username) - 1] = '\0';
+    }
+    else
+    {
+        sqlite3_finalize(current_stmt);
+        fprintf(stderr, "获取当前用户名失败\n");
+        return false;
+    }
+    sqlite3_finalize(current_stmt);
+
+    // 检查新用户名是否与当前用户名相同
+    if (strcmp(current_username, username) == 0)
+    {
+        printf("❌ 新用户名与当前用户名相同，请选择其他用户名\n");
+        return false;
+    }
+
+    // 检查新用户名是否已被其他用户使用
+    const char *check_sql = "SELECT COUNT(*) FROM users WHERE username = ? AND user_id != ?;";
+    sqlite3_stmt *check_stmt;
+
+    rc = sqlite3_prepare_v2(db->db, check_sql, -1, &check_stmt, 0);
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "SQL 预处理失败: %s\n", sqlite3_errmsg(db->db));
+        return false;
+    }
+
+    sqlite3_bind_text(check_stmt, 1, username, -1, SQLITE_STATIC);
+    sqlite3_bind_text(check_stmt, 2, user_id, -1, SQLITE_STATIC);
+
+    if (sqlite3_step(check_stmt) == SQLITE_ROW)
+    {
+        int count = sqlite3_column_int(check_stmt, 0);
+        sqlite3_finalize(check_stmt);
+        
+        if (count > 0)
+        {
+            printf("❌ 用户名 '%s' 已被其他用户使用，请选择其他用户名\n", username);
+            return false;
+        }
+    }
+    else
+    {
+        sqlite3_finalize(check_stmt);
+        fprintf(stderr, "检查用户名失败\n");
+        return false;
+    }
+
+    // 如果用户名未被使用且不与当前用户名相同，则进行更新
+    const char *update_sql = "UPDATE users SET username = ? WHERE user_id = ?;";
+    sqlite3_stmt *update_stmt;
+
+    rc = sqlite3_prepare_v2(db->db, update_sql, -1, &update_stmt, 0);
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "SQL 预处理失败: %s\n", sqlite3_errmsg(db->db));
+        return false;
+    }
+
+    sqlite3_bind_text(update_stmt, 1, username, -1, SQLITE_STATIC);
+    sqlite3_bind_text(update_stmt, 2, user_id, -1, SQLITE_STATIC);
+
+    rc = sqlite3_step(update_stmt);
     if (rc != SQLITE_DONE)
     {
         fprintf(stderr, "用户名更新失败: %s\n", sqlite3_errmsg(db->db));
-        sqlite3_finalize(stmt);
+        sqlite3_finalize(update_stmt);
         return false;
     }
-    // 释放资源
-    sqlite3_finalize(stmt);
-    printf("用户名修改成功\n");
+
+    sqlite3_finalize(update_stmt);
+    printf("✅ 用户名修改成功\n");
     return true;
 }
-
 /**
  * @brief 处理修改密码的功能
  *
