@@ -16,42 +16,10 @@
 - @Fxiansheng-ai
 
 在此感谢以下贡献者：
+
 <a href="https://github.com/peterpetrica/Property_Management_System/graphs/contributors">
 <img src="https://contrib.rocks/image?repo=peterpetrica/Property_Management_System" />
 </a>
-
-## 增加了假数据生成脚本
-
-脚本放置在 data_gen 文件夹下
-
-先执行
-
-```bash
-pip install -r ./data_gen/requirements.txt
-```
-
-来安装所需依赖库，再运行
-
-```bash
-python3 ./data_gen/property_faker.py
-```
-
-即可
-
-## SQLite 可视化
-
-在终端中依次输入以下命令：
-
-```bash
-sudo apt install -y sqlitebrowser
-
-sqlitebrowser ~/.property_management/property_management.db
-```
-
-## Tip
-
-- 我在下面的项目总要求里添加了数据库的表单数据结构预期实现，请按照那个作为预期的数据库结构
-- user_id 是字符串！(至少需要 40 位的数组来存放)
 
 ## 项目指北
 
@@ -231,3 +199,36 @@ sudo apt upgrade -y
 ```
 
 更新完成后，请参照[使用 Linux 开始](#使用-linux-开始)部分继续。
+
+## 增加了假数据生成脚本
+
+脚本放置在 data_gen 文件夹下
+
+先执行
+
+```bash
+pip install -r ./data_gen/requirements.txt
+```
+
+来安装所需依赖库，再运行
+
+```bash
+python3 ./data_gen/property_faker.py
+```
+
+即可
+
+## SQLite 可视化
+
+在终端中依次输入以下命令：
+
+```bash
+sudo apt install -y sqlitebrowser
+
+sqlitebrowser ~/.property_management/property_management.db
+```
+
+## Tip
+
+- 我在下面的项目总要求里添加了数据库的表单数据结构预期实现，请按照那个作为预期的数据库结构
+- user_id 是字符串！(至少需要 40 位的数组来存放)
