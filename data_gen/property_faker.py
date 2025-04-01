@@ -293,7 +293,7 @@ def generate_owners(count=100):
     return [o[0] for o in owners]  # 返回所有生成的user_id
 
 # 生成房屋数据
-def generate_rooms(building_ids, owner_ids, count_per_building=20):
+def generate_rooms(building_ids, owner_ids, count_per_building=None):
     rooms = []
     all_rooms = []  # 存储所有生成的room_id
     
@@ -302,15 +302,15 @@ def generate_rooms(building_ids, owner_ids, count_per_building=20):
         cursor.execute("SELECT floors_count FROM buildings WHERE building_id = ?", (building_id,))
         floors_count = cursor.fetchone()[0]
         
-        # 为每个楼层生成一些房间
+        # 为每个楼层生成房间
         for floor in range(1, floors_count + 1):
-            for unit in range(1, 5):  # 每层4个单元
+            for unit in range(1, 9):  # 每层8个单元，更符合实际情况
                 room_id = gen_id()
                 room_number = f"{floor}{unit:02d}"  # 例如 2楼1单元 = 201
                 area = random.uniform(70, 150)  # 面积70-150平方米
                 
                 # 有75%的房间有业主
-                owner_id = random.choice(owner_ids) if random.random() < 0.75 else None
+                owner_id = random.choice(owner_ids) if random.random() < 0.75 and owner_ids else None
                 status = 1 if owner_id else 0  # 有业主状态为1，无业主为0
                 
                 rooms.append((
@@ -324,16 +324,20 @@ def generate_rooms(building_ids, owner_ids, count_per_building=20):
                 ))
                 all_rooms.append((room_id, owner_id))
                 
-                if len(rooms) >= count_per_building:
-                    break
-            
-            if len(rooms) >= count_per_building:
-                break
+                # 批量插入，避免内存占用过大
+                if len(rooms) >= 500:
+                    cursor.executemany(
+                        "INSERT INTO rooms (room_id, building_id, room_number, floor, area_sqm, owner_id, status) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                        rooms
+                    )
+                    rooms = []
     
-    cursor.executemany(
-        "INSERT INTO rooms (room_id, building_id, room_number, floor, area_sqm, owner_id, status) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        rooms
-    )
+    # 插入剩余房间记录
+    if rooms:
+        cursor.executemany(
+            "INSERT INTO rooms (room_id, building_id, room_number, floor, area_sqm, owner_id, status) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            rooms
+        )
     return all_rooms  # 返回(room_id, owner_id)的元组列表
 
 # 生成停车位数据
@@ -382,6 +386,7 @@ def generate_staff_types():
 # 生成物业人员数据
 def generate_staff(staff_type_ids, count=20):
     staff_members = []
+    staff_ids = []
     
     # 先生成用户
     for i in range(count):
@@ -414,12 +419,24 @@ def generate_staff(staff_type_ids, count=20):
             hire_date,
             1  # 状态-在职
         ))
+        staff_ids.append(staff_id)
+        
+        # 批量插入，避免一次插入过多数据
+        if len(staff_members) >= 50:
+            cursor.executemany(
+                "INSERT INTO staff (staff_id, user_id, staff_type_id, hire_date, status) VALUES (?, ?, ?, ?, ?)",
+                staff_members
+            )
+            staff_members = []
     
-    cursor.executemany(
-        "INSERT INTO staff (staff_id, user_id, staff_type_id, hire_date, status) VALUES (?, ?, ?, ?, ?)",
-        staff_members
-    )
-    return [s[0] for s in staff_members]  # 返回所有生成的staff_id
+    # 插入剩余员工记录
+    if staff_members:
+        cursor.executemany(
+            "INSERT INTO staff (staff_id, user_id, staff_type_id, hire_date, status) VALUES (?, ?, ?, ?, ?)",
+            staff_members
+        )
+    
+    return staff_ids  # 返回所有生成的staff_id
 
 # 生成服务区域数据
 def generate_service_areas(staff_ids, building_ids):
@@ -451,14 +468,13 @@ def generate_service_areas(staff_ids, building_ids):
     )
 
 # 生成服务记录数据
-def generate_service_records(staff_ids, building_ids, room_data, count=200):
+def generate_service_records(staff_ids, building_ids, room_data, count=500):
     service_types = [
         '日常巡检', '设备维修', '清洁服务', '安全检查', 
         '投诉处理', '访客登记', '快递接收', '紧急救援'
     ]
     
     service_status = [0, 1, 2]  # 0-待处理, 1-处理中, 2-已完成
-    
     records = []
     
     for _ in range(count):
@@ -489,14 +505,24 @@ def generate_service_records(staff_ids, building_ids, room_data, count=200):
             status,
             target_id
         ))
+        
+        # 批量插入服务记录
+        if len(records) >= 500:
+            cursor.executemany(
+                "INSERT INTO service_records (record_id, staff_id, service_type, service_date, description, status, target_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                records
+            )
+            records = []
     
-    cursor.executemany(
-        "INSERT INTO service_records (record_id, staff_id, service_type, service_date, description, status, target_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        records
-    )
+    # 插入剩余服务记录
+    if records:
+        cursor.executemany(
+            "INSERT INTO service_records (record_id, staff_id, service_type, service_date, description, status, target_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            records
+        )
 
-# 生成交易数据(物业费、停车费等)
-def generate_transactions(room_data, parking_data, count=300):
+# 新增函数 - 按指定月份生成交易数据
+def generate_transactions_with_months(room_data, parking_data, months):
     transactions = []
     
     # 获取费用标准
@@ -505,14 +531,6 @@ def generate_transactions(room_data, parking_data, count=300):
     
     payment_methods = [0, 1, 2, 3]  # 0-现金, 1-微信, 2-支付宝, 3-银行转账
     payment_status = [0, 1, 2]  # 0-未付, 1-已付, 2-逾期
-    
-    # 获取近两年的每个月作为账单月份
-    now = datetime.now()
-    months = []
-    
-    for i in range(24):
-        month = now.replace(day=1) - timedelta(days=i*30)
-        months.append(month)
     
     # 生成物业费账单
     for room_id, owner_id in room_data:
@@ -523,8 +541,8 @@ def generate_transactions(room_data, parking_data, count=300):
         cursor.execute("SELECT area_sqm FROM rooms WHERE room_id = ?", (room_id,))
         area = cursor.fetchone()[0]
         
-        # 为每个月生成账单
-        for month in random.sample(months, min(len(months), random.randint(1, 12))):
+        # 为指定月份生成账单
+        for month in months:
             period_start = to_timestamp(month.replace(day=1))
             if month.month == 12:
                 period_end = to_timestamp(datetime(month.year+1, 1, 1) - timedelta(days=1))
@@ -567,21 +585,29 @@ def generate_transactions(room_data, parking_data, count=300):
                 period_start,
                 period_end
             ))
+            
+            # 批量插入交易记录，避免内存占用过大
+            if len(transactions) >= 500:
+                cursor.executemany(
+                    "INSERT INTO transactions (transaction_id, user_id, room_id, parking_id, fee_type, amount, payment_date, due_date, payment_method, status, period_start, period_end) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    transactions
+                )
+                transactions = []
     
     # 生成停车费账单
     for parking_id, owner_id in parking_data:
         if not owner_id:
             continue  # 跳过无主停车位
         
-        # 为每个月生成账单
-        for month in random.sample(months, min(len(months), random.randint(1, 12))):
+        # 为指定月份生成账单
+        for month in months:
             period_start = to_timestamp(month.replace(day=1))
             if month.month == 12:
                 period_end = to_timestamp(datetime(month.year+1, 1, 1) - timedelta(days=1))
             else:
                 period_end = to_timestamp(datetime(month.year, month.month+1, 1) - timedelta(days=1))
             
-            # 计算停车费 - 随机选择地上或地下费率
+            # 计算停车费
             parking_fee_type = random.choice([2])  # 固定为2=停车费
             amount = fee_standards[parking_fee_type]
             
@@ -618,15 +644,21 @@ def generate_transactions(room_data, parking_data, count=300):
                 period_start,
                 period_end
             ))
+            
+            # 批量插入交易记录
+            if len(transactions) >= 500:
+                cursor.executemany(
+                    "INSERT INTO transactions (transaction_id, user_id, room_id, parking_id, fee_type, amount, payment_date, due_date, payment_method, status, period_start, period_end) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    transactions
+                )
+                transactions = []
     
-    # 确保不超过指定的交易数量
-    if len(transactions) > count:
-        transactions = random.sample(transactions, count)
-    
-    cursor.executemany(
-        "INSERT INTO transactions (transaction_id, user_id, room_id, parking_id, fee_type, amount, payment_date, due_date, payment_method, status, period_start, period_end) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        transactions
-    )
+    # 插入剩余交易记录
+    if transactions:
+        cursor.executemany(
+            "INSERT INTO transactions (transaction_id, user_id, room_id, parking_id, fee_type, amount, payment_date, due_date, payment_method, status, period_start, period_end) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            transactions
+        )
 
 # 生成测试数据的主函数
 def generate_test_data():
@@ -642,41 +674,56 @@ def generate_test_data():
     init_default_users()
     print("基础数据初始化完成")
     
-    # 生成楼宇数据
-    building_ids = generate_buildings(count=5)
+    # 生成楼宇数据 - 减少到6栋
+    building_ids = generate_buildings(count=6)
     print(f"生成了 {len(building_ids)} 栋楼宇")
     
-    # 生成业主用户
-    owner_ids = generate_owners(count=100)
+    # 生成业主用户 - 设置为200个
+    owner_ids = generate_owners(count=200)
     print(f"生成了 {len(owner_ids)} 个业主账户")
     
-    # 生成房屋数据
-    room_data = generate_rooms(building_ids, owner_ids, count_per_building=20)
+    # 生成房屋数据 - 不限制每栋楼房间数，自然生成
+    room_data = generate_rooms(building_ids, owner_ids)
     print(f"生成了 {len(room_data)} 个房间")
     
-    # 生成停车位数据
-    parking_data = generate_parking_spaces(owner_ids, count=50)
+    # 生成停车位数据 - 减少到房间数量的60%左右
+    parking_count = int(len(room_data) * 0.6)
+    parking_data = generate_parking_spaces(owner_ids, count=parking_count)
     print(f"生成了 {len(parking_data)} 个停车位")
     
     # 生成物业人员类型数据
     staff_type_ids = generate_staff_types()
     print(f"生成了 {len(staff_type_ids)} 种物业人员类型")
     
-    # 生成物业人员数据
-    staff_ids = generate_staff(staff_type_ids, count=20)
+    # 生成物业人员数据 - 调整为每60个房间配1名物业人员
+    staff_count = max(15, int(len(room_data) / 60))
+    staff_ids = generate_staff(staff_type_ids, count=staff_count)
     print(f"生成了 {len(staff_ids)} 名物业人员")
     
     # 生成服务区域数据
     generate_service_areas(staff_ids, building_ids)
     print("生成了服务区域分配数据")
     
-    # 生成服务记录数据
-    generate_service_records(staff_ids, building_ids, room_data, count=200)
-    print("生成了200条服务记录")
+    # 生成服务记录数据 - 减少到500条
+    generate_service_records(staff_ids, building_ids, room_data, count=500)
+    print("生成了500条服务记录")
     
-    # 生成交易数据
-    generate_transactions(room_data, parking_data, count=300)
-    print("生成了300条交易记录")
+    # 生成交易数据 - 采用部分生成策略，每个拥有业主的房间和停车位只为最近6个月生成账单
+    months_to_generate = 6  # 只生成最近6个月的账单
+    now = datetime.now()
+    recent_months = []
+    
+    for i in range(months_to_generate):
+        month = now.replace(day=1) - timedelta(days=i*30)
+        recent_months.append(month)
+    
+    # 采用自定义月份列表生成交易数据
+    generate_transactions_with_months(room_data, parking_data, recent_months)
+    
+    # 计算实际生成的交易记录数量
+    cursor.execute("SELECT COUNT(*) FROM transactions")
+    transaction_count = cursor.fetchone()[0]
+    print(f"生成了{transaction_count}条交易记录")
     
     # 提交所有更改
     conn.commit()
