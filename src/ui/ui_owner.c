@@ -414,7 +414,7 @@ void process_payment_screen(Database *db, const char *user_id)
             char transaction_id[37];
             double amount;
             time_t due_date;
-            int status;  // 添加状态字段
+            int status; // 添加状态字段
         } unpaid_records[100];
         int record_count = 0;
         double total_unpaid = 0.0;
@@ -740,7 +740,7 @@ bool change_username(Database *db, const char *user_id, char *username)
     }
 
     sqlite3_bind_text(current_stmt, 1, user_id, -1, SQLITE_STATIC);
-    
+
     if (sqlite3_step(current_stmt) == SQLITE_ROW)
     {
         const char *current = (const char *)sqlite3_column_text(current_stmt, 0);
@@ -780,7 +780,7 @@ bool change_username(Database *db, const char *user_id, char *username)
     {
         int count = sqlite3_column_int(check_stmt, 0);
         sqlite3_finalize(check_stmt);
-        
+
         if (count > 0)
         {
             printf("❌ 用户名 '%s' 已被其他用户使用，请选择其他用户名\n", username);
@@ -971,10 +971,11 @@ void show_payment_management_screen(Database *db, const char *user_id, UserType 
         printf("1. 查看缴费记录\n");
         printf("2. 缴纳费用\n");
         printf("3. 查询应缴费用\n");
+        printf("4. 按年份统计缴费\n");
         printf("0. 返回上一级\n");
         printf("请输入您的选择: ");
         scanf("%d", &choice);
-        getchar(); // 清除输入缓冲区中的换行符
+        getchar();
 
         switch (choice)
         {
@@ -987,6 +988,9 @@ void show_payment_management_screen(Database *db, const char *user_id, UserType 
         case 3:
             query_due_payments(db, user_id);
             break;
+        case 4:
+            show_payment_stats_by_year(db, user_id);
+            break;
         case 0:
             clear_screen();
             return;
@@ -996,6 +1000,68 @@ void show_payment_management_screen(Database *db, const char *user_id, UserType 
             break;
         }
     }
+}
+
+/**
+ * @brief 按年份统计缴费总额
+ *
+ * 显示用户各年度的缴费总额统计
+ *
+ * @param db 数据库连接
+ * @param user_id 用户ID
+ */
+void show_payment_stats_by_year(Database *db, const char *user_id)
+{
+    clear_screen();
+    printf("\n====== 年度缴费统计 ======\n\n");
+
+    const char *query =
+        "SELECT strftime('%Y', datetime(payment_date, 'unixepoch')) AS year, "
+        "SUM(amount) AS total_amount "
+        "FROM transactions "
+        "WHERE user_id = ? AND status = 1 AND payment_date IS NOT NULL "
+        "GROUP BY year "
+        "ORDER BY year DESC";
+
+    sqlite3_stmt *stmt;
+    if (sqlite3_prepare_v2(db->db, query, -1, &stmt, NULL) != SQLITE_OK)
+    {
+        printf("SQL错误: %s\n", sqlite3_errmsg(db->db));
+        wait_for_key();
+        return;
+    }
+
+    sqlite3_bind_text(stmt, 1, user_id, -1, SQLITE_STATIC);
+
+    printf("%-10s %-20s\n", "年份", "缴费总额(元)");
+    printf("-------------------------------\n");
+
+    int found = 0;
+    double grand_total = 0.0;
+
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        found = 1;
+        const char *year = (const char *)sqlite3_column_text(stmt, 0);
+        double amount = sqlite3_column_double(stmt, 1);
+
+        printf("%-10s ￥%-20.2f\n", year, amount);
+        grand_total += amount;
+    }
+
+    sqlite3_finalize(stmt);
+
+    if (!found)
+    {
+        printf("\n暂无缴费记录!\n");
+    }
+    else
+    {
+        printf("-------------------------------\n");
+        printf("所有年度总计: ￥%.2f\n", grand_total);
+    }
+
+    wait_for_key();
 }
 
 /**
