@@ -7,6 +7,18 @@ from datetime import datetime, timedelta
 from faker import Faker
 import os
 
+# 参数
+CONFIG = {
+    "BUILDING_COUNT": 6,       # 楼栋数量
+    "OWNER_COUNT": 200,        # 业主账户数量
+    "ROOMS_PER_FLOOR": 8,      # 每层房间数
+    "PARKING_RATIO": 0.6,      # 停车位与房间比例
+    "STAFF_RATIO": 60,         # 每名物业人员负责的房间数
+    "MIN_STAFF_COUNT": 15,     # 最少物业人员数量
+    "SERVICE_RECORD_COUNT": 500,  # 服务记录数量
+    "TRANSACTION_MONTHS": 6    # 生成最近几个月的账单
+}
+
 # 初始化Faker库
 fake = Faker('zh_CN')
 
@@ -243,7 +255,7 @@ def init_default_users():
     )
 
 # 生成楼宇数据
-def generate_buildings(count=5):
+def generate_buildings(count=CONFIG["BUILDING_COUNT"]):
     buildings = []
     for i in range(1, count + 1):
         building_id = gen_id()
@@ -261,7 +273,7 @@ def generate_buildings(count=5):
     return [b[0] for b in buildings]  # 返回所有生成的building_id
 
 # 生成业主用户
-def generate_owners(count=100):
+def generate_owners(count=CONFIG["OWNER_COUNT"]):
     owners = []
     for i in range(count):
         user_id = gen_id()
@@ -304,7 +316,7 @@ def generate_rooms(building_ids, owner_ids, count_per_building=None):
         
         # 为每个楼层生成房间
         for floor in range(1, floors_count + 1):
-            for unit in range(1, 9):  # 每层8个单元，更符合实际情况
+            for unit in range(1, CONFIG["ROOMS_PER_FLOOR"] + 1):  # 每层房间数
                 room_id = gen_id()
                 room_number = f"{floor}{unit:02d}"  # 例如 2楼1单元 = 201
                 area = random.uniform(70, 150)  # 面积70-150平方米
@@ -341,7 +353,7 @@ def generate_rooms(building_ids, owner_ids, count_per_building=None):
     return all_rooms  # 返回(room_id, owner_id)的元组列表
 
 # 生成停车位数据
-def generate_parking_spaces(owner_ids, count=50):
+def generate_parking_spaces(owner_ids, count=None):
     parkings = []
     all_parkings = []  # 存储所有生成的parking_id
     
@@ -384,7 +396,7 @@ def generate_staff_types():
     return [t[0] for t in types]  # 返回所有生成的staff_type_id
 
 # 生成物业人员数据
-def generate_staff(staff_type_ids, count=20):
+def generate_staff(staff_type_ids, count=None):
     staff_members = []
     staff_ids = []
     
@@ -468,7 +480,7 @@ def generate_service_areas(staff_ids, building_ids):
     )
 
 # 生成服务记录数据
-def generate_service_records(staff_ids, building_ids, room_data, count=500):
+def generate_service_records(staff_ids, building_ids, room_data, count=CONFIG["SERVICE_RECORD_COUNT"]):
     service_types = [
         '日常巡检', '设备维修', '清洁服务', '安全检查', 
         '投诉处理', '访客登记', '快递接收', '紧急救援'
@@ -674,20 +686,20 @@ def generate_test_data():
     init_default_users()
     print("基础数据初始化完成")
     
-    # 生成楼宇数据 - 减少到6栋
-    building_ids = generate_buildings(count=6)
+    # 生成楼宇数据
+    building_ids = generate_buildings()
     print(f"生成了 {len(building_ids)} 栋楼宇")
     
-    # 生成业主用户 - 设置为200个
-    owner_ids = generate_owners(count=200)
+    # 生成业主用户
+    owner_ids = generate_owners()
     print(f"生成了 {len(owner_ids)} 个业主账户")
     
-    # 生成房屋数据 - 不限制每栋楼房间数，自然生成
+    # 生成房屋数据
     room_data = generate_rooms(building_ids, owner_ids)
     print(f"生成了 {len(room_data)} 个房间")
     
-    # 生成停车位数据 - 减少到房间数量的60%左右
-    parking_count = int(len(room_data) * 0.6)
+    # 生成停车位数据
+    parking_count = int(len(room_data) * CONFIG["PARKING_RATIO"])
     parking_data = generate_parking_spaces(owner_ids, count=parking_count)
     print(f"生成了 {len(parking_data)} 个停车位")
     
@@ -695,8 +707,8 @@ def generate_test_data():
     staff_type_ids = generate_staff_types()
     print(f"生成了 {len(staff_type_ids)} 种物业人员类型")
     
-    # 生成物业人员数据 - 调整为每60个房间配1名物业人员
-    staff_count = max(15, int(len(room_data) / 60))
+    # 生成物业人员数据
+    staff_count = max(CONFIG["MIN_STAFF_COUNT"], int(len(room_data) / CONFIG["STAFF_RATIO"]))
     staff_ids = generate_staff(staff_type_ids, count=staff_count)
     print(f"生成了 {len(staff_ids)} 名物业人员")
     
@@ -704,20 +716,18 @@ def generate_test_data():
     generate_service_areas(staff_ids, building_ids)
     print("生成了服务区域分配数据")
     
-    # 生成服务记录数据 - 减少到500条
-    generate_service_records(staff_ids, building_ids, room_data, count=500)
-    print("生成了500条服务记录")
+    # 生成服务记录数据
+    generate_service_records(staff_ids, building_ids, room_data)
+    print(f"生成了{CONFIG['SERVICE_RECORD_COUNT']}条服务记录")
     
-    # 生成交易数据 - 采用部分生成策略，每个拥有业主的房间和停车位只为最近6个月生成账单
-    months_to_generate = 6  # 只生成最近6个月的账单
+    # 生成交易数据
     now = datetime.now()
     recent_months = []
     
-    for i in range(months_to_generate):
+    for i in range(CONFIG["TRANSACTION_MONTHS"]):
         month = now.replace(day=1) - timedelta(days=i*30)
         recent_months.append(month)
     
-    # 采用自定义月份列表生成交易数据
     generate_transactions_with_months(room_data, parking_data, recent_months)
     
     # 计算实际生成的交易记录数量
