@@ -1,32 +1,32 @@
 # 物业管理系统
 
-## TODO
+## 完结撒花🎆🎆🎆
 
-- [ ] 缴费状态判断函数
+这不算一个完美的项目，但至少是一个结果还不错的C语言课程设计作业
 
-### Admin
+本项目主要由 @peterpetrica 主要负责维护（至少在编写期间）
 
-- [ ] 查看所有用户时日期格式不统一（使用 admin 添加用户时不统一）
-- [ ] 模糊查询不要用户 ID，可以显示别的信息
-- [ ] 不要查询楼盘信息这个功能，和查看所有楼宇重复了
-- [ ] 信息排序界面全不可用
-- [ ] 信息统计中的服务统计没法统计出东西
-- [ ] 数据库备份、恢复和重置的具体逻辑    
+同时参与编写的同学有：
 
-### Staff
+- @ZhuLaoliu888
+- @abbydu626
+- @Fxiansheng-ai
 
-- [ ] 负责区域信息排版是乱的，查看当前收费标准的排版也是乱的
-- [ ] 排版全是乱的！
-- [ ] 当前缴费情况统计的百分比不对
-- [ ] 没法改自己密码
 
-### Owner
-
-- [ ] 不要改自己用户名，可以改姓名
 
 ## 增加了假数据生成脚本
 
-放置在data_gen文件夹下，先安装 requirements.txt 中的依赖库再运行 property_faker.py 脚本即可
+脚本放置在data_gen文件夹下
+
+先执行
+```bash
+pip install -r ./data_gen/requirements.txt
+```
+来安装所需依赖库，再运行 
+```bash
+python3 ./data_gen/property_faker.py 
+```
+即可
 
 ## SQLite 可视化
 
@@ -53,9 +53,9 @@ sqlitebrowser ~/.property_management/property_management.db
 
 同时，你可以在名为 practice 的 branch 里进行开发的练习（可以在 Github Desktop 中切换）
 
-![项目时序图](./images/项目时序图.png)
+![项目流程图](./images/项目流程图.png)
 
-![项目类图](./images/项目类图.png)
+![项目时序图](./images/项目时序图.png)
 
 ## 快速开始
 
