@@ -23,7 +23,10 @@
 ### Owner
 
 - [ ] 不要改自己用户名，可以改姓名
-- [ ] 别的还没看
+
+## 增加了假数据生成脚本
+
+放置在data_gen文件夹下，先安装 requirements.txt 中的依赖库再运行 property_faker.py 脚本即可
 
 ## SQLite 可视化
 
