@@ -3,3 +3,4 @@ build
 Database
 .vscode
 .vs
+.venv
