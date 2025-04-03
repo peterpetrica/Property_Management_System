@@ -87,20 +87,34 @@ jobs:
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
     - if: matrix.build-mode == 'manual'
+      name: 安装依赖和配置编译器
+      shell: bash
+      run: |
+        # 安装所有必要的依赖
+        sudo apt-get update
+        sudo apt-get install -y ninja-build build-essential uuid-dev
+        
+        # 验证工具链安装
+        which ninja
+        which gcc
+        which g++
+        gcc --version
+        
+    - if: matrix.build-mode == 'manual'
       name: 设置 vcpkg
       uses: lukka/run-vcpkg@v11
       with:
         vcpkgDirectory: "${{ github.workspace }}/vcpkg"
         vcpkgJsonGlob: "**/vcpkg.json"
+        # 添加附加选项
+        appendedCacheKey: "fix-libuuid-v1"
+        vcpkgTriplet: "x64-linux"
     
     - if: matrix.build-mode == 'manual'
+      name: 构建项目
       shell: bash
       run: |
-        # 安装依赖
-        sudo apt-get update
-        sudo apt-get install -y ninja-build
-        
-        # 设置 vcpkg
+        # 设置 CMakeUserPresets.json
         echo '{
           "version": 2,
           "configurePresets": [
@@ -114,8 +128,12 @@ jobs:
           ]
         }' > CMakeUserPresets.json
         
+        # 设置环境变量
+        export CC=gcc
+        export CXX=g++
+        
         # 配置项目
-        cmake --preset=default
+        cmake --preset=default -G "Ninja"
         
         # 构建项目
         cmake --build build
